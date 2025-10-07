@@ -1,0 +1,9 @@
+[project]
+name = "historicam-preprocessing"
+version = "0.1.0"
+description = "Data preprocessing pipeline for HistoriCam"
+requires-python = ">=3.11"
+dependencies = [
+    "google-cloud-storage>=2.10.0",
+    "pandas>=2.0.0",
+]
