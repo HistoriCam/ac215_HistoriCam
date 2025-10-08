@@ -13,7 +13,6 @@ This project follows AC215 MLOps best practices with containerized microservices
 ```
 ┌──────────────────┐
 │  Scraper Service │──┐
-│  (Wikipedia API) │  │
 └──────────────────┘  │
                       ▼
               ┌──────────────────┐
@@ -24,7 +23,7 @@ This project follows AC215 MLOps best practices with containerized microservices
                       ▼
 ┌─────────────────┐      ┌──────────────────┐      ┌─────────────────┐
 │  Mobile App     │─────▶│   API Service    │─────▶│  ML Pipeline    │
-│  (React/Next)   │      │   (FastAPI)      │      │  (Vertex AI)    │
+│  (Flutter)      │      │   (FastAPI)      │      │  (Vertex AI)    │
 └─────────────────┘      └──────────────────┘      └─────────────────┘
 ```
 
@@ -33,13 +32,12 @@ This project follows AC215 MLOps best practices with containerized microservices
 ```
 ac215_HistoriCam/
 ├── services/                 # Containerized microservices
-│   ├── scraper/             # Wikipedia data scraper service
+│   ├── scraper/             # data scraper service
 │   │   ├── Dockerfile
 │   │   ├── pyproject.toml   # uv package configuration
 │   │   ├── README.md
 │   │   └── src/
 │   │       ├── run.py       # Main CLI entry point
-│   │       ├── cli.py       # Legacy CLI (deprecated)
 │   │       └── scraper/
 │   │           ├── scrape_building_name.py      # Initial building name scraper
 │   │           └── scrape_metadata.py           # Metadata scraper (lat/lon/aliases)
@@ -54,7 +52,7 @@ ac215_HistoriCam/
 ├── ml/                     # Machine learning pipelines
 │   └── src/               # Training and inference code
 │
-├── data/                   # Data directory (gitignored)
+├── data/                   # Data directory
 │   ├── buildings_names.csv              # Base building data
 │   └── buildings_names_metadata.csv     # Enriched with lat/lon/aliases
 │
