@@ -8,56 +8,57 @@ HistoriCam is a mobile-first web application that combines computer vision, geol
 
 ## Architecture
 
-This project follows AC215 MLOps best practices with containerized components and GCP deployment:
+This project follows AC215 MLOps best practices with containerized microservices and GCP deployment:
 
 ```
+┌──────────────────┐
+│  Scraper Service │──┐
+│  (Wikipedia API) │  │
+└──────────────────┘  │
+                      ▼
+              ┌──────────────────┐
+              │  Google Cloud    │
+              │  Storage (Data)  │
+              └──────────────────┘
+                      │
+                      ▼
 ┌─────────────────┐      ┌──────────────────┐      ┌─────────────────┐
-│   Frontend      │─────▶│   API Service    │─────▶│  ML Model       │
+│  Mobile App     │─────▶│   API Service    │─────▶│  ML Pipeline    │
 │  (React/Next)   │      │   (FastAPI)      │      │  (Vertex AI)    │
 └─────────────────┘      └──────────────────┘      └─────────────────┘
-                                  │
-                                  ▼
-                         ┌──────────────────┐
-                         │  Google Cloud    │
-                         │  Storage (Data)  │
-                         └──────────────────┘
 ```
 
 ## Project Structure
 
 ```
 ac215_HistoriCam/
-├── data-collection/          # Local data gathering scripts (not containerized)
-│   ├── scrape_wikipedia_buildings.py
-│   └── scraped_data/        # Raw data output (gitignored)
+├── services/                 # Containerized microservices
+│   ├── scraper/             # Wikipedia data scraper service
+│   │   ├── Dockerfile
+│   │   ├── pyproject.toml   # uv package configuration
+│   │   ├── README.md
+│   │   └── src/
+│   │       ├── run.py       # Main CLI entry point
+│   │       ├── cli.py       # Legacy CLI (deprecated)
+│   │       └── scraper/
+│   │           ├── scrape_building_name.py      # Initial building name scraper
+│   │           └── scrape_metadata.py           # Metadata scraper (lat/lon/aliases)
+│   │
+│   └── api/                 # FastAPI backend service
+│       ├── Dockerfile
+│       └── src/
 │
-├── data-preprocessing/       # Containerized data cleaning pipeline
-│   ├── Dockerfile
-│   ├── docker-shell.sh
-│   └── src/preprocess.py
+├── apps/                    # Frontend applications
+│   └── mobile/             # Mobile-first web application
 │
-├── model-training/          # Containerized ML training pipeline
-│   ├── Dockerfile
-│   ├── docker-shell.sh
-│   └── src/train.py
+├── ml/                     # Machine learning pipelines
+│   └── src/               # Training and inference code
 │
-├── api-service/             # Containerized FastAPI backend
-│   ├── Dockerfile
-│   ├── docker-compose.yml
-│   ├── docker-shell.sh
-│   └── src/main.py
+├── data/                   # Data directory (gitignored)
+│   ├── buildings_names.csv              # Base building data
+│   └── buildings_names_metadata.csv     # Enriched with lat/lon/aliases
 │
-├── frontend/                # Containerized React/Next.js frontend
-│   ├── Dockerfile
-│   ├── docker-shell.sh
-│   └── src/
-│
-├── deployment/              # K8s and Terraform configs
-│   ├── kubernetes/
-│   └── terraform/
-│
-├── notebooks/               # Jupyter notebooks for exploration
-└── secrets/                 # Service accounts (gitignored)
+└── secrets/               # Service accounts and credentials (gitignored)
 ```
 
 ## Getting Started
@@ -75,38 +76,43 @@ ac215_HistoriCam/
 
 ### Setup
 
-1. **Data Collection (Local)**
+1. **Data Collection (Scraper Service)**
    ```bash
-   cd data-collection
+   cd services/scraper
    uv sync
-   uv run python scrape_wikipedia_buildings.py
+
+   # Full scrape (building names + metadata)
+   uv run python src/run.py
+
+   # Skip metadata scraping
+   uv run python src/run.py --skip-metadata
+
+   # Scrape metadata only from existing CSV
+   uv run python src/run.py --metadata-only -i ../../data/buildings_names.csv
    ```
 
-2. **Data Preprocessing (Containerized)**
-   ```bash
-   cd data-preprocessing
-   # Update docker-shell.sh with your GCP project ID
-   sh docker-shell.sh
-   ```
+   Output files:
+   - `data/buildings_names.csv` - Base building data (id, name, source_url, etc.)
+   - `data/buildings_names_metadata.csv` - Enriched data with latitude, longitude, and aliases
 
-3. **Model Training (Containerized)**
+2. **API Service (Containerized)**
    ```bash
-   cd model-training
-   sh docker-shell.sh
-   ```
-
-4. **API Service (Containerized)**
-   ```bash
-   cd api-service
+   cd services/api
    docker-compose up
    # API available at http://localhost:8000
    ```
 
-5. **Frontend (Containerized)**
+3. **Frontend (Containerized)**
    ```bash
-   cd frontend
-   sh docker-shell.sh
+   cd apps/mobile
+   # TBD: Docker setup
    # App available at http://localhost:3000
+   ```
+
+4. **ML Pipeline (Containerized)**
+   ```bash
+   cd ml
+   # TBD: Training pipeline
    ```
 
 ## Development Workflow
