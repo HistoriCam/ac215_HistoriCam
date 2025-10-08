@@ -1,41 +1,17 @@
 # Python
 __pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-env/
-venv/
-.venv
-*.egg-info/
-dist/
-build/
 
 # uv
 uv.lock
 
-# Data
-data-collection/scraped_data/
-*.csv
-*.json
-*.parquet
-
 # Secrets
 secrets/*
-!secrets/.gitkeep
-*.pem
-*.key
-service-account*.json
 
 # IDE
 .vscode/
-.idea/
-*.swp
-*.swo
 
 # OS
 .DS_Store
-Thumbs.db
 
 # Jupyter
 .ipynb_checkpoints/

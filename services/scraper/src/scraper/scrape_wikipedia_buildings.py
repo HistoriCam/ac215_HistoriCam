@@ -58,7 +58,7 @@ def fetch_page_details(pageids):
             }
     return details
 
-def main(out_csv="wikipedia_buildings_baseline.csv"):
+def main(out_csv="../datasets/wikipedia_buildings_baseline.csv"):
     members = list_category_members(CAT_TITLE)
     pageids = [m["pageid"] for m in members if m["ns"] == 0]  # content pages
     details = fetch_page_details(pageids)
@@ -66,7 +66,7 @@ def main(out_csv="wikipedia_buildings_baseline.csv"):
     now = datetime.utcnow().isoformat()
     with open(out_csv, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
-        w.writerow(["source","source_id","name","primary_category","lat","lon","source_url","last_seen","wikidata_qid"])
+        w.writerow(["source_id", "source","name","primary_category","lat","lon","source_url","last_seen","wikidata_qid"])
         for pid in pageids:
             d = details.get(pid, {})
             w.writerow([
@@ -82,5 +82,5 @@ def main(out_csv="wikipedia_buildings_baseline.csv"):
             ])
 
 if __name__ == "__main__":
-    out = sys.argv[1] if len(sys.argv)>1 else "wikipedia_buildings_baseline.csv"
+    out = sys.argv[1] if len(sys.argv)>1 else "datasets/wikipedia_buildings_baseline.csv"
     main(out)
