@@ -58,7 +58,7 @@ def fetch_page_details(pageids):
             }
     return details
 
-def main(out_csv="../datasets/wikipedia_buildings_baseline.csv"):
+def scrape_building_names(out_csv="data/buildings_names.csv"):
     members = list_category_members(CAT_TITLE)
     pageids = [m["pageid"] for m in members if m["ns"] == 0]  # content pages
     details = fetch_page_details(pageids)
@@ -66,21 +66,17 @@ def main(out_csv="../datasets/wikipedia_buildings_baseline.csv"):
     now = datetime.utcnow().isoformat()
     with open(out_csv, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
-        w.writerow(["source_id", "source","name","primary_category","lat","lon","source_url","last_seen","wikidata_qid"])
+        w.writerow(["source","name", "source_url", "last_seen", "source"])
         for pid in pageids:
             d = details.get(pid, {})
             w.writerow([
-                "wikipedia",
                 pid,
                 d.get("title",""),
-                "",  # fill later if you want to map categories
-                d.get("lat",""),
-                d.get("lon",""),
                 d.get("url",""),
                 now,
-                d.get("qid","")
+                "wikipedia"
             ])
 
 if __name__ == "__main__":
-    out = sys.argv[1] if len(sys.argv)>1 else "datasets/wikipedia_buildings_baseline.csv"
+    out = sys.argv[1] if len(sys.argv)>1 else "data/buildings_names.csv"
     main(out)
