@@ -6,6 +6,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from scraper.scrape_building_name import scrape_building_names as scrape_wikipedia
+from scraper.scrape_metadata import scrape_metadata
 
 
 def main():
@@ -17,7 +18,24 @@ def main():
         "-o",
         type=str,
         default=None,
-        help="Output CSV file path (default: data/wikipedia_buildings_baseline.csv in repo root)"
+        help="Output CSV file path (default: data/buildings_names.csv in repo root)"
+    )
+    parser.add_argument(
+        "--skip-metadata",
+        action="store_true",
+        help="Skip metadata scraping (latitude, longitude, aliases)"
+    )
+    parser.add_argument(
+        "--metadata-only",
+        action="store_true",
+        help="Only scrape metadata from existing buildings CSV"
+    )
+    parser.add_argument(
+        "--input",
+        "-i",
+        type=str,
+        default=None,
+        help="Input CSV file for metadata scraping (used with --metadata-only)"
     )
 
     args = parser.parse_args()
@@ -34,13 +52,29 @@ def main():
     # Ensure the data directory exists
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    print(f"Scraping Wikipedia buildings...")
+    # Metadata-only mode
+    if args.metadata_only:
+        input_path = Path(args.input) if args.input else output_path
+        print(f"Scraping metadata for buildings in {input_path}...")
+        metadata_output = scrape_metadata(str(input_path))
+        print(f"Successfully scraped metadata to {metadata_output}")
+        return
+
+    # Step 1: Scrape building names
+    print(f"Step 1: Scraping Wikipedia buildings...")
     print(f"Output file: {output_path}")
-
-    # Call the scraper
     scrape_wikipedia(str(output_path))
+    print(f"Successfully scraped {output_path}")
 
-    print(f"Successfully scraped data to {output_path}")
+    # Step 2: Scrape metadata (unless skipped)
+    if not args.skip_metadata:
+        print(f"\nStep 2: Scraping metadata (latitude, longitude, aliases)...")
+        metadata_output = scrape_metadata(str(output_path))
+        print(f"Successfully scraped metadata to {metadata_output}")
+    else:
+        print("\nSkipping metadata scraping (--skip-metadata flag set)")
+
+    print("\n✓ Scraping complete!")
 
 
 if __name__ == "__main__":

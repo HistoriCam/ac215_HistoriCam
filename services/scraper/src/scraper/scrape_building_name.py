@@ -66,11 +66,11 @@ def scrape_building_names(out_csv="data/buildings_names.csv"):
     now = datetime.utcnow().isoformat()
     with open(out_csv, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
-        w.writerow(["source","name", "source_url", "last_seen", "source"])
-        for pid in pageids:
+        w.writerow(["id", "name", "source_url", "last_seen", "source"])
+        for idx, pid in enumerate(pageids, start=1):
             d = details.get(pid, {})
             w.writerow([
-                pid,
+                idx,
                 d.get("title",""),
                 d.get("url",""),
                 now,
@@ -79,4 +79,4 @@ def scrape_building_names(out_csv="data/buildings_names.csv"):
 
 if __name__ == "__main__":
     out = sys.argv[1] if len(sys.argv)>1 else "data/buildings_names.csv"
-    main(out)
+    scrape_building_names(out)
