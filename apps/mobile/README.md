@@ -2,6 +2,12 @@
 
 Your Personal Tour Guide - A Flutter mobile application that uses camera and AI to identify historic buildings and provide detailed information about them.
 
+###
+```
+flutter create . --platforms ios web android
+```
+
+
 ## Features
 
 - **Camera Integration**: Access phone camera to capture photos of historic buildings

@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>HistoriCam</string>
+	<string>Historicam</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -41,15 +41,6 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-
-	<!-- Camera Permission -->
-	<key>NSCameraUsageDescription</key>
-	<string>This app needs access to your camera to capture photos of historic buildings and identify them.</string>
-
-	<!-- Photo Library Permission -->
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>This app needs access to your photo library to save captured images.</string>
-
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
