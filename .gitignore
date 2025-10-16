@@ -1,11 +1,16 @@
 # Python
 __pycache__/
 
-# uv
-uv.lock
+# uv (lockfiles are committed for reproducibility)
+# uv.lock
+
+# Data (images are large, stored in GCS)
+data/images/
+*.parquet
 
 # Secrets
 secrets/*
+!secrets/.gitkeep
 
 # IDE
 .vscode/
