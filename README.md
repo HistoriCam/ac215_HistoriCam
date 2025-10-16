@@ -1,10 +1,35 @@
 # HistoriCam
 
-Use your current location and phone's camera to identify nearby landmarks, and instantly discover historical or interesting facts about them.
-
-## Project Overview
-
 HistoriCam is a mobile-first web application that combines computer vision, geolocation, and historical data to provide instant information about landmarks. Users can point their camera at a building or landmark, and the app will identify it and provide historical context and interesting facts.
+
+## Milestone 2 Specific Submission
+
+Below contains information about our submission
+1. llm-rag pipeline setup in 'ml/llm-rag'.
+
+2. Flutter App protype in apps/mobile, currently for web, android and ios (function landing page)
+
+3. Design mockup and initial protype screenshot in 'design folder'
+
+4. Dataset scraping in 'services/scraper'.
+
+5. file scraped db of building information including images for vision model.
+
+6. Vision Model Setup instruction in 'ml/vision-model/'
+
+7. All evidence is in 'evidence_ms2'
+
+TODOS left for further milestone
+1. Finish API's for vision model
+
+2. finetune vision model
+
+3. fine tune llm rag
+
+4. integrate with flutter
+
+
+Find container [container pipeline here](#complete-pipeline-guide)
 
 ## Architecture
 
@@ -31,34 +56,69 @@ This project follows AC215 MLOps best practices with containerized microservices
 
 ```
 ac215_HistoriCam/
-├── services/                 # Containerized microservices
-│   ├── scraper/             # data scraper service
+├── services/                        # Containerized microservices
+│   ├── scraper/                    # Data scraper service
 │   │   ├── Dockerfile
-│   │   ├── pyproject.toml   # uv package configuration
+│   │   ├── docker-shell.sh         # Docker development environment
+│   │   ├── pyproject.toml          # uv package configuration
 │   │   ├── README.md
+│   │   ├── DOCKER_USAGE.md         # Docker usage guide
+│   │   ├── QUICK_REFERENCE.md      # Quick reference guide
 │   │   └── src/
-│   │       ├── run.py       # Main CLI entry point
+│   │       ├── run.py              # Main CLI entry point
+│   │       ├── info_scrape.py      # Building information scraper
 │   │       └── scraper/
-│   │           ├── scrape_building_name.py      # Initial building name scraper
-│   │           └── scrape_metadata.py           # Metadata scraper (lat/lon/aliases)
+│   │           ├── scrape_building_name.py    # Building name scraper
+│   │           ├── scrape_metadata.py         # Metadata scraper (lat/lon/aliases)
+│   │           ├── scrape_images.py           # Image downloader from Wikimedia
+│   │           ├── gcs_manager.py             # GCS upload/versioning manager
+│   │           └── validation.py              # Image validation utilities
 │   │
-│   └── api/                 # FastAPI backend service
+│   └── api/                        # FastAPI backend service (in development)
 │       ├── Dockerfile
-│       └── src/
+│       └── pyproject.toml
 │
-├── apps/                    # Frontend applications
-│   └── mobile/             # Mobile-first web application
+├── apps/                           # Frontend applications
+│   └── mobile/                     # Flutter mobile-first web application
+│       ├── lib/                    # Flutter source code
+│       ├── android/                # Android platform files
+│       ├── ios/                    # iOS platform files
+│       ├── web/                    # Web platform files
+│       └── assets/                 # App assets
 │
-├── ml/                     # Machine learning pipelines
-│   └── src/               # Training and inference code
+├── ml/                             # Machine learning pipelines
+│   ├── llm-rag/                    # LLM-RAG pipeline
+│   │   ├── Dockerfile
+│   │   ├── docker-compose.yml      # ChromaDB + LLM-RAG services
+│   │   ├── docker-shell.sh         # Docker development environment
+│   │   ├── pyproject.toml          # uv package configuration
+│   │   ├── cli.py                  # Main CLI for chunking/embedding/querying
+│   │   ├── semantic_splitter.py    # Semantic text chunking
+│   │   ├── agent_tools.py          # LLM agent tools
+│   │   └── input-datasets/
+│   │       └── buildings/          # Building text files for RAG
+│   │
+│   └── vision-model/               # Vision model for landmark recognition
+│       └── vision_model_api.md     # Vision model API documentation
 │
-├── data/                   # Data directory
-│   ├── buildings_names.csv              # Base building data
-│   ├── buildings_names_metadata.csv     # Enriched with lat/lon/aliases
-│   ├── buildings_info.csv               # Comprehensive building information
-│   └── image_data.csv                   # Image data from Wikipedia baseline scrape
+├── data/                           # Data directory
+│   ├── buildings_names.csv              # Base building data from Wikipedia
+│   ├── buildings_names_metadata.csv     # Enriched with lat/lon/aliases from Wikidata
+│   └── buildings_info.csv               # Comprehensive building information
 │
-└── secrets/               # Service accounts and credentials (gitignored)
+├── design/                         # UI/UX design files
+│   ├── HistoriCam_Mockup.png       # Mobile app mockup
+│   ├── web_app_snapshot.png        # Web app prototype screenshot
+│   └── mockup.md                   # Design documentation
+│
+├── evidence_ms2/                   # Milestone 2 evidence
+│   ├── data_scraping_evidence.jpeg           # Data pipeline evidence
+│   ├── vision_model_data_scraping_evidence.jpeg  # Vision model data evidence
+│   └── llm-evidence.png                      # LLM-RAG evidence
+│
+└── secrets/                        # Service accounts and credentials (gitignored)
+    ├── gcs-service-account.json    # GCS credentials for scraper
+    └── llm-service-account.json    # Vertex AI credentials for LLM-RAG
 ```
 
 ## Getting Started
@@ -165,6 +225,87 @@ uv run python src/scraper/scrape_images.py <csv> <output_dir> --max-images 5
 - **Volumes**: Mounts source code, data directory, and secrets
 - **pyproject.toml**: Dependencies include requests, google-cloud-storage, pillow, pandas
 
+### Phase 1.5: LLM-RAG Pipeline
+
+The LLM-RAG service processes building information to create a retrieval-augmented generation system for answering questions about buildings.
+
+#### Prerequisites
+
+1. **Set up GCP credentials**
+   - Place service account JSON in `secrets/llm-service-account.json`
+   - Update `GCP_PROJECT` in `docker-shell.sh` with your project ID
+
+2. **Prepare input data**
+   - Place building text files in `ml/llm-rag/input-datasets/buildings/`
+   - Each file should be named `[Building Name].txt` with building information
+
+#### Running the LLM-RAG Container
+
+```bash
+cd ml/llm-rag
+
+# Build and start containers (ChromaDB + LLM-RAG CLI)
+./docker-shell.sh
+
+# Inside container - Full RAG pipeline:
+
+# Step 1: Chunk the text data
+uv run python cli.py --chunk --chunk_type char-split
+
+# Step 2: Generate embeddings
+uv run python cli.py --embed --chunk_type char-split
+
+# Step 3: Load embeddings into ChromaDB
+uv run python cli.py --load --chunk_type char-split
+
+# Step 4: Test with a query
+uv run python cli.py --query --chunk_type char-split
+
+# Step 5: Chat with the LLM (RAG-enabled)
+uv run python cli.py --chat --chunk_type char-split
+
+# Step 6: Use the LLM agent
+uv run python cli.py --agent --chunk_type char-split
+```
+
+#### Alternative Chunking Methods
+
+```bash
+# Character-based splitting (default)
+uv run python cli.py --chunk --chunk_type char-split
+
+# Recursive character splitting
+uv run python cli.py --chunk --chunk_type recursive-split
+
+# Semantic splitting (groups by meaning)
+uv run python cli.py --chunk --chunk_type semantic-split
+```
+
+#### Pipeline Architecture
+
+The LLM-RAG system:
+1. **Chunks** text into manageable pieces
+2. **Embeds** chunks using Vertex AI text-embedding-004
+3. **Stores** embeddings in ChromaDB vector database
+4. **Retrieves** relevant chunks based on query similarity
+5. **Generates** responses using Gemini 2.0 Flash with retrieved context
+
+**Docker Components:**
+- **llm-rag-cli**: Main CLI for processing and querying
+- **chromadb**: Vector database for storing embeddings (persistent storage)
+- **Network**: Custom `llm-rag-network` for inter-container communication
+
+**Configuration:**
+- Embedding model: `text-embedding-004` (256 dimensions)
+- Generative model: `gemini-2.0-flash-001`
+- Vector DB: ChromaDB with cosine similarity
+- Port: ChromaDB exposed on `8000`
+
+**Output Files:**
+- `ml/llm-rag/outputs/chunks-[method]-[building].jsonl` - Chunked text
+- `ml/llm-rag/outputs/embeddings-[method]-[building].jsonl` - Embedded chunks
+- `ml/llm-rag/docker-volumes/chromadb/` - Persistent vector database
+
 ### Phase 2: ML Training Pipeline
 
 The ML pipeline trains image classification models using Vertex AI.
@@ -191,21 +332,6 @@ docker run --rm \
 - **Entry point**: `uv run python src/train.py`
 - **Data**: Fetches versioned data from GCS
 
-### Phase 3: API Service (Backend)
-
-The FastAPI service provides REST endpoints for the mobile app.
-
-```bash
-cd services/api
-
-# Option 1: Docker (when docker-compose.yml is ready)
-# docker-compose up
-# API available at http://localhost:8000
-
-# Option 2: Local development
-uv sync
-uv run uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
-```
 
 **Docker Details:**
 - **Dockerfile**: TBD (to be implemented)
@@ -228,57 +354,13 @@ flutter run
 # Build for production
 flutter build apk --release              # Android
 flutter build ios --release              # iOS (macOS only)
+flutter build web --release  
 ```
 
 **Platform-specific setup:**
 - **Android**: Requires Android Studio and Android SDK
 - **iOS**: Requires Xcode (macOS only) and CocoaPods
 - See [apps/mobile/README.md](apps/mobile/README.md) for detailed instructions
-
-**Key Features:**
-- Camera integration for capturing building photos
-- Real-time image recognition (API integration ready)
-- Interactive chatbot for building information
-- Tour suggestions for nearby historic sites
-
-## Development Workflow
-
-1. **Package Management**: This project uses [uv](https://docs.astral.sh/uv/) for fast, reliable Python dependency management
-   - Each Python component has a `pyproject.toml` for dependencies
-   - Docker images use the official uv base image for optimal caching
-   - Run `uv sync` to install dependencies locally
-   - Run `uv lock` to update the lockfile after changing dependencies
-2. **Local Development**: Use `docker-shell.sh` in each component for development
-3. **Data Flow**: GCS buckets for data transfer between components (don't bundle data in containers)
-4. **Secrets**: Place service account JSON files in `secrets/` directory
-5. **CI/CD**: GitHub Actions → Docker Hub → GCP deployment
-
-## Deployment
-
-Deploy to GCP using Kubernetes:
-
-```bash
-cd deployment/kubernetes
-kubectl apply -f .
-```
-
-Or use Terraform for infrastructure:
-
-```bash
-cd deployment/terraform
-terraform init
-terraform apply
-```
-
-## Tech Stack
-
-- **Package Management**: uv
-- **Frontend**: React/Next.js, TailwindCSS
-- **Backend**: FastAPI, Python
-- **ML**: TensorFlow/PyTorch, Vertex AI
-- **Storage**: Google Cloud Storage
-- **Deployment**: GKE, Cloud Run
-- **CI/CD**: GitHub Actions, Docker
 
 ## Team
 
