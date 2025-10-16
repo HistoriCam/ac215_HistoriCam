@@ -54,7 +54,9 @@ ac215_HistoriCam/
 │
 ├── data/                   # Data directory
 │   ├── buildings_names.csv              # Base building data
-│   └── buildings_names_metadata.csv     # Enriched with lat/lon/aliases
+│   ├── buildings_names_metadata.csv     # Enriched with lat/lon/aliases
+│   ├── buildings_info.csv               # Comprehensive building information
+│   └── image_data.csv                   # Image data from Wikipedia baseline scrape
 │
 └── secrets/               # Service accounts and credentials (gitignored)
 ```
@@ -66,52 +68,178 @@ ac215_HistoriCam/
 - [uv](https://docs.astral.sh/uv/) - Fast Python package manager
 - Docker & Docker Compose
 - Python 3.11+
-- Node.js 20+ (for frontend)
+- Flutter SDK 3.0+ (for mobile app)
 - GCP account with enabled APIs:
   - Cloud Storage
   - Vertex AI
   - Cloud Run / GKE
 
-### Setup
+### Initial Setup
 
-1. **Data Collection (Scraper Service)**
+1. **Clone the repository**
    ```bash
-   cd services/scraper
-   uv sync
-
-   # Full scrape (building names + metadata)
-   uv run python src/run.py
-
-   # Skip metadata scraping
-   uv run python src/run.py --skip-metadata
-
-   # Scrape metadata only from existing CSV
-   uv run python src/run.py --metadata-only -i ../../data/buildings_names.csv
+   git clone https://github.com/HistoriCam/ac215_HistoriCam.git
+   cd ac215_HistoriCam
    ```
 
-   Output files:
-   - `data/buildings_names.csv` - Base building data (id, name, source_url, etc.)
-   - `data/buildings_names_metadata.csv` - Enriched data with latitude, longitude, and aliases
+2. **Set up GCP credentials** (if using cloud storage)
+   - Follow the complete setup guide in [GCS_SETUP.md](GCS_SETUP.md)
+   - Place service account JSON in `secrets/gcs-service-account.json`
+   - The secrets directory is gitignored for security
 
-2. **API Service (Containerized)**
-   ```bash
-   cd services/api
-   docker-compose up
-   # API available at http://localhost:8000
-   ```
+## Complete Pipeline Guide
 
-3. **Frontend (Containerized)**
-   ```bash
-   cd apps/mobile
-   # TBD: Docker setup
-   # App available at http://localhost:3000
-   ```
+### Phase 1: Data Collection (Scraper Service)
 
-4. **ML Pipeline (Containerized)**
-   ```bash
-   cd ml
-   # TBD: Training pipeline
-   ```
+The scraper service collects building data and images from Wikipedia and Wikimedia Commons.
+
+#### Using Docker (Recommended)
+
+```bash
+cd services/scraper
+
+# Build and enter container with mounted volumes
+./docker-shell.sh
+
+# Inside container - Full pipeline (names + metadata + images)
+uv run python src/run.py
+uv run python src/scraper/scrape_images.py /data/buildings_names_metadata.csv /data/images
+
+# Upload to GCS with versioning (optional)
+uv run python src/scraper/gcs_manager.py upload \
+    $GCS_BUCKET_NAME \
+    /data/images \
+    /data/images/image_manifest.csv
+```
+
+#### Using Local Python (Alternative)
+
+```bash
+cd services/scraper
+
+# Install dependencies with uv
+uv sync
+
+# Run scraping pipeline
+# Step 1: Scrape building names from Wikipedia
+uv run python src/run.py
+
+# Step 2: Scrape images from Wikimedia Commons
+uv run python src/scraper/scrape_images.py \
+    ../../data/buildings_names_metadata.csv \
+    ../../data/images
+
+# Step 3: Validate images (optional)
+uv run python src/scraper/validation.py ../../data/images
+
+# Step 4: Upload to GCS (optional, requires GCP setup)
+export GOOGLE_APPLICATION_CREDENTIALS="../../secrets/gcs-service-account.json"
+uv run python src/scraper/gcs_manager.py upload \
+    historicam-images \
+    ../../data/images \
+    ../../data/images/image_manifest.csv
+```
+
+**Output Files:**
+- `data/buildings_names.csv` - Base building data (id, name, source_url)
+- `data/buildings_names_metadata.csv` - Enriched with lat/lon/aliases from Wikidata
+- `data/buildings_info.csv` - Comprehensive building information
+- `data/image_data.csv` - Image data from Wikipedia baseline scrape
+- `data/images/` - Downloaded images organized by building ID
+- `data/images/image_manifest.csv` - Image metadata (URLs, dimensions, hashes)
+
+**Available CLI Options:**
+```bash
+# Skip metadata scraping (faster)
+uv run python src/run.py --skip-metadata
+
+# Only scrape metadata from existing CSV
+uv run python src/run.py --metadata-only -i ../../data/buildings_names.csv
+
+# Scrape specific number of images per building
+uv run python src/scraper/scrape_images.py <csv> <output_dir> --max-images 5
+```
+
+**Docker Details:**
+- **Dockerfile**: Uses Python 3.11 slim with uv package manager
+- **Volumes**: Mounts source code, data directory, and secrets
+- **pyproject.toml**: Dependencies include requests, google-cloud-storage, pillow, pandas
+
+### Phase 2: ML Training Pipeline
+
+The ML pipeline trains image classification models using Vertex AI.
+
+```bash
+cd ml
+
+# Build Docker image
+docker build -t historicam-ml .
+
+# Run training (customize as needed)
+docker run --rm \
+  -v "$(pwd)/data":/app/data \
+  -v "$(pwd)/models":/app/models \
+  -e GOOGLE_APPLICATION_CREDENTIALS=/app/secrets/gcs-service-account.json \
+  historicam-ml
+
+# Or run locally with uv (when pyproject.toml is added)
+# uv run python src/train.py
+```
+
+**Docker Details:**
+- **Dockerfile**: Uses official uv base image (ghcr.io/astral-sh/uv:python3.11-bookworm-slim)
+- **Entry point**: `uv run python src/train.py`
+- **Data**: Fetches versioned data from GCS
+
+### Phase 3: API Service (Backend)
+
+The FastAPI service provides REST endpoints for the mobile app.
+
+```bash
+cd services/api
+
+# Option 1: Docker (when docker-compose.yml is ready)
+# docker-compose up
+# API available at http://localhost:8000
+
+# Option 2: Local development
+uv sync
+uv run uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+**Docker Details:**
+- **Dockerfile**: TBD (to be implemented)
+- **pyproject.toml**: Dependencies include requests (FastAPI to be added)
+- **Endpoints**: Will serve predictions and building information
+
+### Phase 4: Mobile Application
+
+The Flutter mobile app provides the user interface.
+
+```bash
+cd apps/mobile
+
+# Install dependencies
+flutter pub get
+
+# Run on connected device/emulator
+flutter run
+
+# Build for production
+flutter build apk --release              # Android
+flutter build ios --release              # iOS (macOS only)
+```
+
+**Platform-specific setup:**
+- **Android**: Requires Android Studio and Android SDK
+- **iOS**: Requires Xcode (macOS only) and CocoaPods
+- See [apps/mobile/README.md](apps/mobile/README.md) for detailed instructions
+
+**Key Features:**
+- Camera integration for capturing building photos
+- Real-time image recognition (API integration ready)
+- Interactive chatbot for building information
+- Tour suggestions for nearby historic sites
 
 ## Development Workflow
 
