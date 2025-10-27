@@ -9,7 +9,16 @@ ENV UV_PROJECT_ENVIRONMENT=/home/app/.venv
 
 # Minimal OS deps; add others only as needed
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      curl && \
+      curl \
+      apt-transport-https \
+      ca-certificates \
+      gnupg && \
+      rm -rf /var/lib/apt/lists/*
+
+# Install Google Cloud SDK
+RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
+      curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - && \
+      apt-get update && apt-get install -y google-cloud-sdk && \
       rm -rf /var/lib/apt/lists/*
 
 # Install uv (official)
