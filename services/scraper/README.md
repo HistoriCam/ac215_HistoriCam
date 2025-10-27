@@ -6,17 +6,30 @@ Scraper service for collecting Harvard building data and images from various sou
 
 - **Building name scraping** from Wikipedia
 - **Metadata scraping** (coordinates, aliases) from Wikidata
-- **Image scraping** from Wikimedia Commons
-- **Image validation** with quality checks
+- **Multi-source image scraping**: Wikimedia Commons, Google Places Photos, Mapillary, Flickr
+- **Image validation** with quality checks (512x512 minimum)
+- **Image deduplication** with perceptual hashing
 - **GCS upload** with versioning support
-- **Extensible** - ready to add more sources (Google Street View, Flickr, etc.)
+- **Target: 20+ images per building**
 
 ## Scripts
 
+### Building Data
 - `scrape_building_name.py` - Scrapes building names from Wikipedia categories
 - `scrape_metadata.py` - Enriches data with coordinates and aliases from Wikidata
-- `scrape_images.py` - Downloads images from Wikimedia Commons
+
+### Image Collection
+- `scrape_all_sources.py` - **Unified scraper** for all image sources (recommended)
+- `scrape_images.py` - Wikimedia Commons (enhanced with category search)
+- `scrape_places.py` - Google Places Photos API
+- `scrape_mapillary.py` - Mapillary crowdsourced imagery
+- `scrape_flickr.py` - Flickr API with CC license filtering
+
+### Quality Control
+- `deduplication.py` - Removes duplicate images using perceptual hashing
 - `validation.py` - Validates image quality and format
+
+### Storage
 - `gcs_manager.py` - Manages GCS uploads with versioning
 
 ## Quick Start
@@ -64,44 +77,64 @@ Output:
 - `../../data/buildings_names.csv` - Base building data
 - `../../data/buildings_names_metadata.csv` - Enriched with coordinates and aliases
 
-### 3. Scrape Images
+### 3. Scrape Images (Multi-Source)
+
+**Recommended: Use the unified scraper for all sources**
 
 ```bash
-# Scrape images from Wikimedia Commons
-uv run python src/scraper/scrape_images.py \
-    ../../data/buildings_names_metadata.csv \
-    ../../data/images
+# Set API keys (get free credits or use free services!)
+export GOOGLE_MAPS_API_KEY="AIza..."           # Google Places (~$8 for 150 buildings)
+export MAPILLARY_ACCESS_TOKEN="MLY|..."        # Free!
+export FLICKR_API_KEY="abc..."                 # Free!
 
-# This will:
-# - Fetch images for each building using their Wikidata QID
-# - Download and validate images
-# - Save images organized by building ID
-# - Generate image_manifest.csv with metadata
+# Scrape from all sources (target: 20+ images per building)
+uv run python src/scraper/scrape_all_sources.py \
+    ../../data/buildings_names_metadata.csv \
+    ../../data/images \
+    --target 20
+
+# This will automatically:
+# 1. Scrape Wikimedia Commons (enhanced: 5-10 images)
+# 2. Scrape Google Places Photos (5-10 images)
+# 3. Scrape Mapillary (3-5 images)
+# 4. Scrape Flickr (3-5 images)
+# 5. Deduplicate using perceptual hashing
+# 6. Validate image quality
+# 7. Generate combined_manifest.csv
 ```
+
+**See [QUICK_START.md](QUICK_START.md) for API setup (5 minutes)** or [MULTI_SOURCE_GUIDE.md](MULTI_SOURCE_GUIDE.md) for detailed guide.
 
 Output structure:
 ```
 data/images/
-├── 1/                      # Building ID
-│   ├── abc123def.jpg       # Image hash
-│   └── xyz789abc.jpg
+├── 1/                          # Building ID
+│   ├── abc123_wm.jpg          # Wikimedia
+│   ├── def456_places.jpg      # Google Places
+│   ├── ghi789_mapillary.jpg   # Mapillary
+│   └── jkl012_flickr.jpg      # Flickr
 ├── 2/
-│   └── def456ghi.jpg
-└── image_manifest.csv      # Metadata for all images
+│   └── ...
+├── image_manifest.csv          # Wikimedia manifest
+├── places_manifest.csv         # Google Places manifest
+├── mapillary_manifest.csv      # Mapillary manifest
+├── flickr_manifest.csv         # Flickr manifest
+└── combined_manifest.csv       # All sources (after dedup)
 ```
 
-### 4. Validate Images
+### 4. Validate Images (Optional - automatic in unified scraper)
 
 ```bash
 # Validate all images in directory
 uv run python src/scraper/validation.py ../../data/images
 
 # This checks:
-# - Minimum dimensions (224x224)
+# - Minimum dimensions (512x512, preferred 1024x1024)
 # - File size limits (max 10MB)
 # - Valid image formats (JPEG, PNG, WebP)
 # - Aspect ratio (not too narrow/wide)
 # - Image integrity (not corrupted)
+# - Quality score (0.0-1.0)
 ```
 
 ### 5. Upload to GCS (with versioning)
@@ -133,11 +166,13 @@ The scraper includes built-in validation:
 
 ### Image Validation Rules
 
-- **Minimum size**: 224x224 pixels (required for ML models)
+- **Minimum size**: 512x512 pixels (required for vision models)
+- **Preferred size**: 1024x1024 pixels or larger
 - **Maximum file size**: 10MB
 - **Allowed formats**: JPEG, PNG, WebP
 - **Aspect ratio**: Between 0.2 and 5.0 (filters out banners/icons)
 - **Integrity check**: Verifies image is not corrupted
+- **Quality score**: 0.0-1.0 based on resolution
 
 ### Quality Filters
 
@@ -180,28 +215,65 @@ gs://bucket/images/v20251016_091500/    # Version 2
 3. **Comparison**: A/B test models with different data versions
 4. **Audit Trail**: Know exactly when data changed
 
-## Future Data Sources
+## Multi-Source Image Collection
 
-The scraper is designed to support multiple image sources:
+The scraper supports **four complementary sources** to achieve 20+ images per building:
 
-### Planned Sources
+### Available Sources
 
-1. ✅ **Wikimedia Commons** (implemented)
-2. 🚧 **Google Street View API** (planned)
-   - Consistent street-level views
-   - Multiple angles
-   - Requires API key + billing
+1. ✅ **Wikimedia Commons** (enhanced)
+   - High-quality, curated images
+   - Creative Commons licensed
+   - Enhanced with category search
+   - ~5-10 images per building
+   - **Cost**: Free
 
-3. 🚧 **Flickr API** (planned)
-   - Creative Commons images
+2. ✅ **Google Places Photos API** (implemented)
+   - User-contributed building photos
+   - Good angles and perspectives
+   - Better than Street View for buildings
+   - ~5-10 images per building
+   - **Cost**: ~$0.05 per building (~$8 for 150 buildings)
+   - Requires: API key + billing setup
+
+3. ✅ **Mapillary** (implemented)
+   - Crowdsourced street imagery
+   - Building-oriented filtering
+   - Free and open
+   - ~3-5 images per building
+   - **Cost**: Free!
+   - Requires: Free access token
+
+4. ✅ **Flickr API** (implemented)
    - User-contributed photos
-   - Free tier available
+   - Seasonal/temporal variety
+   - CC license filtering
+   - ~3-5 images per building
+   - **Cost**: Free (3600 requests/hour)
+   - Requires: Free API key
 
-4. 🚧 **Custom uploads** (planned)
-   - User-submitted photos
-   - Manual curation
+### Scrape from All Sources
 
-To add a new source, create `scrape_{source}.py` following the pattern in `scrape_images.py`.
+```bash
+# Set API keys (optional - will skip sources without keys)
+export GOOGLE_MAPS_API_KEY="your-key"
+export MAPILLARY_ACCESS_TOKEN="MLY|your-token"
+export FLICKR_API_KEY="your-key"
+
+# Scrape from all sources at once
+uv run python src/scraper/scrape_all_sources.py \
+    /data/buildings_names_metadata.csv \
+    /data/images \
+    --target 20
+```
+
+This will:
+- ✅ Scrape all available sources (Wikimedia, Places, Mapillary, Flickr)
+- ✅ Deduplicate images automatically
+- ✅ Validate image quality
+- ✅ Generate combined manifest
+
+See [MULTI_SOURCE_GUIDE.md](MULTI_SOURCE_GUIDE.md) for detailed instructions on multi-source scraping.
 
 ## Configuration
 
@@ -214,10 +286,15 @@ GCS_BUCKET_NAME=historicam-images
 GOOGLE_APPLICATION_CREDENTIALS=../../secrets/gcs-service-account.json
 
 # Scraping Configuration
-MAX_IMAGES_PER_BUILDING=10
-MIN_IMAGE_WIDTH=224
-MIN_IMAGE_HEIGHT=224
+MAX_IMAGES_PER_BUILDING=20
+MIN_IMAGE_WIDTH=512
+MIN_IMAGE_HEIGHT=512
 MAX_IMAGE_SIZE_MB=10
+
+# API Keys (optional)
+GOOGLE_MAPS_API_KEY=your-google-places-key
+MAPILLARY_ACCESS_TOKEN=MLY|your-mapillary-token
+FLICKR_API_KEY=your-flickr-key
 
 # Rate Limiting
 REQUESTS_PER_SECOND=1
@@ -260,8 +337,8 @@ uv run ruff check src/
 
 ## Next Steps
 
-1. **Scrape images**: Run the image scraper for all buildings
+1. **Scrape images**: Run the multi-source scraper for all buildings (see [QUICK_START.md](QUICK_START.md))
 2. **Upload to GCS**: Version and upload to cloud storage
-3. **Add more sources**: Integrate Google Street View API
+3. **Train vision model**: Use collected images for building recognition
 4. **Automate**: Set up Cloud Scheduler for regular scraping
 5. **Monitor**: Track data quality metrics over time

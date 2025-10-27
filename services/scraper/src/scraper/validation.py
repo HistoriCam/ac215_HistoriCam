@@ -12,8 +12,10 @@ class ImageValidator:
 
     def __init__(
         self,
-        min_width: int = 224,
-        min_height: int = 224,
+        min_width: int = 512,
+        min_height: int = 512,
+        preferred_width: int = 1024,
+        preferred_height: int = 1024,
         max_size_mb: int = 10,
         allowed_formats: Tuple[str, ...] = ("JPEG", "PNG", "WebP")
     ):
@@ -21,13 +23,17 @@ class ImageValidator:
         Initialize validator.
 
         Args:
-            min_width: Minimum image width in pixels
-            min_height: Minimum image height in pixels
+            min_width: Minimum image width in pixels (default 512 for better quality)
+            min_height: Minimum image height in pixels (default 512)
+            preferred_width: Preferred minimum width (default 1024)
+            preferred_height: Preferred minimum height (default 1024)
             max_size_mb: Maximum file size in MB
             allowed_formats: Tuple of allowed image formats
         """
         self.min_width = min_width
         self.min_height = min_height
+        self.preferred_width = preferred_width
+        self.preferred_height = preferred_height
         self.max_size_bytes = max_size_mb * 1024 * 1024
         self.allowed_formats = allowed_formats
 
@@ -81,6 +87,9 @@ class ImageValidator:
                         f"Height too small: {img.height}px (min: {self.min_height}px)"
                     )
 
+                # Add quality score based on resolution
+                metadata["quality_score"] = self._compute_quality_score(img.width, img.height)
+
                 # Check aspect ratio (too narrow or too wide)
                 aspect_ratio = img.width / img.height
                 if aspect_ratio > 5 or aspect_ratio < 0.2:
@@ -100,6 +109,28 @@ class ImageValidator:
             "errors": errors,
             "metadata": metadata
         }
+
+    def _compute_quality_score(self, width: int, height: int) -> float:
+        """
+        Compute quality score based on resolution (0.0 to 1.0).
+
+        Args:
+            width: Image width in pixels
+            height: Image height in pixels
+
+        Returns:
+            Quality score (1.0 = preferred resolution or higher, 0.0 = minimum)
+        """
+        # Calculate based on smaller dimension to handle both portrait and landscape
+        min_dim = min(width, height)
+
+        if min_dim >= self.preferred_width:
+            return 1.0
+        elif min_dim <= self.min_width:
+            return 0.0
+        else:
+            # Linear scale between min and preferred
+            return (min_dim - self.min_width) / (self.preferred_width - self.min_width)
 
     def validate_image_bytes(self, image_bytes: bytes) -> Dict:
         """

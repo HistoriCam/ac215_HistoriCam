@@ -23,6 +23,7 @@ class WikimediaImageScraper:
     def get_images_for_qid(self, qid: str, limit: int = 10) -> List[Dict]:
         """
         Get image URLs from Wikimedia Commons for a given Wikidata QID.
+        Now searches both direct images AND category images.
 
         Args:
             qid: Wikidata QID (e.g., 'Q4684454')
@@ -36,7 +37,7 @@ class WikimediaImageScraper:
 
         images = []
 
-        # Step 1: Get image filenames from Wikidata
+        # Step 1: Get image filenames from Wikidata (P18 property)
         params = {
             "action": "wbgetclaims",
             "entity": qid,
@@ -51,27 +52,37 @@ class WikimediaImageScraper:
 
             # Extract image filenames
             claims = data.get("claims", {}).get("P18", [])
-            if not claims:
-                print(f"  No images found in Wikidata for {qid}")
-                return []
+            if claims:
+                filenames = []
+                for claim in claims[:limit]:
+                    try:
+                        filename = claim["mainsnak"]["datavalue"]["value"]
+                        filenames.append(filename)
+                    except (KeyError, TypeError):
+                        continue
 
-            filenames = []
-            for claim in claims[:limit]:
-                try:
-                    filename = claim["mainsnak"]["datavalue"]["value"]
-                    filenames.append(filename)
-                except (KeyError, TypeError):
-                    continue
-
-            # Step 2: Get image URLs and metadata from Commons
-            for filename in filenames:
-                image_info = self._get_image_info(filename)
-                if image_info:
-                    images.append(image_info)
-                    time.sleep(0.5)  # Rate limiting
+                # Get image URLs and metadata from Commons
+                for filename in filenames:
+                    image_info = self._get_image_info(filename)
+                    if image_info:
+                        images.append(image_info)
+                        time.sleep(0.5)  # Rate limiting
 
         except requests.exceptions.RequestException as e:
-            print(f"  Error fetching images for {qid}: {e}")
+            print(f"  Error fetching direct images for {qid}: {e}")
+
+        # Step 2: ENHANCED - Search Commons categories
+        # Many buildings have category pages with more images
+        category_images = self._get_category_images_for_qid(qid, limit=limit)
+
+        # Merge results, avoiding duplicates
+        existing_filenames = {img['filename'] for img in images}
+        for img in category_images:
+            if img['filename'] not in existing_filenames:
+                images.append(img)
+                existing_filenames.add(img['filename'])
+                if len(images) >= limit:
+                    break
 
         return images
 
@@ -138,6 +149,85 @@ class WikimediaImageScraper:
         except requests.exceptions.RequestException as e:
             print(f"  Error downloading {url}: {e}")
             return None
+
+    def _get_category_images_for_qid(self, qid: str, limit: int = 10) -> List[Dict]:
+        """
+        Get images from Wikimedia Commons category associated with QID.
+
+        Many buildings have category pages with additional images.
+        Example: Q4684454 → "Category:Adolphus Busch Hall"
+
+        Args:
+            qid: Wikidata QID
+            limit: Max images to fetch from category
+
+        Returns:
+            List of image metadata dicts
+        """
+        images = []
+
+        try:
+            # Step 1: Get Commons category from Wikidata (P373 property)
+            params = {
+                "action": "wbgetclaims",
+                "entity": qid,
+                "property": "P373",  # P373 = Commons category
+                "format": "json"
+            }
+
+            resp = self.session.get(self.wikidata_api, params=params, timeout=30)
+            resp.raise_for_status()
+            data = resp.json()
+
+            claims = data.get("claims", {}).get("P373", [])
+            if not claims:
+                return []
+
+            # Get category name
+            try:
+                category_name = claims[0]["mainsnak"]["datavalue"]["value"]
+            except (KeyError, TypeError, IndexError):
+                return []
+
+            print(f"    Found Commons category: {category_name}")
+
+            # Step 2: Get images from category
+            category_title = f"Category:{category_name}"
+            params = {
+                "action": "query",
+                "format": "json",
+                "generator": "categorymembers",
+                "gcmtitle": category_title,
+                "gcmtype": "file",
+                "gcmlimit": limit,
+                "prop": "imageinfo",
+                "iiprop": "url|size|mime"
+            }
+
+            resp = self.session.get(self.commons_api, params=params, timeout=30)
+            resp.raise_for_status()
+            data = resp.json()
+
+            pages = data.get("query", {}).get("pages", {})
+            for page_id, page in pages.items():
+                if "imageinfo" in page and page["imageinfo"]:
+                    info = page["imageinfo"][0]
+                    images.append({
+                        "url": info.get("url"),
+                        "filename": page.get("title", "").replace("File:", ""),
+                        "width": info.get("width"),
+                        "height": info.get("height"),
+                        "size": info.get("size"),
+                        "mime": info.get("mime")
+                    })
+
+            if images:
+                print(f"    Found {len(images)} images in category")
+
+        except requests.exceptions.RequestException as e:
+            print(f"    Error fetching category images: {e}")
+
+        return images
 
     @staticmethod
     def compute_hash(data: bytes) -> str:
