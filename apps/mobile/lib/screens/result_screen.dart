@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dart:io';
+import 'package:flutter/services.dart';
 import '../widgets/chatbot_widget.dart';
 
 class ResultScreen extends StatefulWidget {
@@ -24,15 +24,37 @@ class _ResultScreenState extends State<ResultScreen> {
 
   Future<void> _processImage() async {
     // Simulate API call delay
-    // TODO: Replace with actual Vision API call
     await Future.delayed(const Duration(seconds: 2));
 
-    // Mock data - replace with actual API response
-    setState(() {
-      _buildingName = "Sander's Theatre";
-      _buildingDescription = '''Inspired by Christopher Wren's Sheldonian Theatre at Oxford, England, Sanders Theatre is famous for its design and its acoustics. A member of the League of Historic American Theatres, the 1,000 seat theatre offers a unique and intimate 180 degree design which provides unusual proximity to the stage. The theatre was designed to function as a major lecture hall and as the site of college commencements. Although Sanders saw its last regularly scheduled Harvard College commencement exercise in 1922, and its final Radcliffe College commencement in 1957, the theatre continues to play a major role in the academic mission of Harvard College, hosting undergraduate core curriculum courses, the prestigious Charles Eliot Norton Lectures, and the annual Phi Beta Kappa induction ceremony. Many of the most venerable academic, political and literary figures of the nineteenth and twentieth century have taken the lectern at Sanders Theatre including Winston Churchill, Theodore Roosevelt, and Martin Luther King, Jr.''';
-      _isLoading = false;
-    });
+    try {
+      // Load dummy data from assets
+      final String dummyData = await rootBundle.loadString('assets/dummy.txt');
+      final List<String> lines = dummyData.split('\n');
+
+      // Parse the dummy data (first line: building name, second line: description)
+      if (lines.length >= 2) {
+        setState(() {
+          _buildingName = lines[0].trim();
+          _buildingDescription = lines[1].trim();
+          _isLoading = false;
+        });
+      } else {
+        // Fallback if file format is incorrect
+        setState(() {
+          _buildingName = "Unknown Building";
+          _buildingDescription = "No description available.";
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error loading dummy data: $e');
+      // Fallback in case of error
+      setState(() {
+        _buildingName = "Error";
+        _buildingDescription = "Failed to load building information.";
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -131,11 +153,11 @@ class _ResultScreenState extends State<ResultScreen> {
     return SingleChildScrollView(
       child: Column(
         children: [
-          // Captured image
-          _buildImageSection(),
+          // Image and description side by side
+          _buildImageAndDescriptionSection(),
 
-          // Building information
-          _buildInfoSection(),
+          // Tour suggestions button
+          _buildTourButton(),
 
           // Chatbot section
           ChatbotWidget(),
@@ -144,103 +166,116 @@ class _ResultScreenState extends State<ResultScreen> {
     );
   }
 
-  Widget _buildImageSection() {
-    return Container(
-      width: double.infinity,
-      height: 300,
-      decoration: BoxDecoration(
-        color: Colors.black,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 10,
-            offset: Offset(0, 5),
+  Widget _buildImageAndDescriptionSection() {
+    return SizedBox(
+      height: 600, // Fixed height to avoid layout issues
+      child: Stack(
+        children: [
+          // Background image
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/dummy.png',
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  color: Colors.grey[800],
+                  child: const Center(
+                    child: Icon(
+                      Icons.image_not_supported,
+                      color: Colors.white,
+                      size: 64,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+
+          // Description overlay on the right side
+          Positioned(
+            top: 40,
+            right: 40,
+            width: 450,
+            height: 520, // Fixed height instead of using bottom constraint
+            child: Container(
+              padding: const EdgeInsets.all(32.0),
+              decoration: BoxDecoration(
+                color: const Color(0xFFD3D3D3).withValues(alpha: 0.85),
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.2),
+                    blurRadius: 15,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Building name
+                    Text(
+                      _buildingName,
+                      style: const TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF000000),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Description
+                    Text(
+                      _buildingDescription,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        height: 1.6,
+                        color: Color(0xFF000000),
+                      ),
+                      textAlign: TextAlign.justify,
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
         ],
-      ),
-      child: Image.file(
-        File(widget.imagePath),
-        fit: BoxFit.cover,
       ),
     );
   }
 
-  Widget _buildInfoSection() {
+  Widget _buildTourButton() {
     return Container(
-      padding: const EdgeInsets.all(24.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Building name
-          Text(
-            _buildingName,
+      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+      color: const Color(0xFFF5EFE6),
+      child: SizedBox(
+        width: double.infinity,
+        child: OutlinedButton(
+          onPressed: () {
+            // TODO: Implement tour suggestions
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Tour suggestions coming soon!'),
+              ),
+            );
+          },
+          style: OutlinedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            side: const BorderSide(color: Color(0xFF2B2B2B), width: 2),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
+          ),
+          child: const Text(
+            'Do want suggestions for a tour?',
             style: TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
               color: Color(0xFF2B2B2B),
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
             ),
           ),
-          const SizedBox(height: 16),
-
-          // Description
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Text(
-              _buildingDescription,
-              style: TextStyle(
-                fontSize: 16,
-                height: 1.6,
-                color: Color(0xFF2B2B2B),
-              ),
-              textAlign: TextAlign.justify,
-            ),
-          ),
-
-          const SizedBox(height: 24),
-
-          // Tour suggestions button
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton(
-              onPressed: () {
-                // TODO: Implement tour suggestions
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Tour suggestions coming soon!'),
-                  ),
-                );
-              },
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                side: BorderSide(color: Color(0xFF2B2B2B), width: 2),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-              ),
-              child: Text(
-                'Do want suggestions for a tour?',
-                style: TextStyle(
-                  color: Color(0xFF2B2B2B),
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 32),
-        ],
+        ),
       ),
     );
   }
