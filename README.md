@@ -2,34 +2,17 @@
 
 HistoriCam is a mobile-first web application that combines computer vision, geolocation, and historical data to provide instant information about landmarks. Users can point their camera at a building or landmark, and the app will identify it and provide historical context and interesting facts.
 
-## Milestone 2 Specific Submission
+## Milestone 3 Specific Submission
 
-Below contains information about our submission
-1. llm-rag pipeline setup in 'ml/llm-rag'.
-
-2. Flutter App protype in apps/mobile, currently for web, android and ios (function landing page)
-
-3. Design mockup and initial protype screenshot in 'design folder'
-
-4. Dataset scraping in 'services/scraper'.
-
-5. file scraped db of building information including images for vision model.
-
-6. Vision Model Setup instruction in 'ml/vision-model/'
-
-7. All evidence is in 'evidence_ms2'
+1. Updated Flutter App to have results page (Completed UI)
+2. Functional Demo which takes a picture and loads our demo image
+3. Gathered additional images for vision model. WIP: Creating vector db
 
 TODOS left for further milestone
 1. Finish API's for vision model
-
 2. finetune vision model
-
 3. fine tune llm rag
-
 4. integrate with flutter
-
-
-Find container [container pipeline here](#complete-pipeline-guide)
 
 ## Architecture
 
