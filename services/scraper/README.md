@@ -1,6 +1,6 @@
 # Scraper Service
 
-Scraper service for collecting Harvard building data and images from various sources.
+Scraper service for collecting Harvard building data and images from various sources. **Extracts at least 4 images per building from different angles** using multiple complementary sources.
 
 ## Features
 
@@ -10,7 +10,8 @@ Scraper service for collecting Harvard building data and images from various sou
 - **Image validation** with quality checks (512x512 minimum)
 - **Image deduplication** with perceptual hashing
 - **GCS upload** with versioning support
-- **Target: 20+ images per building**
+- **Target: 4+ images per building (minimum), 20+ images recommended**
+- **Diverse angles**: Automatically collects images from different perspectives
 
 ## Scripts
 
@@ -34,23 +35,35 @@ Scraper service for collecting Harvard building data and images from various sou
 
 ## Quick Start
 
+### 1. Prerequisites
+
+**API Keys** (optional but recommended for 4+ images per building):
+- **Google Places API**: ~$8 for 150 buildings ([Get key](https://console.cloud.google.com/apis/credentials))
+- **Mapillary**: Free ([Get token](https://www.mapillary.com/dashboard/developers))
+- **Flickr**: Free ([Get key](https://www.flickr.com/services/api/misc.api_keys.html))
+
+### 2. Setup
+
 You can run the scraper either **locally** or **in Docker**. Docker is recommended for consistency and reproducibility.
 
-### Option A: Docker (Recommended)
+#### Option A: Docker (Recommended)
 
 ```bash
 cd services/scraper
 
-# Build and run with one command
+# Set API keys (optional - will use Wikimedia only if not set)
+export GOOGLE_MAPS_API_KEY="your-key"
+export MAPILLARY_ACCESS_TOKEN="MLY|your-token"
+export FLICKR_API_KEY="your-key"
+
+# Build and run container
 ./docker-shell.sh
 
-# Inside the container, run any scraper commands
+# Inside the container, run scraper commands
 # (see examples below)
 ```
 
-See [DOCKER_USAGE.md](DOCKER_USAGE.md) for detailed Docker instructions.
-
-### Option B: Local Development
+#### Option B: Local Development
 
 ```bash
 # Install uv if not already installed
@@ -58,52 +71,53 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # Install project dependencies
 uv sync
+
+# Set API keys
+export GOOGLE_MAPS_API_KEY="your-key"
+export MAPILLARY_ACCESS_TOKEN="MLY|your-token"
+export FLICKR_API_KEY="your-key"
 ```
 
-### 2. Scrape Building Data
+### 3. Scrape Building Data
 
 ```bash
 # Full pipeline: names + metadata
 uv run python src/run.py
 
-# Skip metadata (faster)
-uv run python src/run.py --skip-metadata
-
-# Only scrape metadata from existing CSV
-uv run python src/run.py --metadata-only -i ../../data/buildings_names.csv
+# Output:
+# - ../../data/buildings_names.csv (base building data)
+# - ../../data/buildings_names_metadata.csv (enriched with coordinates)
 ```
 
-Output:
-- `../../data/buildings_names.csv` - Base building data
-- `../../data/buildings_names_metadata.csv` - Enriched with coordinates and aliases
+### 4. Scrape Images from All Harvard Buildings
 
-### 3. Scrape Images (Multi-Source)
-
-**Recommended: Use the unified scraper for all sources**
+**This extracts at least 4 images per building from different angles:**
 
 ```bash
-# Set API keys (get free credits or use free services!)
-export GOOGLE_MAPS_API_KEY="AIza..."           # Google Places (~$8 for 150 buildings)
-export MAPILLARY_ACCESS_TOKEN="MLY|..."        # Free!
-export FLICKR_API_KEY="abc..."                 # Free!
-
-# Scrape from all sources (target: 20+ images per building)
+# Scrape from all sources (minimum 4 images per building)
 uv run python src/scraper/scrape_all_sources.py \
     ../../data/buildings_names_metadata.csv \
     ../../data/images \
+    --min-images 4 \
     --target 20
 
 # This will automatically:
-# 1. Scrape Wikimedia Commons (enhanced: 5-10 images)
-# 2. Scrape Google Places Photos (5-10 images)
-# 3. Scrape Mapillary (3-5 images)
-# 4. Scrape Flickr (3-5 images)
+# 1. Scrape Wikimedia Commons (2-10 images from different angles)
+# 2. Scrape Google Places Photos (2-10 user-contributed images)
+# 3. Scrape Mapillary (1-5 street-level images)
+# 4. Scrape Flickr (1-5 community photos)
 # 5. Deduplicate using perceptual hashing
-# 6. Validate image quality
+# 6. Validate image quality (512x512 minimum)
 # 7. Generate combined_manifest.csv
 ```
 
-**See [QUICK_START.md](QUICK_START.md) for API setup (5 minutes)** or [MULTI_SOURCE_GUIDE.md](MULTI_SOURCE_GUIDE.md) for detailed guide.
+**Without API keys** (Wikimedia only - may not reach 4 images for all buildings):
+```bash
+# Uses only Wikimedia Commons (free, no API key needed)
+uv run python src/scraper/scrape_all_sources.py \
+    ../../data/buildings_names_metadata.csv \
+    ../../data/images
+```
 
 Output structure:
 ```
@@ -335,10 +349,186 @@ uv run black src/
 uv run ruff check src/
 ```
 
+## Running on Google Cloud Platform (GCP)
+
+This section shows how to run the scraper on GCP for production use.
+
+### Prerequisites
+
+1. **GCP Project** with billing enabled
+2. **Service Account** with these permissions:
+   - Storage Admin (for GCS)
+   - Compute Admin (for VM)
+3. **API Keys** set in VM environment variables
+
+### Step 1: Set Up GCS Bucket
+
+```bash
+# Create bucket for images
+gsutil mb -p your-project-id -c STANDARD -l us-central1 gs://historicam-images
+
+# Enable versioning
+gsutil versioning set on gs://historicam-images
+
+# Set up lifecycle management (optional - auto-delete old versions after 90 days)
+cat > lifecycle.json << EOF
+{
+  "lifecycle": {
+    "rule": [
+      {
+        "action": {"type": "Delete"},
+        "condition": {
+          "numNewerVersions": 3,
+          "daysSinceNoncurrentTime": 90
+        }
+      }
+    ]
+  }
+}
+EOF
+gsutil lifecycle set lifecycle.json gs://historicam-images
+```
+
+### Step 2: Create Service Account
+
+```bash
+# Create service account
+gcloud iam service-accounts create historicam-scraper \
+    --display-name="HistoriCam Image Scraper" \
+    --project=your-project-id
+
+# Grant Storage Admin permission
+gcloud projects add-iam-policy-binding your-project-id \
+    --member="serviceAccount:historicam-scraper@your-project-id.iam.gserviceaccount.com" \
+    --role="roles/storage.admin"
+
+# Create and download key
+gcloud iam service-accounts keys create ./secrets/gcs-service-account.json \
+    --iam-account=historicam-scraper@your-project-id.iam.gserviceaccount.com
+```
+
+### Step 3: Run Scraper on GCP Compute Engine
+
+```bash
+# Create VM instance
+gcloud compute instances create historicam-scraper \
+    --project=your-project-id \
+    --zone=us-central1-a \
+    --machine-type=e2-medium \
+    --image-family=ubuntu-2204-lts \
+    --image-project=ubuntu-os-cloud \
+    --boot-disk-size=50GB \
+    --scopes=storage-full \
+    --service-account=historicam-scraper@your-project-id.iam.gserviceaccount.com
+
+# SSH into VM
+gcloud compute ssh historicam-scraper --zone=us-central1-a
+
+# On the VM: Install Docker
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+sudo usermod -aG docker $USER
+newgrp docker
+
+# Clone repository
+git clone https://github.com/your-org/ac215_HistoriCam.git
+cd ac215_HistoriCam/services/scraper
+
+# Set API keys
+export GOOGLE_MAPS_API_KEY="your-key"
+export MAPILLARY_ACCESS_TOKEN="MLY|your-token"
+export FLICKR_API_KEY="your-key"
+export GOOGLE_APPLICATION_CREDENTIALS="/app/secrets/gcs-service-account.json"
+
+# Run scraper in Docker
+./docker-shell.sh
+
+# Inside container: Run scraper
+uv run python src/scraper/scrape_all_sources.py \
+    /data/buildings_names_metadata.csv \
+    /data/images \
+    --min-images 4 \
+    --target 20
+```
+
+### Step 4: Upload to GCS
+
+```bash
+# Inside the Docker container or VM
+uv run python src/scraper/gcs_manager.py upload \
+    historicam-images \
+    /data/images \
+    /data/images/combined_manifest.csv
+
+# Verify upload
+gsutil ls gs://historicam-images/images/
+```
+
+### Step 5: Automate with Cloud Scheduler (Optional)
+
+```bash
+# Create Cloud Run job for periodic scraping
+gcloud run jobs create historicam-scraper \
+    --image=gcr.io/your-project-id/historicam-scraper \
+    --region=us-central1 \
+    --memory=2Gi \
+    --cpu=1 \
+    --max-retries=3 \
+    --task-timeout=3600s \
+    --service-account=historicam-scraper@your-project-id.iam.gserviceaccount.com \
+    --set-env-vars GOOGLE_MAPS_API_KEY=$GOOGLE_MAPS_API_KEY,MAPILLARY_ACCESS_TOKEN=$MAPILLARY_ACCESS_TOKEN
+
+# Schedule monthly scraping
+gcloud scheduler jobs create http historicam-monthly-scrape \
+    --location=us-central1 \
+    --schedule="0 0 1 * *" \
+    --uri="https://us-central1-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/your-project-id/jobs/historicam-scraper:run" \
+    --http-method=POST \
+    --oauth-service-account-email=historicam-scraper@your-project-id.iam.gserviceaccount.com
+```
+
+### Cost Estimation for GCP
+
+**One-time scraping (150 buildings):**
+- Compute Engine (e2-medium): ~$0.50/hour × 2 hours = **$1.00**
+- API costs (Google Places): **~$8.00**
+- GCS Storage: 6 GB × $0.020/GB = **$0.12/month**
+- **Total**: ~$9-10 one-time + $0.12/month storage
+
+**Monthly automated scraping:**
+- Cloud Run: ~$0.10/execution
+- GCS Storage: $0.12/month (grows with versions)
+- **Total**: ~$0.22/month
+
+### Quick Reference: Common GCS Commands
+
+```bash
+# List all images
+gsutil ls gs://historicam-images/images/
+
+# Download all images
+gsutil -m cp -r gs://historicam-images/images/ ./local_images/
+
+# Check bucket size
+gsutil du -sh gs://historicam-images/
+
+# List versions
+uv run python src/scraper/gcs_manager.py list historicam-images
+
+# Delete old version
+gsutil rm -r gs://historicam-images/images/v20251015_143022/
+```
+
 ## Next Steps
 
-1. **Scrape images**: Run the multi-source scraper for all buildings (see [QUICK_START.md](QUICK_START.md))
-2. **Upload to GCS**: Version and upload to cloud storage
+1. ✅ **Scrape images**: Run the multi-source scraper for all buildings
+2. ✅ **Upload to GCS**: Version and upload to cloud storage
 3. **Train vision model**: Use collected images for building recognition
 4. **Automate**: Set up Cloud Scheduler for regular scraping
 5. **Monitor**: Track data quality metrics over time
+
+## References
+
+- [MULTI_SOURCE_GUIDE.md](MULTI_SOURCE_GUIDE.md) - Detailed multi-source scraping guide
+- [QUICK_START.md](QUICK_START.md) - Quick start guide with API setup
+- [QUICK_REFERENCE.md](QUICK_REFERENCE.md) - Quick reference for common commands

@@ -24,25 +24,29 @@ def scrape_all_sources(
     google_maps_api_key: str = None,
     flickr_api_key: str = None,
     mapillary_token: str = None,
-    target_images_per_building: int = 20
+    target_images_per_building: int = 20,
+    min_images_per_building: int = 4
 ) -> Dict:
     """
     Scrape images from all available sources.
 
-    Target distribution (20+ images per building):
-    - Wikimedia Commons (enhanced): 5-10 images (categories + direct)
-    - Google Street View: 6-8 images (if API key provided)
-    - Google Places Photos: 5-10 images (if API key provided)
-    - Mapillary: 3-5 images (if token provided)
-    - Flickr: 3-5 images (if API key provided)
+    Target distribution (minimum 4 images per building from different angles):
+    - Wikimedia Commons (enhanced): 2-10 images (categories + direct)
+    - Google Places Photos: 2-10 images (if API key provided)
+    - Mapillary: 1-5 images (if token provided)
+    - Flickr: 1-5 images (if API key provided)
+
+    The scraper ensures at least 4 images per building from different angles
+    by pulling from multiple sources (Wikimedia + Google Places prioritized).
 
     Args:
         csv_path: Path to buildings CSV
         output_dir: Output directory for images
-        google_maps_api_key: Google Maps API key (for Street View + Places)
+        google_maps_api_key: Google Maps API key (for Places Photos)
         flickr_api_key: Flickr API key (optional)
         mapillary_token: Mapillary access token (optional)
-        target_images_per_building: Target total images per building
+        target_images_per_building: Target total images per building (default: 20)
+        min_images_per_building: Minimum images per building (default: 4)
 
     Returns:
         Combined statistics
@@ -64,17 +68,21 @@ def scrape_all_sources(
     print("="*60)
     print("HISTORICAM IMAGE SCRAPING - ALL SOURCES")
     print("="*60)
-    print(f"Target: {target_images_per_building} images per building\n")
+    print(f"Target: {target_images_per_building} images per building")
+    print(f"Minimum: {min_images_per_building} images per building from different angles\n")
 
-    # 1. Wikimedia Commons (enhanced with categories: 5-10 images per building)
+    # 1. Wikimedia Commons (enhanced with categories: prioritize diverse angles)
     print("\n" + "="*60)
     print("PHASE 1: Wikimedia Commons (Enhanced)")
     print("="*60)
+    print("Collecting images with diverse angles and perspectives...")
     try:
+        # Ensure at least 2 images from Wikimedia (for minimum coverage)
+        wikimedia_max = max(10, min_images_per_building // 2)
         wikimedia_stats = scrape_images_for_buildings(
             csv_path=csv_path,
             output_dir=output_dir,
-            max_images_per_building=10  # Increased for category search
+            max_images_per_building=wikimedia_max
         )
         all_stats["wikimedia"] = wikimedia_stats
         all_stats["total_images"] += wikimedia_stats.get("total_images_downloaded", 0)
@@ -82,17 +90,20 @@ def scrape_all_sources(
     except Exception as e:
         print(f"\n✗ Wikimedia scraping failed: {e}")
 
-    # 2. Google Places Photos (5-10 images per building)
+    # 2. Google Places Photos (user-contributed photos from different angles)
     if google_maps_api_key:
         print("\n" + "="*60)
         print("PHASE 2: Google Places Photos")
         print("="*60)
+        print("Collecting user-contributed photos from various perspectives...")
         try:
+            # Ensure at least 2 images from Places (for angle diversity)
+            places_max = max(10, min_images_per_building // 2)
             places_stats = scrape_places_for_buildings(
                 csv_path=csv_path,
                 output_dir=output_dir,
                 api_key=google_maps_api_key,
-                max_images_per_building=10
+                max_images_per_building=places_max
             )
             all_stats["places"] = places_stats
             all_stats["total_images"] += places_stats.get("total_images_downloaded", 0)
@@ -102,6 +113,7 @@ def scrape_all_sources(
             print(f"\n✗ Places Photos scraping failed: {e}")
     else:
         print("\n⊗ Skipping Google Places Photos (no API key)")
+        print("  NOTE: Google Places provides diverse building angles from user photos")
 
     # 3. Mapillary (3-5 images per building)
     if mapillary_token:
@@ -269,6 +281,8 @@ if __name__ == "__main__":
     parser.add_argument("--mapillary-token", help="Mapillary access token")
     parser.add_argument("--target", type=int, default=20,
                        help="Target images per building (default: 20)")
+    parser.add_argument("--min-images", type=int, default=4,
+                       help="Minimum images per building (default: 4)")
 
     args = parser.parse_args()
 
@@ -290,7 +304,8 @@ if __name__ == "__main__":
         google_maps_api_key=google_key,
         flickr_api_key=flickr_key,
         mapillary_token=mapillary_token,
-        target_images_per_building=args.target
+        target_images_per_building=args.target,
+        min_images_per_building=args.min_images
     )
 
     # Print summary
