@@ -1,5 +1,6 @@
 #!/bin/bash
 # Upload all scraped data (images, CSVs, manifests) to GCS with versioning
+# Uses shared lib/gcs_utils framework
 
 set -e
 
@@ -36,92 +37,105 @@ if [ ! -f "/data/buildings_names_metadata.csv" ]; then
     exit 1
 fi
 
-# Pass bucket and version to Python script
-export UPLOAD_BUCKET=$BUCKET
-export UPLOAD_VERSION=$VERSION
-
-# 1. Upload images using Python manager (includes versioning metadata)
-echo "Step 1/3: Uploading images..."
-echo "----------------------------------------"
-uv run python src/scraper/gcs_manager.py upload \
-    $BUCKET \
-    /data/images \
-    /data/images/combined_manifest.csv
-
-echo ""
-echo "Step 2/3: Uploading CSV data..."
-echo "----------------------------------------"
-
-# Use Python script to upload CSVs and manifests (uses same auth as images)
-python3 << 'PYEOF'
+# Use Python script with shared GCS utilities
+uv run python << PYEOF
+import sys
 import os
 from pathlib import Path
-from google.cloud import storage
 
-bucket_name = os.environ.get('UPLOAD_BUCKET')
-version = os.environ.get('UPLOAD_VERSION')
+# Add lib to path
+sys.path.insert(0, '/app/lib')
 
-client = storage.Client()
-bucket = client.bucket(bucket_name)
+from gcs_utils import GCSDataManager
 
-# Upload buildings CSV
-buildings_csv = Path('/data/buildings_names.csv')
-if buildings_csv.exists():
-    blob = bucket.blob(f'csv/buildings/{version}/buildings_names.csv')
-    blob.upload_from_filename(str(buildings_csv))
-    print(f'✓ Uploaded buildings_names.csv')
-else:
-    print('⊗ Skipping buildings_names.csv (not found)')
+bucket_name = "${BUCKET}"
+version = "${VERSION}"
 
-# Upload metadata CSV
-metadata_csv = Path('/data/buildings_names_metadata.csv')
-if metadata_csv.exists():
-    blob = bucket.blob(f'csv/metadata/{version}/buildings_names_metadata.csv')
-    blob.upload_from_filename(str(metadata_csv))
-    print(f'✓ Uploaded buildings_names_metadata.csv')
-else:
-    print('⊗ Skipping buildings_names_metadata.csv (not found)')
+print("Initializing GCS Data Manager...")
+manager = GCSDataManager(bucket_name)
 
-# Upload info CSV
-info_csv = Path('/data/buildings_info.csv')
-if info_csv.exists():
-    blob = bucket.blob(f'csv/metadata/{version}/buildings_info.csv')
-    blob.upload_from_filename(str(info_csv))
-    print(f'✓ Uploaded buildings_info.csv')
-else:
-    print('⊗ Skipping buildings_info.csv (not found)')
+# Step 1: Upload images with versioning
+print("\nStep 1/3: Uploading images...")
+print("----------------------------------------")
 
-print('')
-print('Step 3/3: Uploading all manifests...')
-print('----------------------------------------')
+# Find combined manifest or use first available manifest
+manifest_path = Path('/data/images/combined_manifest.csv')
+if not manifest_path.exists():
+    # Try to find any manifest
+    manifests = list(Path('/data/images').glob('*_manifest.csv'))
+    if manifests:
+        manifest_path = manifests[0]
+        print(f"Using manifest: {manifest_path.name}")
+    else:
+        print("Error: No manifest file found")
+        sys.exit(1)
 
-# Upload all manifest files
+stats = manager.upload_images_with_versioning(
+    Path('/data/images'),
+    manifest_path,
+    version=version
+)
+
+print(f"\n✓ Uploaded {stats['images_uploaded']} images")
+print(f"  Version: {stats['version']}")
+print(f"  Size: {stats['bytes_uploaded'] / (1024*1024):.2f} MB")
+
+# Step 2: Upload CSV files
+print("\nStep 2/3: Uploading CSV data...")
+print("----------------------------------------")
+
+csv_files = [
+    ('/data/buildings_names.csv', 'buildings'),
+    ('/data/buildings_names_metadata.csv', 'metadata'),
+    ('/data/buildings_info.csv', 'metadata')
+]
+
+for csv_path_str, data_type in csv_files:
+    csv_path = Path(csv_path_str)
+    if csv_path.exists():
+        manager.upload_csv_with_versioning(csv_path, data_type, version=version)
+    else:
+        print(f"⊗ Skipping {csv_path.name} (not found)")
+
+# Step 3: Upload additional manifests
+print("\nStep 3/3: Uploading additional manifests...")
+print("----------------------------------------")
+
 manifest_count = 0
 for manifest in Path('/data/images').glob('*_manifest.csv'):
-    blob = bucket.blob(f'manifests/{version}/{manifest.name}')
-    blob.upload_from_filename(str(manifest))
-    print(f'✓ Uploaded {manifest.name}')
-    manifest_count += 1
+    if manifest != manifest_path:  # Skip already uploaded manifest
+        gcs_path = f"manifests/{version}/{manifest.name}"
+        try:
+            blob = manager.bucket.blob(gcs_path)
+            blob.upload_from_filename(str(manifest))
+            print(f"✓ Uploaded {manifest.name}")
+            manifest_count += 1
+        except Exception as e:
+            print(f"Failed to upload {manifest.name}: {e}")
 
 if manifest_count == 0:
-    print('⊗ No manifest files found')
+    print("No additional manifest files found")
+
+print("\n" + "="*50)
+print("✓ UPLOAD COMPLETE!")
+print("="*50)
+
 PYEOF
 
 echo ""
-echo "=========================================="
-echo "✓ UPLOAD COMPLETE!"
-echo "=========================================="
 echo "Version: $VERSION"
 echo ""
 echo "View your data:"
 echo "  gsutil ls gs://$BUCKET/images/$VERSION/"
-echo "  gsutil ls gs://$BUCKET/csv/$VERSION/"
+echo "  gsutil ls gs://$BUCKET/csv/buildings/$VERSION/"
+echo "  gsutil ls gs://$BUCKET/csv/metadata/$VERSION/"
 echo "  gsutil ls gs://$BUCKET/manifests/$VERSION/"
 echo ""
 echo "Bucket structure:"
 echo "  gs://$BUCKET/"
-echo "  ├── images/$VERSION/        # Building images"
-echo "  ├── manifests/$VERSION/     # Image metadata CSVs"
-echo "  ├── csv/$VERSION/           # Building data CSVs"
-echo "  └── metadata/versions.json  # Version tracking"
+echo "  ├── images/$VERSION/              # Building images"
+echo "  ├── manifests/$VERSION/           # Image metadata CSVs"
+echo "  ├── csv/buildings/$VERSION/       # Buildings names CSV"
+echo "  ├── csv/metadata/$VERSION/        # Metadata & info CSVs"
+echo "  └── metadata/versions.json        # Version tracking"
 echo ""

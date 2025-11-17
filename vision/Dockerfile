@@ -46,6 +46,6 @@ ENTRYPOINT ["/bin/bash"]
 CMD ["-c", "source /home/app/.venv/bin/activate && \
     if [ -d /app/lib/gcs_utils ]; then \
         echo 'Installing gcs_utils from /app/lib...' && \
-        uv pip install -e /app/lib/gcs_utils; \
+        cd /app/lib && uv pip install -e gcs_utils; \
     fi && \
     exec bash"]

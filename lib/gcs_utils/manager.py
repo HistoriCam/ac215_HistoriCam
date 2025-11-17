@@ -68,47 +68,33 @@ class GCSDataManager:
             "failed_uploads": 0
         }
 
-        # Upload images
+        # Upload images (support both lowercase and uppercase extensions)
         image_dir = Path(local_image_dir)
-        for img_path in image_dir.rglob("*.jpg"):
-            # Get building ID from parent directory
-            building_id = img_path.parent.name
-            if building_id == image_dir.name:
-                continue  # Skip if not in building subdirectory
+        extensions = ["*.jpg", "*.JPG", "*.jpeg", "*.JPEG", "*.png", "*.PNG", "*.tif", "*.TIF", "*.tiff", "*.TIFF"]
 
-            # Construct GCS path: images/{version}/{building_id}/{filename}
-            gcs_path = f"images/{version}/{building_id}/{img_path.name}"
+        for ext in extensions:
+            for img_path in image_dir.rglob(ext):
+                # Get building ID from parent directory
+                building_id = img_path.parent.name
+                if building_id == image_dir.name:
+                    continue  # Skip if not in building subdirectory
 
-            try:
-                blob = self.bucket.blob(gcs_path)
-                blob.upload_from_filename(str(img_path))
+                # Construct GCS path: images/{version}/{building_id}/{filename}
+                gcs_path = f"images/{version}/{building_id}/{img_path.name}"
 
-                stats["images_uploaded"] += 1
-                stats["bytes_uploaded"] += img_path.stat().st_size
+                try:
+                    blob = self.bucket.blob(gcs_path)
+                    blob.upload_from_filename(str(img_path))
 
-                if stats["images_uploaded"] % 10 == 0:
-                    print(f"  Uploaded {stats['images_uploaded']} images...")
+                    stats["images_uploaded"] += 1
+                    stats["bytes_uploaded"] += img_path.stat().st_size
 
-            except Exception as e:
-                print(f"  Failed to upload {img_path}: {e}")
-                stats["failed_uploads"] += 1
+                    if stats["images_uploaded"] % 10 == 0:
+                        print(f"  Uploaded {stats['images_uploaded']} images...")
 
-        # Also upload PNG files
-        for img_path in image_dir.rglob("*.png"):
-            building_id = img_path.parent.name
-            if building_id == image_dir.name:
-                continue
-
-            gcs_path = f"images/{version}/{building_id}/{img_path.name}"
-
-            try:
-                blob = self.bucket.blob(gcs_path)
-                blob.upload_from_filename(str(img_path))
-                stats["images_uploaded"] += 1
-                stats["bytes_uploaded"] += img_path.stat().st_size
-            except Exception as e:
-                print(f"  Failed to upload {img_path}: {e}")
-                stats["failed_uploads"] += 1
+                except Exception as e:
+                    print(f"  Failed to upload {img_path}: {e}")
+                    stats["failed_uploads"] += 1
 
         # Upload manifest
         manifest_gcs_path = f"manifests/{version}/image_manifest.csv"

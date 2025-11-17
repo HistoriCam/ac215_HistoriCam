@@ -15,7 +15,7 @@ This guide walks you through setting up GCS for HistoriCam image data with versi
 
 ```bash
 # Set your project ID
-export GCP_PROJECT="your-project-id"
+export GCP_PROJECT="AC215-HistoriCam"
 
 # Create service account
 gcloud iam service-accounts create historicam-storage \

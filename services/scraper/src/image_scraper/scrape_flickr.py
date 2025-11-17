@@ -8,7 +8,7 @@ import os
 from pathlib import Path
 from typing import Optional, List, Dict
 import pandas as pd
-from scraper.scrape_images import WikimediaImageScraper
+from image_scraper.scrape_images import WikimediaImageScraper
 
 
 class FlickrScraper:
@@ -300,6 +300,7 @@ def scrape_flickr_for_buildings(
                 "building_id": building_id,
                 "building_name": building_name,
                 "image_hash": img_hash,
+                "filename": img_path.name,  # Actual filename on disk
                 "local_path": str(img_path),
                 "source": "flickr",
                 "flickr_id": photo.get("id"),

@@ -10,7 +10,7 @@ from typing import Optional, List, Dict
 import pandas as pd
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from scraper.scrape_images import WikimediaImageScraper
+from image_scraper.scrape_images import WikimediaImageScraper
 
 
 class GooglePlacesScraper:
@@ -270,6 +270,7 @@ def scrape_places_for_buildings(
                 "building_id": building_id,
                 "building_name": building_name,
                 "image_hash": img_hash,
+                "filename": img_path.name,  # Actual filename on disk
                 "local_path": str(img_path),
                 "source": "google_places",
                 "place_id": place_id,

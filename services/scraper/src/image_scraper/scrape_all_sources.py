@@ -11,11 +11,11 @@ from typing import Dict
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from scraper.scrape_images import scrape_images_for_buildings
-from scraper.scrape_flickr import scrape_flickr_for_buildings
-from scraper.scrape_mapillary import scrape_mapillary_for_buildings
-from scraper.scrape_places import scrape_places_for_buildings
-from scraper.validation import validate_image_directory
+from image_scraper.scrape_images import scrape_images_for_buildings
+from image_scraper.scrape_flickr import scrape_flickr_for_buildings
+from image_scraper.scrape_mapillary import scrape_mapillary_for_buildings
+from image_scraper.scrape_places import scrape_places_for_buildings
+from image_scraper.validation import validate_image_directory
 
 
 def scrape_all_sources(
@@ -171,7 +171,7 @@ def scrape_all_sources(
             print(f"✓ Combined {len(manifests)} manifests: {len(combined_manifest)} total images")
 
             # Deduplicate
-            from scraper.deduplication import ImageDeduplicator
+            from image_scraper.deduplication import ImageDeduplicator
             deduplicator = ImageDeduplicator(similarity_threshold=5)
 
             print("Removing duplicate images...")

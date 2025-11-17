@@ -46,6 +46,7 @@ class WikimediaImageScraper:
         }
 
         try:
+            time.sleep(0.5)  # Rate limiting before API call
             resp = self.session.get(self.wikidata_api, params=params, timeout=30)
             resp.raise_for_status()
             data = resp.json()
@@ -66,7 +67,7 @@ class WikimediaImageScraper:
                     image_info = self._get_image_info(filename)
                     if image_info:
                         images.append(image_info)
-                        time.sleep(0.5)  # Rate limiting
+                    time.sleep(1.0)  # Rate limiting - increased delay
 
         except requests.exceptions.RequestException as e:
             print(f"  Error fetching direct images for {qid}: {e}")
@@ -97,6 +98,7 @@ class WikimediaImageScraper:
         }
 
         try:
+            time.sleep(0.5)  # Rate limiting before API call
             resp = self.session.get(self.commons_api, params=params, timeout=30)
             resp.raise_for_status()
             data = resp.json()
@@ -131,6 +133,7 @@ class WikimediaImageScraper:
             Image bytes if successful, None otherwise
         """
         try:
+            time.sleep(0.5)  # Rate limiting before download
             resp = self.session.get(url, timeout=30)
             resp.raise_for_status()
             image_bytes = resp.content
@@ -175,6 +178,7 @@ class WikimediaImageScraper:
                 "format": "json"
             }
 
+            time.sleep(0.5)  # Rate limiting before API call
             resp = self.session.get(self.wikidata_api, params=params, timeout=30)
             resp.raise_for_status()
             data = resp.json()
@@ -204,12 +208,13 @@ class WikimediaImageScraper:
                 "iiprop": "url|size|mime"
             }
 
+            time.sleep(0.5)  # Rate limiting before API call
             resp = self.session.get(self.commons_api, params=params, timeout=30)
             resp.raise_for_status()
             data = resp.json()
 
             pages = data.get("query", {}).get("pages", {})
-            for page_id, page in pages.items():
+            for page in pages.values():
                 if "imageinfo" in page and page["imageinfo"]:
                     info = page["imageinfo"][0]
                     images.append({
@@ -317,6 +322,7 @@ def scrape_images_for_buildings(
                 "building_name": building_name,
                 "qid": qid,
                 "image_hash": img_hash,
+                "filename": img_path.name,  # Actual filename on disk
                 "original_filename": img_info['filename'],
                 "local_path": str(img_path),
                 "url": img_info['url'],
@@ -326,7 +332,7 @@ def scrape_images_for_buildings(
                 "mime_type": img_info['mime']
             })
 
-            time.sleep(1)  # Rate limiting
+            time.sleep(1.5)  # Rate limiting - increased delay to avoid 429 errors
 
     # Save manifest
     manifest_df = pd.DataFrame(manifest)
