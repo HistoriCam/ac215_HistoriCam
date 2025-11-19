@@ -6,7 +6,8 @@ set -e
 # Load .env if it exists
 if [ -f .env ]; then
     echo "Loading environment from .env file..."
-    export $(grep -v '^#' .env | xargs)
+    # Handle Windows line endings (CRLF) by using dos2unix or tr
+    export $(grep -v '^#' .env | tr -d '\r' | xargs)
 fi
 
 # Configuration

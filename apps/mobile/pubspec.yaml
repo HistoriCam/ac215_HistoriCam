@@ -20,8 +20,9 @@ dependencies:
   # UI components
   cupertino_icons: ^1.0.2
 
-  # HTTP for future API calls
+  # HTTP for API calls
   http: ^1.1.0
+  http_parser: ^4.0.2
 
   # State management
   provider: ^6.0.5
