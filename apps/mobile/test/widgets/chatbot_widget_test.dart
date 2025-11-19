@@ -4,7 +4,8 @@ import 'package:historicam/widgets/chatbot_widget.dart';
 
 void main() {
   group('ChatbotWidget', () {
-    testWidgets('should display chatbot UI elements', (WidgetTester tester) async {
+    testWidgets('should display chatbot UI elements',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -55,14 +56,16 @@ void main() {
       expect(find.text(testMessage), findsOneWidget);
 
       // Verify typing indicator appears
-      expect(find.byType(CircularProgressIndicator), findsNothing); // Dots animation instead
+      expect(find.byType(CircularProgressIndicator),
+          findsNothing); // Dots animation instead
 
       // Wait for bot response
       await tester.pump(const Duration(seconds: 2));
 
       // Verify bot response appears
       expect(
-        find.text('Thanks for your question! The chatbot API will be integrated soon to provide detailed answers about this historic building.'),
+        find.text(
+            'Thanks for your question! The chatbot API will be integrated soon to provide detailed answers about this historic building.'),
         findsOneWidget,
       );
     });
@@ -87,8 +90,7 @@ void main() {
       expect(find.text(testMessage), findsOneWidget);
     });
 
-    testWidgets('should not send empty messages',
-        (WidgetTester tester) async {
+    testWidgets('should not send empty messages', (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -158,8 +160,7 @@ void main() {
       expect(find.byIcon(Icons.smart_toy), findsOneWidget);
     });
 
-    testWidgets('should handle multiple messages',
-        (WidgetTester tester) async {
+    testWidgets('should handle multiple messages', (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(

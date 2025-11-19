@@ -2,6 +2,27 @@
 
 This directory contains comprehensive tests for the HistoriCam mobile application.
 
+## Quick Start
+
+### Format Code Before Testing
+```bash
+# On macOS/Linux
+cd apps/mobile
+./format.sh
+
+# On Windows
+cd apps\mobile
+format.bat
+
+# Or directly with dart
+dart format .
+```
+
+### Run Tests
+```bash
+flutter test
+```
+
 ## Test Structure
 
 ```

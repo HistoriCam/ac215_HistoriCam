@@ -60,10 +60,12 @@ void main() {
 
       // Find the header container
       final headerContainer = tester.widget<Container>(
-        find.ancestor(
-          of: find.text('HistoriCam'),
-          matching: find.byType(Container),
-        ).first,
+        find
+            .ancestor(
+              of: find.text('HistoriCam'),
+              matching: find.byType(Container),
+            )
+            .first,
       );
 
       // Verify header background color

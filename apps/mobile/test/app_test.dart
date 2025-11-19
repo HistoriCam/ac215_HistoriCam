@@ -171,8 +171,7 @@ void main() {
       expect(
         find.byWidgetPredicate(
           (widget) =>
-              widget is Container &&
-              widget.color == const Color(0xFFE63946),
+              widget is Container && widget.color == const Color(0xFFE63946),
         ),
         findsWidgets,
       );

@@ -50,10 +50,10 @@ class _ResultScreenState extends State<ResultScreen> {
           // Add confidence info to description
           if (status == 'uncertain') {
             _buildingDescription =
-              'Confidence: ${(confidence * 100).toStringAsFixed(1)}% (Low confidence - building might be nearby)\n\n$baseDescription';
+                'Confidence: ${(confidence * 100).toStringAsFixed(1)}% (Low confidence - building might be nearby)\n\n$baseDescription';
           } else {
             _buildingDescription =
-              'Confidence: ${(confidence * 100).toStringAsFixed(1)}%\n\n$baseDescription';
+                'Confidence: ${(confidence * 100).toStringAsFixed(1)}%\n\n$baseDescription';
           }
 
           _isLoading = false;
@@ -64,7 +64,7 @@ class _ResultScreenState extends State<ResultScreen> {
         setState(() {
           _buildingName = "Building Not Found";
           _buildingDescription = parsed['message'] ??
-            "We couldn't identify this building. It may not be in our database, or the image quality might be too low. Please try again with a clearer photo.";
+              "We couldn't identify this building. It may not be in our database, or the image quality might be too low. Please try again with a clearer photo.";
           _errorMessage = parsed['error'];
           _isLoading = false;
         });
@@ -74,14 +74,15 @@ class _ResultScreenState extends State<ResultScreen> {
 
       // Fallback to dummy data if API fails
       try {
-        final String dummyData = await rootBundle.loadString('assets/dummy.txt');
+        final String dummyData =
+            await rootBundle.loadString('assets/dummy.txt');
         final List<String> lines = dummyData.split('\n');
 
         if (lines.length >= 2) {
           setState(() {
             _buildingName = lines[0].trim();
             _buildingDescription =
-              'Note: Using cached data (API unavailable)\n\n${lines[1].trim()}';
+                'Note: Using cached data (API unavailable)\n\n${lines[1].trim()}';
             _errorMessage = 'API connection failed';
             _isLoading = false;
           });
@@ -93,7 +94,7 @@ class _ResultScreenState extends State<ResultScreen> {
         setState(() {
           _buildingName = "Connection Error";
           _buildingDescription =
-            "Unable to connect to the vision service. Please check your internet connection and try again.\n\nError: $e";
+              "Unable to connect to the vision service. Please check your internet connection and try again.\n\nError: $e";
           _errorMessage = 'connection_error';
           _isLoading = false;
         });

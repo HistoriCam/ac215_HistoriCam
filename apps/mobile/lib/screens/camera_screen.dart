@@ -260,9 +260,7 @@ class _CameraScreenState extends State<CameraScreen> {
               height: 80,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: _isProcessing
-                    ? Colors.grey
-                    : const Color(0xFFE63946),
+                color: _isProcessing ? Colors.grey : const Color(0xFFE63946),
                 border: Border.all(
                   color: Colors.white,
                   width: 4,

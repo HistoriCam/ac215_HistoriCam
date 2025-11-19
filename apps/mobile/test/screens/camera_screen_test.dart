@@ -21,7 +21,8 @@ void main() {
       // Verify header elements
       expect(find.text('HistoriCam'), findsOneWidget);
       expect(find.text('Your Personal Tour Guide'), findsOneWidget);
-      expect(find.byIcon(Icons.camera_alt), findsWidgets); // Multiple camera icons
+      expect(
+          find.byIcon(Icons.camera_alt), findsWidgets); // Multiple camera icons
     });
 
     testWidgets('should display loading state when camera is initializing',
@@ -84,7 +85,8 @@ void main() {
       // The instruction text should appear once camera initializes
       // Since we have no cameras, we won't see the overlay
       // This test documents the expected behavior
-      expect(find.text('Point your camera at a historic building'), findsNothing);
+      expect(
+          find.text('Point your camera at a historic building'), findsNothing);
     });
 
     testWidgets('should have proper widget structure',
@@ -115,10 +117,12 @@ void main() {
 
       // Find the header container
       final headerContainer = tester.widget<Container>(
-        find.ancestor(
-          of: find.text('HistoriCam'),
-          matching: find.byType(Container),
-        ).first,
+        find
+            .ancestor(
+              of: find.text('HistoriCam'),
+              matching: find.byType(Container),
+            )
+            .first,
       );
 
       // Verify header background color
@@ -185,13 +189,15 @@ void main() {
 
       // Find the capture button container
       final captureButton = tester.widget<Container>(
-        find.descendant(
-          of: find.ancestor(
-            of: find.byIcon(Icons.camera),
-            matching: find.byType(Container),
-          ),
-          matching: find.byType(Container),
-        ).first,
+        find
+            .descendant(
+              of: find.ancestor(
+                of: find.byIcon(Icons.camera),
+                matching: find.byType(Container),
+              ),
+              matching: find.byType(Container),
+            )
+            .first,
       );
 
       // Verify it has decoration
