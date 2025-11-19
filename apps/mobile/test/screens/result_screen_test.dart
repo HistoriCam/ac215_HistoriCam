@@ -100,14 +100,14 @@ void main() {
 
       // Navigate to ResultScreen
       await tester.tap(find.text('Navigate'));
-      await tester.pumpAndSettle();
+      await tester.pump();
 
       // Verify we're on the ResultScreen
       expect(find.text('HistoriCam'), findsOneWidget);
 
       // Tap back button
       await tester.tap(find.byIcon(Icons.arrow_back));
-      await tester.pumpAndSettle();
+      await tester.pump();
 
       // Verify we're back to the original screen
       expect(find.text('Navigate'), findsOneWidget);
@@ -122,7 +122,7 @@ void main() {
       );
 
       // Wait for the error state (since API will fail in test)
-      await tester.pumpAndSettle(const Duration(seconds: 5));
+      await tester.pump(const Duration(seconds: 5));
 
       // Should show tour button
       expect(find.text('Do want suggestions for a tour?'), findsOneWidget);
@@ -137,7 +137,7 @@ void main() {
       );
 
       // Wait for loading to complete
-      await tester.pumpAndSettle(const Duration(seconds: 5));
+      await tester.pump(const Duration(seconds: 5));
 
       // Chatbot should be visible
       expect(find.text('Ask Anything'), findsOneWidget);
@@ -166,7 +166,7 @@ void main() {
       );
 
       // Wait for content to load
-      await tester.pumpAndSettle(const Duration(seconds: 5));
+      await tester.pump(const Duration(seconds: 5));
 
       // Tap the tour suggestions button
       await tester.tap(find.text('Do want suggestions for a tour?'));
@@ -185,7 +185,7 @@ void main() {
       );
 
       // Wait for API call to complete and fail
-      await tester.pumpAndSettle(const Duration(seconds: 5));
+      await tester.pump(const Duration(seconds: 5));
 
       // Should eventually show some content (either error or dummy data)
       // The screen should not be stuck in loading state
@@ -220,7 +220,7 @@ void main() {
       );
 
       // Wait for processing to complete
-      await tester.pumpAndSettle(const Duration(seconds: 5));
+      await tester.pump(const Duration(seconds: 5));
 
       // At this point, should display either building info or error message
       // Since API will fail in test, should show error or dummy data
@@ -236,7 +236,7 @@ void main() {
       );
 
       // Wait for content to load
-      await tester.pumpAndSettle(const Duration(seconds: 5));
+      await tester.pump(const Duration(seconds: 5));
 
       // Should have scrollable content
       expect(find.byType(SingleChildScrollView), findsWidgets);

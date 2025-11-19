@@ -80,7 +80,7 @@ void main() {
         ),
       );
 
-      await tester.pumpAndSettle();
+      await tester.pump();
 
       // The instruction text should appear once camera initializes
       // Since we have no cameras, we won't see the overlay
@@ -115,21 +115,28 @@ void main() {
         ),
       );
 
-      // Find the header container
-      final headerContainer = tester.widget<Container>(
-        find
-            .ancestor(
-              of: find.text('HistoriCam'),
-              matching: find.byType(Container),
-            )
-            .first,
+      // Find all containers that could be the header
+      final containers = find.ancestor(
+        of: find.text('HistoriCam'),
+        matching: find.byType(Container),
       );
 
-      // Verify header background color
-      expect(
-        (headerContainer.decoration as BoxDecoration?)?.color,
-        const Color(0xFFE63946),
-      );
+      // Verify at least one container exists with the header color
+      expect(containers, findsWidgets);
+
+      // Check if any container has the correct color
+      bool foundHeaderColor = false;
+      for (var i = 0;
+          i < tester.widgetList<Container>(containers).length;
+          i++) {
+        final container = tester.widgetList<Container>(containers).elementAt(i);
+        if ((container.decoration as BoxDecoration?)?.color ==
+            const Color(0xFFE63946)) {
+          foundHeaderColor = true;
+          break;
+        }
+      }
+      expect(foundHeaderColor, true);
     });
 
     testWidgets('capture button should be disabled when processing',

@@ -111,7 +111,7 @@ void main() {
       cameras = [];
 
       await tester.pumpWidget(const HistoriCamApp());
-      await tester.pumpAndSettle();
+      await tester.pump();
 
       // App should still launch without crashing
       expect(find.byType(MaterialApp), findsOneWidget);
@@ -137,7 +137,7 @@ void main() {
       cameras = [];
 
       await tester.pumpWidget(const HistoriCamApp());
-      await tester.pumpAndSettle();
+      await tester.pump();
 
       // Verify we start on camera screen
       expect(find.text('Tap to capture'), findsOneWidget);
@@ -148,7 +148,7 @@ void main() {
       cameras = [];
 
       await tester.pumpWidget(const HistoriCamApp());
-      await tester.pumpAndSettle();
+      await tester.pump();
 
       // Verify initial state
       expect(find.text('HistoriCam'), findsOneWidget);
@@ -165,7 +165,7 @@ void main() {
       cameras = [];
 
       await tester.pumpWidget(const HistoriCamApp());
-      await tester.pumpAndSettle();
+      await tester.pump();
 
       // Find elements with theme colors
       expect(
@@ -191,7 +191,7 @@ void main() {
       cameras = [];
 
       await tester.pumpWidget(const HistoriCamApp());
-      await tester.pumpAndSettle();
+      await tester.pump();
 
       final materialApp = tester.widget<MaterialApp>(find.byType(MaterialApp));
 

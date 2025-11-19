@@ -28,7 +28,10 @@ void main() {
       });
 
       test('should not have double slashes in endpoint', () {
-        expect(ApiConfig.identifyEndpoint, isNot(contains('//')));
+        // URLs start with http:// or https://, so check for triple slashes or double slashes in path
+        final endpoint = ApiConfig.identifyEndpoint;
+        final pathPart = endpoint.replaceFirst(RegExp(r'https?://'), '');
+        expect(pathPart, isNot(contains('//')));
       });
     });
 
