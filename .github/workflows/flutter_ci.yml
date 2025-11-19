@@ -40,7 +40,7 @@ jobs:
         continue-on-error: true
 
       - name: Analyze code
-        run: flutter analyze --no-pub
+        run: flutter analyze --no-pub --no-fatal-infos
 
   test:
     name: Test
@@ -66,18 +66,27 @@ jobs:
         run: flutter pub get
 
       - name: Run unit tests
+        id: unit-tests
         run: flutter test test/config/ test/services/ --no-pub
+        continue-on-error: true
 
       - name: Run widget tests
+        id: widget-tests
         run: flutter test test/widgets/ test/screens/ --no-pub
+        continue-on-error: true
 
       - name: Run integration tests
+        id: integration-tests
         run: flutter test test/app_test.dart test/widget_test.dart --no-pub
+        continue-on-error: true
 
       - name: Run all tests with coverage
+        id: coverage-tests
         run: flutter test --coverage --no-pub
+        continue-on-error: true
 
       - name: Upload coverage
+        if: always()
         uses: codecov/codecov-action@v4
         with:
           files: ./apps/mobile/coverage/lcov.info
@@ -85,6 +94,25 @@ jobs:
           name: flutter-coverage
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        continue-on-error: true
+
+      - name: Check test results
+        if: always()
+        run: |
+          echo "Unit tests: ${{ steps.unit-tests.outcome }}"
+          echo "Widget tests: ${{ steps.widget-tests.outcome }}"
+          echo "Integration tests: ${{ steps.integration-tests.outcome }}"
+          echo "Coverage tests: ${{ steps.coverage-tests.outcome }}"
+
+          if [ "${{ steps.unit-tests.outcome }}" != "success" ] || \
+             [ "${{ steps.widget-tests.outcome }}" != "success" ] || \
+             [ "${{ steps.integration-tests.outcome }}" != "success" ] || \
+             [ "${{ steps.coverage-tests.outcome }}" != "success" ]; then
+            echo "❌ Some tests failed"
+            exit 1
+          else
+            echo "✅ All tests passed"
+          fi
 
   build-web:
     name: Build Web
