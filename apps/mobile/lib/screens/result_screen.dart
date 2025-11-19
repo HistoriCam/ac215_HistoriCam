@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'dart:io';
 import '../widgets/chatbot_widget.dart';
 import '../services/vision_api_service.dart';
 
@@ -17,8 +16,6 @@ class _ResultScreenState extends State<ResultScreen> {
   bool _isLoading = true;
   String _buildingName = '';
   String _buildingDescription = '';
-  String? _errorMessage;
-  Map<String, dynamic>? _apiResponse;
 
   final VisionApiService _visionApi = VisionApiService();
 
@@ -32,7 +29,6 @@ class _ResultScreenState extends State<ResultScreen> {
     try {
       // Call the vision API to identify the building
       final response = await _visionApi.identifyBuilding(widget.imagePath);
-      _apiResponse = response;
 
       // Parse the response
       final parsed = _visionApi.parseResponse(response);
@@ -57,7 +53,6 @@ class _ResultScreenState extends State<ResultScreen> {
           }
 
           _isLoading = false;
-          _errorMessage = null;
         });
       } else {
         // Failed to identify building
@@ -65,7 +60,6 @@ class _ResultScreenState extends State<ResultScreen> {
           _buildingName = "Building Not Found";
           _buildingDescription = parsed['message'] ??
               "We couldn't identify this building. It may not be in our database, or the image quality might be too low. Please try again with a clearer photo.";
-          _errorMessage = parsed['error'];
           _isLoading = false;
         });
       }
@@ -83,7 +77,6 @@ class _ResultScreenState extends State<ResultScreen> {
             _buildingName = lines[0].trim();
             _buildingDescription =
                 'Note: Using cached data (API unavailable)\n\n${lines[1].trim()}';
-            _errorMessage = 'API connection failed';
             _isLoading = false;
           });
         } else {
@@ -95,7 +88,6 @@ class _ResultScreenState extends State<ResultScreen> {
           _buildingName = "Connection Error";
           _buildingDescription =
               "Unable to connect to the vision service. Please check your internet connection and try again.\n\nError: $e";
-          _errorMessage = 'connection_error';
           _isLoading = false;
         });
       }
@@ -245,11 +237,11 @@ class _ResultScreenState extends State<ResultScreen> {
             child: Container(
               padding: const EdgeInsets.all(32.0),
               decoration: BoxDecoration(
-                color: const Color(0xFFD3D3D3).withValues(alpha: 0.85),
+                color: const Color(0xFFD3D3D3).withOpacity(0.85),
                 borderRadius: BorderRadius.circular(8),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.2),
+                    color: Colors.black.withOpacity(0.2),
                     blurRadius: 15,
                     offset: const Offset(0, 4),
                   ),
