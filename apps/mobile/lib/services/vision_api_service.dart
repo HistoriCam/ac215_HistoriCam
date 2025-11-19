@@ -1,6 +1,7 @@
-import 'dart:io';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import 'package:image_picker/image_picker.dart';
 import '../config/api_config.dart';
 
 class VisionApiService {
@@ -8,7 +9,7 @@ class VisionApiService {
   /// Identifies a building from an image file
   ///
   /// Args:
-  ///   imagePath: Path to the image file on device
+  ///   imagePath: Path to the image file (for mobile) or XFile path (for web)
   ///
   /// Returns:
   ///   Map containing the API response with building identification
@@ -24,22 +25,33 @@ class VisionApiService {
     }
 
     try {
-      // Read the image file
-      final imageFile = File(imagePath);
-      if (!await imageFile.exists()) {
-        throw Exception('Image file not found: $imagePath');
-      }
-
       // Create multipart request
       final uri = Uri.parse(ApiConfig.identifyEndpoint);
       final request = http.MultipartRequest('POST', uri);
 
-      // Add the image file
+      // Use XFile for cross-platform compatibility (web + mobile)
+      final xFile = XFile(imagePath);
+      final bytes = await xFile.readAsBytes();
+      final filename = xFile.name;
+
+      // Determine content type from file extension
+      String contentType = 'image/jpeg'; // default
+      if (filename.toLowerCase().endsWith('.png')) {
+        contentType = 'image/png';
+      } else if (filename.toLowerCase().endsWith('.jpg') ||
+                 filename.toLowerCase().endsWith('.jpeg')) {
+        contentType = 'image/jpeg';
+      } else if (filename.toLowerCase().endsWith('.webp')) {
+        contentType = 'image/webp';
+      }
+
+      // Add the image file with proper content type
       request.files.add(
-        await http.MultipartFile.fromPath(
+        http.MultipartFile.fromBytes(
           'image',
-          imagePath,
-          filename: imagePath.split('/').last,
+          bytes,
+          filename: filename,
+          contentType: MediaType.parse(contentType),
         ),
       );
 

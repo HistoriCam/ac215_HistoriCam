@@ -9,14 +9,21 @@ class ApiConfig {
   /// 2. Copy the URL from the deployment output (format: https://vision-service-xxxxx-uc.a.run.app)
   /// 3. Replace the value below with your URL (do NOT include trailing slash)
   ///
-  /// For local testing, you can use: http://10.0.2.2:8080 (Android emulator)
-  /// or http://localhost:8080 (iOS simulator)
-  static const String visionApiUrl = 'YOUR_CLOUD_RUN_URL';
+  /// For local testing:
+  /// - iOS simulator: http://localhost:8080
+  /// - Android emulator: http://10.0.2.2:8080
+  static const String visionApiUrl = 'http://localhost:8080';
 
   /// Validate that the API URL has been configured
   static bool isConfigured() {
-    return visionApiUrl != 'YOUR_CLOUD_RUN_URL' &&
-           visionApiUrl.isNotEmpty;
+    // Allow localhost for local testing
+    if (visionApiUrl == 'http://localhost:8080' ||
+        visionApiUrl == 'http://10.0.2.2:8080') {
+      return true;
+    }
+    // For production, ensure it's a valid Cloud Run URL
+    return visionApiUrl.isNotEmpty &&
+           visionApiUrl.startsWith('http');
   }
 
   /// Get the full identify endpoint URL
