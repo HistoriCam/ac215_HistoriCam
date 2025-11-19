@@ -85,8 +85,8 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-  build-android:
-    name: Build Android APK
+  build-web:
+    name: Build Web
     needs: test
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
@@ -99,12 +99,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'zulu'
-          java-version: '17'
-
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -115,42 +109,15 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Build APK
-        run: flutter build apk --debug --no-pub
+      - name: Build Web
+        run: flutter build web --no-pub
 
-      - name: Upload APK artifact
+      - name: Upload Web Build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug
-          path: apps/mobile/build/app/outputs/flutter-apk/app-debug.apk
+          name: web-build
+          path: apps/mobile/build/web
           retention-days: 7
-
-  build-ios:
-    name: Build iOS
-    needs: test
-    runs-on: macos-latest
-    if: github.event_name == 'push'
-
-    defaults:
-      run:
-        working-directory: apps/mobile
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.24.0'
-          channel: 'stable'
-          cache: true
-
-      - name: Get dependencies
-        run: flutter pub get
-
-      - name: Build iOS (no codesign)
-        run: flutter build ios --debug --no-codesign --no-pub
 
   summary:
     name: CI Summary
