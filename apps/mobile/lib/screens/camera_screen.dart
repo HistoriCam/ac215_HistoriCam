@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'dart:io';
 import '../main.dart';
 import 'result_screen.dart';
 
@@ -260,9 +259,7 @@ class _CameraScreenState extends State<CameraScreen> {
               height: 80,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: _isProcessing
-                    ? Colors.grey
-                    : const Color(0xFFE63946),
+                color: _isProcessing ? Colors.grey : const Color(0xFFE63946),
                 border: Border.all(
                   color: Colors.white,
                   width: 4,

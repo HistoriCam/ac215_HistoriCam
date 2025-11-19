@@ -6,6 +6,7 @@ Your Personal Tour Guide - A Flutter mobile application that uses camera and AI 
 ```
 flutter create . --platforms web
 flutter run
+dart format .
 ```
 ## Features
 
@@ -121,12 +122,36 @@ Future<String> sendMessage(String message, String buildingContext) async {
 
 ## Testing
 
-Run tests:
+### Format Code
+Before running tests or committing, format your code:
 ```bash
-flutter test
+# Quick format
+dart format .
+
+# Or use the helper scripts
+./format.sh      # macOS/Linux
+format.bat       # Windows
 ```
 
-Check code quality:
+### Run Tests
 ```bash
-flutter analyze
+# Run all tests
+flutter test
+
+# Run specific test file
+flutter test test/app_test.dart
+
+# Run with coverage
+flutter test --coverage
 ```
+
+### Code Quality
+```bash
+# Analyze code
+flutter analyze
+
+# Check formatting without changing files
+dart format --output=none --set-exit-if-changed .
+```
+
+See [test/README.md](test/README.md) for detailed testing documentation.

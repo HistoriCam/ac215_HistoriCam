@@ -38,7 +38,8 @@ class _ChatbotWidgetState extends State<ChatbotWidget> {
       if (mounted) {
         setState(() {
           _messages.add(ChatMessage(
-            text: "Thanks for your question! The chatbot API will be integrated soon to provide detailed answers about this historic building.",
+            text:
+                "Thanks for your question! The chatbot API will be integrated soon to provide detailed answers about this historic building.",
             isUser: false,
           ));
           _isTyping = false;
@@ -243,9 +244,7 @@ class _ChatbotWidgetState extends State<ChatbotWidget> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: message.isUser
-                    ? Color(0xFFE63946)
-                    : Color(0xFFF5F5F5),
+                color: message.isUser ? Color(0xFFE63946) : Color(0xFFF5F5F5),
                 borderRadius: BorderRadius.circular(18),
               ),
               child: Text(

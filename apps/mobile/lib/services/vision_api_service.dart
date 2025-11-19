@@ -5,7 +5,6 @@ import 'package:image_picker/image_picker.dart';
 import '../config/api_config.dart';
 
 class VisionApiService {
-
   /// Identifies a building from an image file
   ///
   /// Args:
@@ -20,8 +19,7 @@ class VisionApiService {
     // Check if API is configured
     if (!ApiConfig.isConfigured()) {
       throw Exception(
-        'Vision API URL not configured. Please update ApiConfig.visionApiUrl with your Cloud Run URL.'
-      );
+          'Vision API URL not configured. Please update ApiConfig.visionApiUrl with your Cloud Run URL.');
     }
 
     try {
@@ -39,7 +37,7 @@ class VisionApiService {
       if (filename.toLowerCase().endsWith('.png')) {
         contentType = 'image/png';
       } else if (filename.toLowerCase().endsWith('.jpg') ||
-                 filename.toLowerCase().endsWith('.jpeg')) {
+          filename.toLowerCase().endsWith('.jpeg')) {
         contentType = 'image/jpeg';
       } else if (filename.toLowerCase().endsWith('.webp')) {
         contentType = 'image/webp';
@@ -65,8 +63,7 @@ class VisionApiService {
         return json.decode(response.body);
       } else {
         throw Exception(
-          'API request failed with status ${response.statusCode}: ${response.body}'
-        );
+            'API request failed with status ${response.statusCode}: ${response.body}');
       }
     } catch (e) {
       throw Exception('Error calling vision API: $e');
@@ -127,7 +124,9 @@ class VisionApiService {
   String getBuildingName(String buildingId) {
     // TODO: Implement proper building ID to name mapping
     // For now, just return the building ID formatted nicely
-    return buildingId.replaceAll('_', ' ').split(' ')
+    return buildingId
+        .replaceAll('_', ' ')
+        .split(' ')
         .map((word) => word[0].toUpperCase() + word.substring(1))
         .join(' ');
   }

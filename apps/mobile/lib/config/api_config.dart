@@ -22,8 +22,7 @@ class ApiConfig {
       return true;
     }
     // For production, ensure it's a valid Cloud Run URL
-    return visionApiUrl.isNotEmpty &&
-           visionApiUrl.startsWith('http');
+    return visionApiUrl.isNotEmpty && visionApiUrl.startsWith('http');
   }
 
   /// Get the full identify endpoint URL
