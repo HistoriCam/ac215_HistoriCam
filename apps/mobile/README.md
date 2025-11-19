@@ -4,10 +4,8 @@ Your Personal Tour Guide - A Flutter mobile application that uses camera and AI 
 
 ###
 ```
-flutter create . --platforms ios web android
+flutter create . --platforms web
 ```
-
-
 ## Features
 
 - **Camera Integration**: Access phone camera to capture photos of historic buildings

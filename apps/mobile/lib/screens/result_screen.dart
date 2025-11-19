@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'dart:io';
 import '../widgets/chatbot_widget.dart';
+import '../services/vision_api_service.dart';
 
 class ResultScreen extends StatefulWidget {
   final String imagePath;
@@ -15,6 +17,10 @@ class _ResultScreenState extends State<ResultScreen> {
   bool _isLoading = true;
   String _buildingName = '';
   String _buildingDescription = '';
+  String? _errorMessage;
+  Map<String, dynamic>? _apiResponse;
+
+  final VisionApiService _visionApi = VisionApiService();
 
   @override
   void initState() {
@@ -23,37 +29,75 @@ class _ResultScreenState extends State<ResultScreen> {
   }
 
   Future<void> _processImage() async {
-    // Simulate API call delay
-    await Future.delayed(const Duration(seconds: 2));
-
     try {
-      // Load dummy data from assets
-      final String dummyData = await rootBundle.loadString('assets/dummy.txt');
-      final List<String> lines = dummyData.split('\n');
+      // Call the vision API to identify the building
+      final response = await _visionApi.identifyBuilding(widget.imagePath);
+      _apiResponse = response;
 
-      // Parse the dummy data (first line: building name, second line: description)
-      if (lines.length >= 2) {
+      // Parse the response
+      final parsed = _visionApi.parseResponse(response);
+
+      if (parsed['success'] == true) {
+        // Successfully identified building
+        final buildingId = parsed['buildingId'];
+        final confidence = parsed['confidence'];
+        final status = parsed['status'];
+
         setState(() {
-          _buildingName = lines[0].trim();
-          _buildingDescription = lines[1].trim();
+          _buildingName = _visionApi.getBuildingName(buildingId);
+          final baseDescription = _visionApi.getBuildingDescription(buildingId);
+
+          // Add confidence info to description
+          if (status == 'uncertain') {
+            _buildingDescription =
+              'Confidence: ${(confidence * 100).toStringAsFixed(1)}% (Low confidence - building might be nearby)\n\n$baseDescription';
+          } else {
+            _buildingDescription =
+              'Confidence: ${(confidence * 100).toStringAsFixed(1)}%\n\n$baseDescription';
+          }
+
           _isLoading = false;
+          _errorMessage = null;
         });
       } else {
-        // Fallback if file format is incorrect
+        // Failed to identify building
         setState(() {
-          _buildingName = "Unknown Building";
-          _buildingDescription = "No description available.";
+          _buildingName = "Building Not Found";
+          _buildingDescription = parsed['message'] ??
+            "We couldn't identify this building. It may not be in our database, or the image quality might be too low. Please try again with a clearer photo.";
+          _errorMessage = parsed['error'];
           _isLoading = false;
         });
       }
     } catch (e) {
-      print('Error loading dummy data: $e');
-      // Fallback in case of error
-      setState(() {
-        _buildingName = "Error";
-        _buildingDescription = "Failed to load building information.";
-        _isLoading = false;
-      });
+      print('Error calling vision API: $e');
+
+      // Fallback to dummy data if API fails
+      try {
+        final String dummyData = await rootBundle.loadString('assets/dummy.txt');
+        final List<String> lines = dummyData.split('\n');
+
+        if (lines.length >= 2) {
+          setState(() {
+            _buildingName = lines[0].trim();
+            _buildingDescription =
+              'Note: Using cached data (API unavailable)\n\n${lines[1].trim()}';
+            _errorMessage = 'API connection failed';
+            _isLoading = false;
+          });
+        } else {
+          throw Exception('Invalid dummy data format');
+        }
+      } catch (dummyError) {
+        // Complete fallback
+        setState(() {
+          _buildingName = "Connection Error";
+          _buildingDescription =
+            "Unable to connect to the vision service. Please check your internet connection and try again.\n\nError: $e";
+          _errorMessage = 'connection_error';
+          _isLoading = false;
+        });
+      }
     }
   }
 
