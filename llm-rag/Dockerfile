@@ -1,7 +1,8 @@
 # Use the official Debian-hosted Python image
 FROM python:3.12-slim-bookworm
 
-ARG DEBIAN_PACKAGES="build-essential curl libpq5"
+# Add additional system packages often required to build Python wheels (aarch64/platform builds)
+ARG DEBIAN_PACKAGES="build-essential curl libpq5 libssl-dev libffi-dev pkg-config python3-dev cargo"
 # libpq-dev
 
 # Prevent apt from showing prompts
@@ -42,7 +43,14 @@ WORKDIR /app
 COPY --chown=app:app pyproject.toml uv.lock* ./
 
 # Install dependencies in a separate layer for better caching
-RUN uv sync --frozen
+# Ensure the virtualenv has pip installed, upgrade packaging tools, then sync project deps
+RUN python -m venv /.venv \
+    && /.venv/bin/python -m ensurepip --upgrade || true \
+    && /.venv/bin/python -m pip install --upgrade pip setuptools wheel \
+    # Ensure web dependencies are present in the venv so uvicorn/fastapi import correctly
+    && /.venv/bin/python -m pip install --no-cache-dir fastapi "uvicorn[standard]" \
+    && /.venv/bin/python -m pip install --no-cache-dir -e . || true \
+    && uv sync --frozen
 
 # Copy the rest of the source code
 COPY --chown=app:app . ./

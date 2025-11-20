@@ -6,14 +6,20 @@ services:
     llm-rag-cli:
         image: llm-rag-cli
         container_name: llm-rag-cli
+        ports:
+            # Use a different host port to avoid colliding with the ChromaDB service (host:8000)
+            - "8001:8000"
         volumes:
             - ../secrets:/secrets
             - ../llm-rag:/app
         environment:
-            GOOGLE_APPLICATION_CREDENTIALS: $GOOGLE_APPLICATION_CREDENTIALS
-            GCP_PROJECT: $GCP_PROJECT
+            - GOOGLE_APPLICATION_CREDENTIALS=/secrets/llm-service-account.json
+            - GCP_PROJECT=ac215-historicam
         depends_on:
             - chromadb
+        # Start the FastAPI server automatically so the container remains running
+        command: ["/bin/bash", "-c", "/.venv/bin/uvicorn server:app --host 0.0.0.0 --port 8000"]
+        restart: unless-stopped
     chromadb:
         image: chromadb/chroma:latest
         container_name: llm-rag-chromadb
@@ -24,4 +30,4 @@ services:
         environment:
             - IS_PERSISTENT=TRUE
             - ANONYMIZED_TELEMETRY=FALSE
-            - CHROMA_CORS_ALLOW_ORIGINS=["*"] # This is not recommended for production environments.
+            - CHROMA_CORS_ALLOW_ORIGINS=["*"]
