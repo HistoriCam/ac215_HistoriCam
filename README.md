@@ -2,106 +2,36 @@
 
 HistoriCam is a mobile-first web application that combines computer vision, geolocation, and historical data to provide instant information about landmarks. Users can point their camera at a building or landmark, and the app will identify it and provide historical context and interesting facts.
 
-## Milestone 3 Specific Submission
-
-1. Updated Flutter App to have results page (Completed UI)
-2. Functional Demo which takes a picture and loads our demo image
-3. Gathered additional images for vision model. WIP: Creating vector db
-
-TODOS left for further milestone
-1. Finish API's for vision model
-2. finetune vision model
-3. fine tune llm rag
-4. integrate with flutter
-
 ## Architecture
 
 This project follows AC215 MLOps best practices with containerized microservices and GCP deployment:
 
+![Architecture Diagram](design/HistoriCam_architecture.png)
+
 ```
-┌──────────────────┐
-│  Scraper Service │──┐
-└──────────────────┘  │
-                      ▼
-              ┌──────────────────┐
-              │  Google Cloud    │
-              │  Storage (Data)  │
-              └──────────────────┘
-                      │
-                      ▼
-┌─────────────────┐      ┌──────────────────┐      ┌─────────────────┐
-│  Mobile App     │─────▶│   API Service    │─────▶│  ML Pipeline    │
-│  (Flutter)      │      │   (FastAPI)      │      │  (Vertex AI)    │
-└─────────────────┘      └──────────────────┘      └─────────────────┘
+┌──────────────────┐        ┌──────────────────┐
+│  Scraper Service │ -----> │    GCP Bucket    │
+└──────────────────┘        └──────────────────┘
 ```
 
 ## Project Structure
 
 ```
 ac215_HistoriCam/
-├── services/                        # Containerized microservices
-│   ├── scraper/                    # Data scraper service
-│   │   ├── Dockerfile
-│   │   ├── docker-shell.sh         # Docker development environment
-│   │   ├── pyproject.toml          # uv package configuration
-│   │   ├── README.md
-│   │   ├── DOCKER_USAGE.md         # Docker usage guide
-│   │   ├── QUICK_REFERENCE.md      # Quick reference guide
-│   │   └── src/
-│   │       ├── run.py              # Main CLI entry point
-│   │       ├── info_scrape.py      # Building information scraper
-│   │       └── scraper/
-│   │           ├── scrape_building_name.py    # Building name scraper
-│   │           ├── scrape_metadata.py         # Metadata scraper (lat/lon/aliases)
-│   │           ├── scrape_images.py           # Image downloader from Wikimedia
-│   │           ├── gcs_manager.py             # GCS upload/versioning manager
-│   │           └── validation.py              # Image validation utilities
-│   │
-│   └── api/                        # FastAPI backend service (in development)
-│       ├── Dockerfile
-│       └── pyproject.toml
+├── services/                   # Backend microservices (FastAPI)
+│   ├── scraper/               # Data collection & image scraping
+│   ├── api/                   # Main API service
+│   └── vision/                # Vision model API (Cloud Run)
 │
-├── apps/                           # Frontend applications
-│   └── mobile/                     # Flutter mobile-first web application
-│       ├── lib/                    # Flutter source code
-│       ├── android/                # Android platform files
-│       ├── ios/                    # iOS platform files
-│       ├── web/                    # Web platform files
-│       └── assets/                 # App assets
+├── apps/mobile/               # Flutter mobile app
 │
-├── ml/                             # Machine learning pipelines
-│   ├── llm-rag/                    # LLM-RAG pipeline
-│   │   ├── Dockerfile
-│   │   ├── docker-compose.yml      # ChromaDB + LLM-RAG services
-│   │   ├── docker-shell.sh         # Docker development environment
-│   │   ├── pyproject.toml          # uv package configuration
-│   │   ├── cli.py                  # Main CLI for chunking/embedding/querying
-│   │   ├── semantic_splitter.py    # Semantic text chunking
-│   │   ├── agent_tools.py          # LLM agent tools
-│   │   └── input-datasets/
-│   │       └── buildings/          # Building text files for RAG
-│   │
-│   └── vision-model/               # Vision model for landmark recognition
-│       └── vision_model_api.md     # Vision model API documentation
+├── ml/
+│   ├── llm-rag/              # RAG pipeline with ChromaDB
+│   └── vision-model/         # Vision model training
 │
-├── data/                           # Data directory
-│   ├── buildings_names.csv              # Base building data from Wikipedia
-│   ├── buildings_names_metadata.csv     # Enriched with lat/lon/aliases from Wikidata
-│   └── buildings_info.csv               # Comprehensive building information
-│
-├── design/                         # UI/UX design files
-│   ├── HistoriCam_Mockup.png       # Mobile app mockup
-│   ├── web_app_snapshot.png        # Web app prototype screenshot
-│   └── mockup.md                   # Design documentation
-│
-├── evidence_ms2/                   # Milestone 2 evidence
-│   ├── data_scraping_evidence.jpeg           # Data pipeline evidence
-│   ├── vision_model_data_scraping_evidence.jpeg  # Vision model data evidence
-│   └── llm-evidence.png                      # LLM-RAG evidence
-│
-└── secrets/                        # Service accounts and credentials (gitignored)
-    ├── gcs-service-account.json    # GCS credentials for scraper
-    └── llm-service-account.json    # Vertex AI credentials for LLM-RAG
+├── data/                      # Scraped building data & images
+├── design/                    # UI/UX mockups
+└── secrets/                   # GCP credentials (gitignored)
 ```
 
 ## Getting Started

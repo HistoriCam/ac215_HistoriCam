@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - dev
     paths:
       - 'apps/mobile/lib/**'
       - 'apps/mobile/pubspec.yaml'
