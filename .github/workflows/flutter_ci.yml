@@ -1,0 +1,168 @@
+name: Flutter CI
+
+on:
+  push:
+    branches: [main, dev]
+    paths:
+      - 'apps/mobile/**'
+      - '.github/workflows/flutter_ci.yml'
+  pull_request:
+    branches: [main, dev]
+    paths:
+      - 'apps/mobile/**'
+      - '.github/workflows/flutter_ci.yml'
+
+jobs:
+  analyze:
+    name: Analyze & Lint
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: apps/mobile
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Check formatting
+        run: dart format --output=none --set-exit-if-changed .
+        continue-on-error: true
+
+      - name: Analyze code
+        run: flutter analyze --no-pub --no-fatal-infos
+
+  test:
+    name: Test
+    needs: analyze
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: apps/mobile
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Run unit tests
+        id: unit-tests
+        run: flutter test test/config/ test/services/ --no-pub
+        continue-on-error: true
+
+      - name: Run widget tests
+        id: widget-tests
+        run: flutter test test/widgets/ test/screens/ --no-pub
+        continue-on-error: true
+
+      - name: Run integration tests
+        id: integration-tests
+        run: flutter test test/app_test.dart test/widget_test.dart --no-pub
+        continue-on-error: true
+
+      - name: Run all tests with coverage
+        id: coverage-tests
+        run: flutter test --coverage --no-pub
+        continue-on-error: true
+
+      - name: Upload coverage
+        if: always()
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./apps/mobile/coverage/lcov.info
+          flags: flutter
+          name: flutter-coverage
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        continue-on-error: true
+
+      - name: Check test results
+        if: always()
+        run: |
+          echo "Unit tests: ${{ steps.unit-tests.outcome }}"
+          echo "Widget tests: ${{ steps.widget-tests.outcome }}"
+          echo "Integration tests: ${{ steps.integration-tests.outcome }}"
+          echo "Coverage tests: ${{ steps.coverage-tests.outcome }}"
+
+          if [ "${{ steps.unit-tests.outcome }}" != "success" ] || \
+             [ "${{ steps.widget-tests.outcome }}" != "success" ] || \
+             [ "${{ steps.integration-tests.outcome }}" != "success" ] || \
+             [ "${{ steps.coverage-tests.outcome }}" != "success" ]; then
+            echo "❌ Some tests failed"
+            exit 1
+          else
+            echo "✅ All tests passed"
+          fi
+
+  build-web:
+    name: Build Web
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+
+    defaults:
+      run:
+        working-directory: apps/mobile
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build Web
+        run: flutter build web --no-pub
+
+      - name: Upload Web Build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          path: apps/mobile/build/web
+          retention-days: 7
+
+  summary:
+    name: CI Summary
+    needs: [analyze, test]
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Check results
+        run: |
+          echo "Analyze job status: ${{ needs.analyze.result }}"
+          echo "Test job status: ${{ needs.test.result }}"
+
+          if [ "${{ needs.analyze.result }}" != "success" ] || [ "${{ needs.test.result }}" != "success" ]; then
+            echo "❌ CI checks failed"
+            exit 1
+          else
+            echo "✅ All CI checks passed"
+          fi

@@ -5,8 +5,8 @@ from pathlib import Path
 # Add the src directory to the path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from scraper.scrape_building_name import scrape_building_names as scrape_wikipedia
-from scraper.scrape_metadata import scrape_metadata
+from services.scraper.src.info_scraper.scrape_building_name import scrape_building_names as scrape_wikipedia
+from services.scraper.src.info_scraper.scrape_metadata import scrape_metadata
 
 
 def main():
