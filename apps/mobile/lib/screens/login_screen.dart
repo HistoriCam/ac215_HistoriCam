@@ -101,7 +101,7 @@ class _LoginScreenState extends State<LoginScreen>
             colors: [
               const Color(0xFF1A1A1A),
               const Color(0xFF2B2B2B),
-              const Color(0xFFE63946).withValues(alpha: 0.1),
+              const Color(0xFFE63946).withOpacity(0.1),
             ],
           ),
         ),
