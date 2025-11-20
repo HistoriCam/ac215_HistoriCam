@@ -5,7 +5,7 @@ Your Personal Tour Guide - A Flutter mobile application that uses camera and AI 
 ### Create Build
 ```
 flutter create . --platforms web
-flutter run
+flutter run --dart-define-from-file=../../secrets/supabase_key.env
 dart format .
 ```
 ## Features
