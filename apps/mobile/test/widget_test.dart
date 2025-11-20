@@ -18,12 +18,14 @@ void main() {
 
     // Build our app and trigger a frame.
     await tester.pumpWidget(const HistoriCamApp());
+    await tester.pumpAndSettle();
 
     // Verify that the app launches successfully
     expect(find.text('HistoriCam'), findsOneWidget);
     expect(find.text('Your Personal Tour Guide'), findsOneWidget);
 
-    // Verify the camera screen is displayed
-    expect(find.text('Tap to capture'), findsOneWidget);
+    // Verify the login screen is displayed when not authenticated
+    expect(find.text('Username'), findsOneWidget);
+    expect(find.text('Password'), findsOneWidget);
   });
 }
