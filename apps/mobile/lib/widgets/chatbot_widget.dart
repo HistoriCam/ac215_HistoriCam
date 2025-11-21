@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/llm_rag_service.dart';
 
 class ChatbotWidget extends StatefulWidget {
   const ChatbotWidget({super.key});
@@ -10,6 +11,7 @@ class ChatbotWidget extends StatefulWidget {
 class _ChatbotWidgetState extends State<ChatbotWidget> {
   final TextEditingController _messageController = TextEditingController();
   final List<ChatMessage> _messages = [];
+  final LlmRagService _llmRagService = LlmRagService();
   bool _isTyping = false;
 
   @override
@@ -18,7 +20,7 @@ class _ChatbotWidgetState extends State<ChatbotWidget> {
     super.dispose();
   }
 
-  void _sendMessage() {
+  void _sendMessage() async {
     if (_messageController.text.trim().isEmpty) return;
 
     final userMessage = _messageController.text.trim();
@@ -32,20 +34,43 @@ class _ChatbotWidgetState extends State<ChatbotWidget> {
 
     _messageController.clear();
 
-    // Simulate bot response
-    // TODO: Replace with actual chatbot API call
-    Future.delayed(const Duration(seconds: 1), () {
+    try {
+      // Call the LLM-RAG API
+      final response = await _llmRagService.askQuestion(
+        question: userMessage,
+        chunkType: 'recursive-split',
+        topK: 5,
+        returnDocs: false,
+      );
+
+      // Parse the answer
+      final answer = _llmRagService.parseAnswer(response);
+
       if (mounted) {
         setState(() {
           _messages.add(ChatMessage(
-            text:
-                "Thanks for your question! The chatbot API will be integrated soon to provide detailed answers about this historic building.",
+            text: answer,
             isUser: false,
           ));
           _isTyping = false;
         });
       }
-    });
+    } catch (e) {
+      // Handle errors
+      if (mounted) {
+        setState(() {
+          _messages.add(ChatMessage(
+            text:
+                "Sorry, I'm having trouble connecting to the knowledge base. Please make sure the LLM-RAG service is running at localhost:8001 and try again.",
+            isUser: false,
+            isError: true,
+          ));
+          _isTyping = false;
+        });
+      }
+      // Log the error for debugging
+      debugPrint('Error calling LLM-RAG API: $e');
+    }
   }
 
   @override
@@ -163,6 +188,10 @@ class _ChatbotWidgetState extends State<ChatbotWidget> {
                 Expanded(
                   child: TextField(
                     controller: _messageController,
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 14,
+                    ),
                     decoration: InputDecoration(
                       hintText: 'Ask anything (eg. Where to next?)',
                       hintStyle: TextStyle(
@@ -244,15 +273,42 @@ class _ChatbotWidgetState extends State<ChatbotWidget> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: message.isUser ? Color(0xFFE63946) : Color(0xFFF5F5F5),
+                color: message.isUser
+                    ? Color(0xFFE63946)
+                    : (message.isError
+                        ? Color(0xFFFFEBEE)
+                        : Color(0xFFF5F5F5)),
                 borderRadius: BorderRadius.circular(18),
+                border: message.isError
+                    ? Border.all(color: Color(0xFFE63946).withOpacity(0.3))
+                    : null,
               ),
-              child: Text(
-                message.text,
-                style: TextStyle(
-                  color: message.isUser ? Colors.white : Color(0xFF2B2B2B),
-                  fontSize: 14,
-                ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (message.isError)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: Icon(
+                        Icons.warning_amber_rounded,
+                        color: Color(0xFFE63946),
+                        size: 16,
+                      ),
+                    ),
+                  Flexible(
+                    child: Text(
+                      message.text,
+                      style: TextStyle(
+                        color: message.isUser
+                            ? Colors.white
+                            : (message.isError
+                                ? Color(0xFFE63946)
+                                : Color(0xFF2B2B2B)),
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -320,9 +376,11 @@ class _ChatbotWidgetState extends State<ChatbotWidget> {
 class ChatMessage {
   final String text;
   final bool isUser;
+  final bool isError;
 
   ChatMessage({
     required this.text,
     required this.isUser,
+    this.isError = false,
   });
 }

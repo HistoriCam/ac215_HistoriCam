@@ -59,15 +59,18 @@ void main() {
       expect(find.byType(CircularProgressIndicator),
           findsNothing); // Dots animation instead
 
-      // Wait for bot response
-      await tester.pump(const Duration(seconds: 2));
+      // Wait for bot response (API will fail in test environment)
+      await tester.pumpAndSettle();
 
-      // Verify bot response appears
+      // Verify error message appears (since HTTP requests fail in test environment)
       expect(
-        find.text(
-            'Thanks for your question! The chatbot API will be integrated soon to provide detailed answers about this historic building.'),
+        find.textContaining(
+            'Sorry, I\'m having trouble connecting to the knowledge base'),
         findsOneWidget,
       );
+
+      // Verify error icon is shown
+      expect(find.byIcon(Icons.warning_amber_rounded), findsOneWidget);
     });
 
     testWidgets('should send message when pressing enter',
@@ -156,10 +159,10 @@ void main() {
       await tester.tap(find.byIcon(Icons.send));
       await tester.pump();
 
-      // Wait for bot response
-      await tester.pump(const Duration(seconds: 2));
+      // Wait for bot response (API will fail in test environment)
+      await tester.pumpAndSettle();
 
-      // Both user and bot icons should be visible
+      // Both user and bot icons should be visible (bot shows error message)
       expect(find.byIcon(Icons.person), findsOneWidget);
       expect(find.byIcon(Icons.smart_toy), findsOneWidget);
     });
@@ -177,13 +180,13 @@ void main() {
       await tester.enterText(find.byType(TextField), 'First message');
       await tester.tap(find.byIcon(Icons.send));
       await tester.pump();
-      await tester.pump(const Duration(seconds: 2));
+      await tester.pumpAndSettle();
 
       // Send second message
       await tester.enterText(find.byType(TextField), 'Second message');
       await tester.tap(find.byIcon(Icons.send));
       await tester.pump();
-      await tester.pump(const Duration(seconds: 2));
+      await tester.pumpAndSettle();
 
       // Both messages should be visible
       expect(find.text('First message'), findsOneWidget);

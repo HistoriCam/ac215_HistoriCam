@@ -15,8 +15,8 @@ from google.genai.types import Content, Part, GenerationConfig, ToolConfig
 from google.genai import errors
 
 # Langchain
-from langchain.text_splitter import CharacterTextSplitter
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import CharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from semantic_splitter import SemanticChunker
 import agent_tools
 

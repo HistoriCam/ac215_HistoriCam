@@ -2,6 +2,10 @@
 
 HistoriCam is a mobile-first web application that combines computer vision, geolocation, and historical data to provide instant information about landmarks. Users can point their camera at a building or landmark, and the app will identify it and provide historical context and interesting facts.
 
+## Milestone 4 Specifics
+
+here is a demo of the full pipeline running locally: [video](https://drive.google.com/file/d/1xDccEPMYJSxnadXA0BW5U6aER20OuOAM/view?usp=sharing)
+
 ## Architecture
 
 This project follows AC215 MLOps best practices with containerized microservices and GCP deployment:
