@@ -1,0 +1,185 @@
+name: Generate Test Coverage Report
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/mobile/**'
+      - '.github/workflows/test_coverage_report.yml'
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+    paths:
+      - 'apps/mobile/**'
+      - '.github/workflows/test_coverage_report.yml'
+  workflow_dispatch:
+
+jobs:
+  coverage-report:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    defaults:
+      run:
+        working-directory: apps/mobile
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.5'
+          channel: 'stable'
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Run tests with coverage
+        run: flutter test --coverage --no-pub
+        continue-on-error: true
+
+      - name: Install lcov
+        run: sudo apt-get update && sudo apt-get install -y lcov
+
+      - name: Generate coverage summary
+        id: coverage
+        run: |
+          # Generate coverage summary
+          lcov --summary coverage/lcov.info > coverage_summary.txt 2>&1 || echo "No coverage data available"
+
+          # Extract coverage percentage
+          if [ -f coverage/lcov.info ]; then
+            LINES_PERCENT=$(lcov --summary coverage/lcov.info 2>&1 | grep "lines" | grep -oP '\d+\.\d+(?=%)')
+            FUNCTIONS_PERCENT=$(lcov --summary coverage/lcov.info 2>&1 | grep "functions" | grep -oP '\d+\.\d+(?=%)' || echo "N/A")
+
+            # If grep fails, set default
+            if [ -z "$LINES_PERCENT" ]; then
+              LINES_PERCENT="0.0"
+            fi
+            if [ -z "$FUNCTIONS_PERCENT" ]; then
+              FUNCTIONS_PERCENT="N/A"
+            fi
+          else
+            LINES_PERCENT="0.0"
+            FUNCTIONS_PERCENT="N/A"
+          fi
+
+          echo "lines_percent=$LINES_PERCENT" >> $GITHUB_OUTPUT
+          echo "functions_percent=$FUNCTIONS_PERCENT" >> $GITHUB_OUTPUT
+
+          # Get test count
+          TEST_COUNT=$(find test -name "*_test.dart" | wc -l)
+          echo "test_count=$TEST_COUNT" >> $GITHUB_OUTPUT
+
+          # Count total Dart files in lib
+          TOTAL_FILES=$(find lib -name "*.dart" | wc -l)
+          echo "total_files=$TOTAL_FILES" >> $GITHUB_OUTPUT
+
+      - name: Generate markdown report
+        run: |
+          mkdir -p ../../docs/tests
+
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          COMMIT_SHA="${{ github.sha }}"
+          COMMIT_SHORT="${COMMIT_SHA:0:7}"
+          BRANCH="${{ github.ref_name }}"
+
+          cat > ../../docs/tests/coverage-report.md << 'EOF'
+          # Test Coverage Report
+
+          ## Flutter Mobile App Coverage
+
+          ### Overall Coverage
+
+          | Metric | Coverage |
+          |--------|----------|
+          | **Lines** | **${{ steps.coverage.outputs.lines_percent }}%** |
+          | **Functions** | **${{ steps.coverage.outputs.functions_percent }}%** |
+
+          ### Test Statistics
+
+          - **Total Test Files**: ${{ steps.coverage.outputs.test_count }}
+          - **Total Source Files**: ${{ steps.coverage.outputs.total_files }}
+          - **Last Updated**: $TIMESTAMP
+          - **Commit**: [$COMMIT_SHORT](https://github.com/${{ github.repository }}/commit/$COMMIT_SHA)
+          - **Branch**: $BRANCH
+
+          ### Coverage Status
+
+          EOF
+
+          # Add status badge based on coverage
+          LINES_PERCENT="${{ steps.coverage.outputs.lines_percent }}"
+          LINES_INT=${LINES_PERCENT%.*}
+
+          if [ "$LINES_INT" -ge 80 ]; then
+            echo "![Coverage Status](https://img.shields.io/badge/coverage-${LINES_PERCENT}%25-brightgreen)" >> ../../docs/tests/coverage-report.md
+          elif [ "$LINES_INT" -ge 60 ]; then
+            echo "![Coverage Status](https://img.shields.io/badge/coverage-${LINES_PERCENT}%25-yellow)" >> ../../docs/tests/coverage-report.md
+          else
+            echo "![Coverage Status](https://img.shields.io/badge/coverage-${LINES_PERCENT}%25-red)" >> ../../docs/tests/coverage-report.md
+          fi
+
+          cat >> ../../docs/tests/coverage-report.md << 'EOF'
+
+          ### Coverage Guidelines
+
+          - **Excellent**: ≥ 80% - Great job! Keep it up.
+          - **Good**: 60-79% - Consider adding more tests.
+          - **Needs Improvement**: < 60% - Please prioritize test coverage.
+
+          ### How to Run Tests Locally
+
+          ```bash
+          cd apps/mobile
+          flutter test --coverage
+          ```
+
+          ### View Detailed Coverage
+
+          To view detailed line-by-line coverage:
+
+          ```bash
+          # Generate HTML report
+          genhtml coverage/lcov.info -o coverage/html
+
+          # Open in browser
+          open coverage/html/index.html
+          ```
+
+          ---
+
+          *This report is automatically generated by the Test Coverage workflow.*
+          EOF
+
+      - name: Commit coverage report
+        # Run for push, workflow_dispatch, and merged PRs to main
+        if: github.ref == 'refs/heads/main' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd ../..
+
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+          git add docs/tests/coverage-report.md
+
+          # Check if there are changes to commit
+          if git diff --cached --quiet; then
+            echo "No coverage report changes to commit"
+            exit 0
+          fi
+
+          echo "Committing coverage report..."
+          git commit -m "chore: update test coverage report [skip ci]"
+          git push

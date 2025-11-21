@@ -8,6 +8,15 @@ on:
       - 'apps/mobile/lib/**'
       - 'apps/mobile/pubspec.yaml'
       - '.github/workflows/flutter_docs.yml'
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+    paths:
+      - 'apps/mobile/lib/**'
+      - 'apps/mobile/pubspec.yaml'
+      - '.github/workflows/flutter_docs.yml'
   workflow_dispatch:
 
 jobs:
@@ -59,8 +68,8 @@ jobs:
           fi
 
       - name: Commit documentation
-        # Run for both push and workflow_dispatch, but only on main branch
-        if: github.ref == 'refs/heads/main'
+        # Run for push, workflow_dispatch, and merged PRs to main
+        if: github.ref == 'refs/heads/main' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
