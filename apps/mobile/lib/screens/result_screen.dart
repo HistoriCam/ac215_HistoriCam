@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../widgets/chatbot_widget.dart';
@@ -12,10 +14,12 @@ class ResultScreen extends StatefulWidget {
   State<ResultScreen> createState() => _ResultScreenState();
 }
 
-class _ResultScreenState extends State<ResultScreen> {
+class _ResultScreenState extends State<ResultScreen> with SingleTickerProviderStateMixin {
   bool _isLoading = true;
   String _buildingName = '';
   String _buildingDescription = '';
+  String _displayedDescription = '';
+  int _currentCharIndex = 0;
 
   final VisionApiService _visionApi = VisionApiService();
 
@@ -23,6 +27,20 @@ class _ResultScreenState extends State<ResultScreen> {
   void initState() {
     super.initState();
     _processImage();
+  }
+
+  void _startTypingAnimation() {
+    if (_currentCharIndex < _buildingDescription.length) {
+      Future.delayed(const Duration(milliseconds: 20), () {
+        if (mounted) {
+          setState(() {
+            _currentCharIndex++;
+            _displayedDescription = _buildingDescription.substring(0, _currentCharIndex);
+          });
+          _startTypingAnimation();
+        }
+      });
+    }
   }
 
   Future<void> _processImage() async {
@@ -53,7 +71,10 @@ class _ResultScreenState extends State<ResultScreen> {
           }
 
           _isLoading = false;
+          _currentCharIndex = 0;
+          _displayedDescription = '';
         });
+        _startTypingAnimation();
       } else {
         // Failed to identify building
         setState(() {
@@ -61,7 +82,10 @@ class _ResultScreenState extends State<ResultScreen> {
           _buildingDescription = parsed['message'] ??
               "We couldn't identify this building. It may not be in our database, or the image quality might be too low. Please try again with a clearer photo.";
           _isLoading = false;
+          _currentCharIndex = 0;
+          _displayedDescription = '';
         });
+        _startTypingAnimation();
       }
     } catch (e) {
       print('Error calling vision API: $e');
@@ -78,7 +102,10 @@ class _ResultScreenState extends State<ResultScreen> {
             _buildingDescription =
                 'Note: Using cached data (API unavailable)\n\n${lines[1].trim()}';
             _isLoading = false;
+            _currentCharIndex = 0;
+            _displayedDescription = '';
           });
+          _startTypingAnimation();
         } else {
           throw Exception('Invalid dummy data format');
         }
@@ -89,7 +116,10 @@ class _ResultScreenState extends State<ResultScreen> {
           _buildingDescription =
               "Unable to connect to the vision service. Please check your internet connection and try again.\n\nError: $e";
           _isLoading = false;
+          _currentCharIndex = 0;
+          _displayedDescription = '';
         });
+        _startTypingAnimation();
       }
     }
   }
@@ -207,62 +237,89 @@ class _ResultScreenState extends State<ResultScreen> {
     final screenWidth = MediaQuery.of(context).size.width;
     final isPhone = screenWidth < 600; // Tablet breakpoint
 
-    return Column(
+    return Stack(
       children: [
         // Image section
         Container(
-          height: isPhone ? 300 : 400,
+          height: isPhone ? 400 : 500,
           width: double.infinity,
-          child: Image.asset(
-            'assets/images/dummy.png',
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
-              return Container(
-                color: Colors.grey[800],
-                child: const Center(
-                  child: Icon(
-                    Icons.image_not_supported,
-                    color: Colors.white,
-                    size: 64,
-                  ),
+          child: kIsWeb
+              ? Image.network(
+                  widget.imagePath,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.grey[800],
+                      child: const Center(
+                        child: Icon(
+                          Icons.image_not_supported,
+                          color: Colors.white,
+                          size: 64,
+                        ),
+                      ),
+                    );
+                  },
+                )
+              : Image.file(
+                  File(widget.imagePath),
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.grey[800],
+                      child: const Center(
+                        child: Icon(
+                          Icons.image_not_supported,
+                          color: Colors.white,
+                          size: 64,
+                        ),
+                      ),
+                    );
+                  },
                 ),
-              );
-            },
-          ),
         ),
 
-        // Description section
-        Container(
-          width: double.infinity,
-          padding: EdgeInsets.all(isPhone ? 20.0 : 32.0),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF5EFE6),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Building name
-              Text(
-                _buildingName,
-                style: TextStyle(
-                  fontSize: isPhone ? 24 : 32,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF2B2B2B),
-                ),
+        // Description overlay at bottom
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(24.0),
+            decoration: const BoxDecoration(
+              color: Color(0xFFF5EFE6),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
               ),
-              SizedBox(height: isPhone ? 12 : 20),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Building name
+                Text(
+                  _buildingName,
+                  style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2B2B2B),
+                  ),
+                ),
+                const SizedBox(height: 16),
 
-              // Description
-              Text(
-                _buildingDescription,
-                style: TextStyle(
-                  fontSize: isPhone ? 14 : 15,
-                  height: 1.6,
-                  color: const Color(0xFF2B2B2B),
+                // Description with typing animation
+                Text(
+                  _displayedDescription,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    height: 1.6,
+                    color: Color(0xFF2B2B2B),
+                  ),
+                  textAlign: TextAlign.left,
                 ),
-                textAlign: TextAlign.left,
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ],
