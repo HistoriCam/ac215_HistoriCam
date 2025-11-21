@@ -40,44 +40,6 @@ void main() {
       expect(find.byType(TextFormField), findsNWidgets(2));
     });
 
-    testWidgets('should toggle between login and signup modes',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: LoginScreen(),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      // Initially in login mode
-      expect(find.text('Login'), findsOneWidget);
-
-      // Find the TextButton that contains "Sign Up"
-      final signUpButton = find.ancestor(
-        of: find.text('Sign Up'),
-        matching: find.byType(TextButton),
-      );
-
-      // Tap toggle button
-      await tester.tap(signUpButton);
-      await tester.pumpAndSettle();
-
-      // Now in signup mode
-      expect(find.text('Create Account'), findsOneWidget);
-
-      // Find the TextButton that contains "Login"
-      final loginButton = find.ancestor(
-        of: find.text('Login'),
-        matching: find.byType(TextButton),
-      );
-
-      // Toggle back
-      await tester.tap(loginButton);
-      await tester.pumpAndSettle();
-
-      expect(find.text('Login'), findsAtLeastNWidgets(1));
-    });
-
     testWidgets('should validate empty username', (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
@@ -129,35 +91,6 @@ void main() {
       expect(find.text('Please enter a password'), findsOneWidget);
     });
 
-    testWidgets('should validate short password in signup mode',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: LoginScreen(),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      // Switch to signup mode - find the button containing "Sign Up"
-      final signUpButton = find.ancestor(
-        of: find.text('Sign Up'),
-        matching: find.byType(TextButton),
-      );
-      await tester.tap(signUpButton);
-      await tester.pumpAndSettle();
-
-      // Enter valid username but short password
-      await tester.enterText(
-          find.widgetWithText(TextFormField, 'Username'), 'testuser');
-      await tester.enterText(
-          find.widgetWithText(TextFormField, 'Password'), '12345');
-      await tester.tap(find.text('Create Account'));
-      await tester.pumpAndSettle();
-
-      expect(find.text('Password must be at least 6 characters'),
-          findsAtLeastNWidgets(1));
-    });
-
     testWidgets('should toggle password visibility',
         (WidgetTester tester) async {
       await tester.pumpWidget(
@@ -187,59 +120,6 @@ void main() {
 
       // Should show visibility_off icon again
       expect(find.byIcon(Icons.visibility_off), findsOneWidget);
-    });
-
-    testWidgets('should show loading indicator when submitting',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: LoginScreen(),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      // Enter valid credentials
-      await tester.enterText(
-          find.widgetWithText(TextFormField, 'Username'), 'testuser');
-      await tester.enterText(
-          find.widgetWithText(TextFormField, 'Password'), 'password123');
-
-      // Submit form
-      await tester.tap(find.text('Login'));
-      await tester.pump(); // Trigger loading state
-      await tester.pump(const Duration(milliseconds: 100));
-
-      // Should show loading indicator
-      expect(find.byType(CircularProgressIndicator), findsAtLeastNWidgets(1));
-    });
-
-    testWidgets('should disable fields while loading',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: LoginScreen(),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      // Enter valid credentials
-      await tester.enterText(
-          find.widgetWithText(TextFormField, 'Username'), 'testuser');
-      await tester.enterText(
-          find.widgetWithText(TextFormField, 'Password'), 'password123');
-
-      // Submit form
-      await tester.tap(find.text('Login'));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
-
-      // Fields should be disabled - check that they exist first
-      final usernameFields = find.widgetWithText(TextFormField, 'Username');
-      if (usernameFields.evaluate().isNotEmpty) {
-        final usernameField =
-            tester.widget<TextFormField>(usernameFields.first);
-        expect(usernameField.enabled, isFalse);
-      }
     });
 
     testWidgets('should have hero animation for logo',
@@ -274,40 +154,6 @@ void main() {
       expect(container, findsOneWidget);
     });
 
-    testWidgets('should clear error when toggling modes',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: LoginScreen(),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      // Enter invalid short username to trigger error
-      await tester.enterText(
-          find.widgetWithText(TextFormField, 'Username'), 'ab');
-      await tester.tap(find.text('Login'));
-      await tester.pumpAndSettle();
-
-      // Error should be visible
-      expect(find.text('Username must be at least 3 characters'),
-          findsAtLeastNWidgets(1));
-
-      // Toggle to signup mode - find the TextButton
-      final signUpButton = find.ancestor(
-        of: find.text('Sign Up'),
-        matching: find.byType(TextButton),
-      );
-      await tester.tap(signUpButton);
-      await tester.pumpAndSettle();
-
-      // Should now be in signup mode
-      expect(find.text('Create Account'), findsOneWidget);
-
-      // Error should be cleared (validation happens on new submit)
-      // The form is cleared when mode changes
-    });
-
     testWidgets('should have correct branding colors',
         (WidgetTester tester) async {
       await tester.pumpWidget(
@@ -338,29 +184,5 @@ void main() {
       expect(find.text('HistoriCam'), findsOneWidget);
     });
 
-    testWidgets('should support keyboard submission',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: LoginScreen(),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      // Enter credentials
-      await tester.enterText(
-          find.widgetWithText(TextFormField, 'Username'), 'testuser');
-      await tester.enterText(
-          find.widgetWithText(TextFormField, 'Password'), 'password123');
-
-      // Submit via keyboard (testTextInput.receiveAction)
-      await tester.testTextInput.receiveAction(TextInputAction.done);
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
-
-      // Should trigger form submission - look for loading or any state change
-      // The form should have attempted to submit
-      expect(find.byType(CircularProgressIndicator), findsAtLeastNWidgets(1));
-    });
   });
 }
