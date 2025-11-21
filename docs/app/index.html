@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="historicam API docs, for the Dart programming language.">
+  <title>historicam - Dart API docs</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="static-assets/github.css?v1">
+  <link rel="stylesheet" href="static-assets/styles.css?v1">
+  <link rel="icon" href="static-assets/favicon.png?v1">
+
+  
+</head>
+
+
+<body data-base-href="" data-using-base-href="false" class="light-theme">
+
+<div id="overlay-under-drawer"></div>
+
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li class="self-crumb">historicam package</li>
+  </ol>
+  <div class="self-name">historicam</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <div class="toggle" id="theme-button" title="Toggle brightness">
+    <label for="theme">
+      <input type="checkbox" id="theme" value="light-theme">
+      <span id="dark-theme-button" class="material-symbols-outlined">
+        dark_mode
+      </span>
+      <span id="light-theme-button" class="material-symbols-outlined">
+        light_mode
+      </span>
+    </label>
+  </div>
+</header>
+<main>
+
+  <div id="dartdoc-main-content" class="main-content">
+      
+<section class="desc markdown">
+  <h1 id="historicam-mobile-app">HistoriCam Mobile App</h1>
+<p>Your Personal Tour Guide - A Flutter mobile application that uses camera and AI to identify historic buildings and provide detailed information about them.</p>
+<h3 id="create-build">Create Build</h3>
+<pre class="language-dart"><code>flutter create . --platforms web
+flutter run --dart-define-from-file=../../secrets/supabase_key.env
+dart format .
+</code></pre>
+<h2 id="features">Features</h2>
+<ul>
+<li><strong>Camera Integration</strong>: Access phone camera to capture photos of historic buildings</li>
+<li><strong>Image Recognition</strong>: Ready for Vision API integration to identify landmarks</li>
+<li><strong>Building Information</strong>: Display detailed descriptions and historical context</li>
+<li><strong>Interactive Chatbot</strong>: Ask questions about the buildings (API integration ready)</li>
+<li><strong>Tour Suggestions</strong>: Get recommendations for nearby historic sites</li>
+</ul>
+<h2 id="project-structure">Project Structure</h2>
+<pre class="language-dart"><code>apps/mobile/
+├── lib/
+│   ├── main.dart                 # App entry point
+│   ├── config                    # API urls
+│   ├── screens/
+│   │   ├── camera_screen.dart    # Camera capture screen
+│   │   └── result_screen.dart    # Building info display screen
+│   ├── widgets/
+│   │   └── chatbot_widget.dart   # Chatbot interface widget
+│   └── services/                 # Future API services
+├── web/                          # Web app files
+└── pubspec.yaml                  # Dependencies
+</code></pre>
+<h2 id="setup-instructions">Setup Instructions</h2>
+<h3 id="prerequisites">Prerequisites</h3>
+<ol>
+<li>
+<p>Install Flutter SDK (3.0.0 or higher)</p>
+<ul>
+<li>Follow instructions at: <a href="https://flutter.dev/docs/get-started/install">https://flutter.dev/docs/get-started/install</a></li>
+</ul>
+</li>
+<li>
+<p>Install an IDE:</p>
+<ul>
+<li>VS Code with Flutter extension, or</li>
+<li>Android Studio with Flutter plugin</li>
+</ul>
+</li>
+<li>
+<p>Set up mobile device or emulator:</p>
+<ul>
+<li><strong>Android</strong>: Android Studio emulator or physical device with USB debugging</li>
+<li><strong>iOS</strong>: Xcode simulator or physical device (macOS only)</li>
+</ul>
+</li>
+</ol>
+<h3 id="installation">Installation</h3>
+<ol>
+<li>
+<p>Navigate to the mobile app directory:</p>
+<pre class="language-bash"><code class="language-bash">cd apps/mobile
+</code></pre>
+</li>
+<li>
+<p>Install dependencies:</p>
+<pre class="language-bash"><code class="language-bash">flutter pub get
+</code></pre>
+</li>
+<li>
+<p>Check Flutter setup:</p>
+<pre class="language-bash"><code class="language-bash">flutter doctor
+</code></pre>
+<p>Resolve any issues shown by the doctor command.</p>
+</li>
+</ol>
+<h3 id="running-the-app">Running the App</h3>
+<h3 id="building-for-release">Building for Release</h3>
+<pre class="language-bash"><code class="language-bash">flutter build web --release
+</code></pre>
+<h2 id="dependencies">Dependencies</h2>
+<p>Key packages used:</p>
+<ul>
+<li><code>camera</code>: Camera functionality</li>
+<li><code>image_picker</code>: Image selection</li>
+<li><code>permission_handler</code>: Runtime permissions</li>
+<li><code>http</code>: HTTP requests for API calls</li>
+<li><code>provider</code>: State management</li>
+</ul>
+<p>See <a href="pubspec.yaml">pubspec.yaml</a> for complete list.</p>
+<h2 id="future-integrations">Future Integrations</h2>
+<p>The app is structured to easily integrate the following APIs:</p>
+<h3 id="1-vision-api-integration">1. Vision API Integration</h3>
+<p>Location: Create <code>lib/services/vision_service.dart</code></p>
+<pre class="language-dart"><code class="language-dart">Future&lt;String&gt; identifyBuilding(String imagePath) async {
+  // Send image to Vision API
+  // Return building label/name
+}
+</code></pre>
+<h3 id="2-database-api-integration">2. Database API Integration</h3>
+<p>Location: Create <code>lib/services/database_service.dart</code></p>
+<pre class="language-dart"><code class="language-dart">Future&lt;BuildingInfo&gt; getBuildingInfo(String buildingLabel) async {
+  // Query database API with building label
+  // Return building information
+}
+</code></pre>
+<h3 id="3-chatbot-api-integration">3. Chatbot API Integration</h3>
+<p>Location: Update <code>lib/widgets/chatbot_widget.dart</code></p>
+<pre class="language-dart"><code class="language-dart">Future&lt;String&gt; sendMessage(String message, String buildingContext) async {
+  // Send message to chatbot API with context
+  // Return chatbot response
+}
+</code></pre>
+<h2 id="testing">Testing</h2>
+<h3 id="format-code">Format Code</h3>
+<p>Before running tests or committing, format your code:</p>
+<pre class="language-bash"><code class="language-bash"># Quick format
+dart format .
+
+# Or use the helper scripts
+./format.sh      # macOS/Linux
+format.bat       # Windows
+</code></pre>
+<h3 id="run-tests">Run Tests</h3>
+<pre class="language-bash"><code class="language-bash"># Run all tests
+flutter test
+
+# Run specific test file
+flutter test test/app_test.dart
+
+# Run with coverage
+flutter test --coverage
+</code></pre>
+<h3 id="code-quality">Code Quality</h3>
+<pre class="language-bash"><code class="language-bash"># Analyze code
+flutter analyze
+
+# Check formatting without changing files
+dart format --output=none --set-exit-if-changed .
+</code></pre>
+<p>See <a href="test/README.md">test/README.md</a> for detailed testing documentation.</p>
+</section>
+
+
+      <section class="summary">
+          <h2>Libraries</h2>
+        <dl>
+          <dt id="api_config">
+  <span class="name"><a href="config_api_config/config_api_config-library.html">config/api_config</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="supabase_config">
+  <span class="name"><a href="config_supabase_config/config_supabase_config-library.html">config/supabase_config</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="main">
+  <span class="name"><a href="main/main-library.html">main</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="camera_screen">
+  <span class="name"><a href="screens_camera_screen/screens_camera_screen-library.html">screens/camera_screen</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="login_screen">
+  <span class="name"><a href="screens_login_screen/screens_login_screen-library.html">screens/login_screen</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="result_screen">
+  <span class="name"><a href="screens_result_screen/screens_result_screen-library.html">screens/result_screen</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="auth_service">
+  <span class="name"><a href="services_auth_service/services_auth_service-library.html">services/auth_service</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="llm_rag_service">
+  <span class="name"><a href="services_llm_rag_service/services_llm_rag_service-library.html">services/llm_rag_service</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="vision_api_service">
+  <span class="name"><a href="services_vision_api_service/services_vision_api_service-library.html">services/vision_api_service</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="chatbot_widget">
+  <span class="name"><a href="widgets_chatbot_widget/widgets_chatbot_widget-library.html">widgets/chatbot_widget</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+        </dl>
+      </section>
+
+  </div> <!-- /.main-content -->
+
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+<header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+    <li class="self-crumb">historicam package</li>
+</ol>
+
+
+    <h5 class="hidden-xs"><span class="package-name">historicam</span> <span class="package-kind">package</span></h5>
+    <ol>
+      <li class="section-title">Libraries</li>
+      <li><a href="config_api_config/config_api_config-library.html">config/api_config</a></li>
+      <li><a href="config_supabase_config/config_supabase_config-library.html">config/supabase_config</a></li>
+      <li><a href="main/main-library.html">main</a></li>
+      <li><a href="screens_camera_screen/screens_camera_screen-library.html">screens/camera_screen</a></li>
+      <li><a href="screens_login_screen/screens_login_screen-library.html">screens/login_screen</a></li>
+      <li><a href="screens_result_screen/screens_result_screen-library.html">screens/result_screen</a></li>
+      <li><a href="services_auth_service/services_auth_service-library.html">services/auth_service</a></li>
+      <li><a href="services_llm_rag_service/services_llm_rag_service-library.html">services/llm_rag_service</a></li>
+      <li><a href="services_vision_api_service/services_vision_api_service-library.html">services/vision_api_service</a></li>
+      <li><a href="widgets_chatbot_widget/widgets_chatbot_widget-library.html">widgets/chatbot_widget</a></li>
+</ol>
+
+  </div>
+
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div>
+
+</main>
+
+<footer>
+  <span class="no-break">
+    historicam
+      1.0.0+1
+  </span>
+
+  
+</footer>
+
+
+
+<script src="static-assets/highlight.pack.js?v1"></script>
+<script src="static-assets/docs.dart.js"></script>
+
+
+
+</body>
+
+</html>
+
