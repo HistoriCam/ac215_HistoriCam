@@ -1,1 +1,0 @@
-"""HistoriCam API"""
