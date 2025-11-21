@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 bool _supabaseInitialized = false;
 
@@ -9,6 +10,9 @@ Future<void> initializeSupabaseForTest() async {
   if (_supabaseInitialized) {
     return;
   }
+
+  // Set up mock SharedPreferences
+  SharedPreferences.setMockInitialValues({});
 
   try {
     await Supabase.initialize(
