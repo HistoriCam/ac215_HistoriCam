@@ -16,6 +16,7 @@ class _CameraScreenState extends State<CameraScreen> {
   Future<void>? _initializeControllerFuture;
   bool _isCameraInitialized = false;
   bool _isProcessing = false;
+  int _currentCameraIndex = 0; // 0 for back camera, 1 for front camera
 
   @override
   void initState() {
@@ -28,14 +29,38 @@ class _CameraScreenState extends State<CameraScreen> {
     final status = await Permission.camera.request();
 
     if (status.isGranted) {
+      // Get available cameras if not already loaded
+      if (cameras.isEmpty) {
+        try {
+          cameras = await availableCameras();
+        } catch (e) {
+          print('Error getting cameras: $e');
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Failed to access camera'),
+              ),
+            );
+          }
+          return;
+        }
+      }
+
       if (cameras.isEmpty) {
         print('No cameras available');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('No cameras found on this device'),
+            ),
+          );
+        }
         return;
       }
 
-      // Initialize the camera controller
+      // Initialize the camera controller with the selected camera
       _controller = CameraController(
-        cameras[0], // Use the first camera (usually back camera)
+        cameras[_currentCameraIndex],
         ResolutionPreset.high,
         enableAudio: false,
       );
@@ -58,6 +83,43 @@ class _CameraScreenState extends State<CameraScreen> {
           ),
         );
       }
+    }
+  }
+
+  Future<void> _switchCamera() async {
+    if (cameras.length < 2) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No other camera available'),
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _isCameraInitialized = false;
+    });
+
+    // Dispose current controller
+    await _controller?.dispose();
+
+    // Switch camera index
+    _currentCameraIndex = (_currentCameraIndex + 1) % cameras.length;
+
+    // Initialize new camera
+    _controller = CameraController(
+      cameras[_currentCameraIndex],
+      ResolutionPreset.high,
+      enableAudio: false,
+    );
+
+    _initializeControllerFuture = _controller!.initialize();
+    await _initializeControllerFuture;
+
+    if (mounted) {
+      setState(() {
+        _isCameraInitialized = true;
+      });
     }
   }
 
@@ -214,6 +276,36 @@ class _CameraScreenState extends State<CameraScreen> {
                   color: Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ),
+
+        // Camera switch button
+        if (!_isProcessing && cameras.length > 1)
+          Positioned(
+            bottom: 20,
+            right: 20,
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: _switchCamera,
+                borderRadius: BorderRadius.circular(30),
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.6),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.3),
+                      width: 2,
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.cameraswitch,
+                    color: Colors.white,
+                    size: 28,
+                  ),
                 ),
               ),
             ),

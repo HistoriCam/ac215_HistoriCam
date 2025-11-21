@@ -11,6 +11,7 @@ data/images/
 # Secrets
 secrets/*
 !secrets/.gitkeep
+!secrets/README.md
 
 # IDE
 .vscode/

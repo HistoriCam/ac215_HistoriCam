@@ -8,22 +8,45 @@
 // - test/services/ - Tests for API services
 // - test/config/ - Tests for configuration
 
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:historicam/main.dart';
+import 'package:historicam/screens/login_screen.dart';
+import 'test_helpers.dart';
 
 void main() {
+  setUpAll(() async {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    await initializeSupabaseForTest();
+  });
+
   testWidgets('HistoriCam app smoke test', (WidgetTester tester) async {
     // Initialize with empty cameras to avoid permission issues in tests
     cameras = [];
 
     // Build our app and trigger a frame.
     await tester.pumpWidget(const HistoriCamApp());
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
 
     // Verify that the app launches successfully
+    // The app may show loading state or login screen depending on auth state
+    expect(find.byType(MaterialApp), findsOneWidget);
+  });
+
+  testWidgets('Login screen renders correctly', (WidgetTester tester) async {
+    // Test the login screen directly
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: LoginScreen(),
+      ),
+    );
+    await tester.pump();
+
+    // Verify login screen elements
     expect(find.text('HistoriCam'), findsOneWidget);
     expect(find.text('Your Personal Tour Guide'), findsOneWidget);
-
-    // Verify the camera screen is displayed
-    expect(find.text('Tap to capture'), findsOneWidget);
+    expect(find.text('Username'), findsOneWidget);
+    expect(find.text('Password'), findsOneWidget);
   });
 }

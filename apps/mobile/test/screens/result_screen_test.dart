@@ -101,7 +101,8 @@ void main() {
       // Navigate to ResultScreen
       await tester.tap(find.text('Navigate'));
       await tester.pump(); // Start navigation animation
-      await tester.pump(const Duration(milliseconds: 500)); // Complete navigation
+      await tester
+          .pump(const Duration(milliseconds: 500)); // Complete navigation
 
       // Verify we're on the ResultScreen
       expect(find.text('HistoriCam'), findsOneWidget);
@@ -109,7 +110,8 @@ void main() {
       // Tap back button
       await tester.tap(find.byIcon(Icons.arrow_back));
       await tester.pump(); // Start back navigation
-      await tester.pump(const Duration(milliseconds: 500)); // Complete back navigation
+      await tester
+          .pump(const Duration(milliseconds: 500)); // Complete back navigation
 
       // Verify we're back to the original screen
       expect(find.text('Navigate'), findsOneWidget);
