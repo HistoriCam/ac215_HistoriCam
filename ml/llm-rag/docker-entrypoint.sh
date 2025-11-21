@@ -12,4 +12,10 @@ echo "Activating virtual environment..."
 source /.venv/bin/activate
 
 # Keep a shell open
-exec /bin/bash
+if [ "$#" -gt 0 ]; then
+	# If the container was started with a command, run it (this allows docker-compose `command:` to work)
+	exec "$@"
+else
+	# Otherwise, open an interactive shell
+	exec /bin/bash
+fi
