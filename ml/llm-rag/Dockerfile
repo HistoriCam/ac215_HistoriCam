@@ -43,14 +43,20 @@ WORKDIR /app
 COPY --chown=app:app pyproject.toml uv.lock* ./
 
 # Install dependencies in a separate layer for better caching
-# Ensure the virtualenv has pip installed, upgrade packaging tools, then sync project deps
 RUN python -m venv /.venv \
     && /.venv/bin/python -m ensurepip --upgrade || true \
     && /.venv/bin/python -m pip install --upgrade pip setuptools wheel \
-    # Ensure web dependencies are present in the venv so uvicorn/fastapi import correctly
-    && /.venv/bin/python -m pip install --no-cache-dir fastapi "uvicorn[standard]" \
-    && /.venv/bin/python -m pip install --no-cache-dir -e . || true \
-    && uv sync --frozen
+    && /.venv/bin/python -m pip install --no-cache-dir \
+        chromadb>=1.1.0 \
+        google-genai>=1.39.1 \
+        langchain>=0.3.27 \
+        langchain-community>=0.3.30 \
+        langchain-text-splitters>=0.3.0 \
+        openai>=1.95.1 \
+        pandas>=2.3.3 \
+        fastapi>=0.95.0 \
+        "uvicorn[standard]>=0.22.0" \
+        pydantic>=2.0.0
 
 # Copy the rest of the source code
 COPY --chown=app:app . ./

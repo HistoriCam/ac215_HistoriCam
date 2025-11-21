@@ -8,28 +8,21 @@ import rag_core
 
 app = FastAPI(title="llm-rag API")
 
-# Configure CORS: allow a set of sensible dev origins by default, but allow
-# overriding via the ALLOWED_ORIGINS environment variable (comma-separated).
+# Configure CORS: allow all origins in development
+# For production, set ALLOWED_ORIGINS environment variable with specific origins
 allowed = os.environ.get("ALLOWED_ORIGINS")
 if allowed:
     # Parse comma-separated list and strip whitespace
     origins = [o.strip() for o in allowed.split(",") if o.strip()]
 else:
-    # sensible development defaults (common front-end dev ports)
-    origins = [
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "http://localhost:8000",
-        "http://127.0.0.1:8000",
-        "http://localhost:8001",
-        "http://127.0.0.1:8001",
-    ]
+    # Allow all origins for development
+    origins = ["*"]
 
 # Apply CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_credentials=True,
+    allow_credentials=False,  # Must be False when allow_origins is ["*"]
     allow_methods=["*"],
     allow_headers=["*"],
 )

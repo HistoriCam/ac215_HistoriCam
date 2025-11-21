@@ -18,6 +18,26 @@ OUTPUT_FOLDER = os.environ.get("OUTPUT_FOLDER", "outputs")
 CHROMADB_HOST = os.environ.get("CHROMADB_HOST", "llm-rag-chromadb")
 CHROMADB_PORT = int(os.environ.get("CHROMADB_PORT", 8000))
 
+# System instruction for the LLM
+SYSTEM_INSTRUCTION = """
+You are an AI assistant specialized in landmark knowledge. Your responses are based solely on the information provided in the text chunks given to you. Do not use any external knowledge or make assumptions beyond what is explicitly stated in these chunks.
+
+When answering a query:
+1. Carefully read all the text chunks provided.
+2. Identify the most relevant information from these chunks to address the user's question.
+3. Formulate your response using only the information found in the given chunks.
+4. If the provided chunks do not contain sufficient information to answer the query, state that you don't have enough information to provide a complete answer.
+5. Always maintain a professional and knowledgeable tone, befitting a tour guide.
+6. If there are contradictions in the provided chunks, mention this in your response and explain the different viewpoints presented.
+
+Remember:
+- You are an expert in landmarks, but your knowledge is limited to the information in the provided chunks.
+- Do not invent information or draw from knowledge outside of the given text chunks.
+- If asked about topics unrelated to landmarks, politely redirect the conversation back to landmark-related subjects.
+- Be concise in your responses while ensuring you cover all relevant information from the chunks.
+
+Your goal is to provide accurate, helpful information about landmarks based solely on the content of the text chunks you receive with each query.
+"""
 
 # Lazily initialize the LLM client to avoid failing at import time when credentials are missing
 _llm_client = None
@@ -113,10 +133,16 @@ def answer_question(question: str, chunk_type: str = "char-split", top_k: int = 
 {joined_docs}
 """
 
-    # 4) Call LLM
+    # 4) Call LLM with system instruction
     try:
         client = get_llm_client()
-        response = client.models.generate_content(model=GENERATIVE_MODEL, contents=INPUT_PROMPT)
+        response = client.models.generate_content(
+            model=GENERATIVE_MODEL,
+            contents=INPUT_PROMPT,
+            config=types.GenerateContentConfig(
+                system_instruction=SYSTEM_INSTRUCTION
+            )
+        )
         generated_text = response.text
     except errors.APIError as e:
         raise RuntimeError(f"LLM generation failed: {e}")
