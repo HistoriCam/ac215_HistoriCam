@@ -114,7 +114,8 @@ Exception if the fetch fails</p>
         final building = data[0];
         return {
           &#39;name&#39;: building[&#39;name&#39;] ?? &#39;Unknown Building&#39;,
-          &#39;description&#39;: building[&#39;description&#39;] ?? &#39;No description available.&#39;,
+          &#39;description&#39;:
+              building[&#39;description&#39;] ?? &#39;No description available.&#39;,
         };
       } else {
         &#47;&#47; Building not found in database
@@ -124,7 +125,8 @@ Exception if the fetch fails</p>
         };
       }
     } else {
-      throw Exception(&#39;Failed to fetch building info: ${response.statusCode}&#39;);
+      throw Exception(
+          &#39;Failed to fetch building info: ${response.statusCode}&#39;);
     }
   } catch (e) {
     &#47;&#47; Return fallback data on error
