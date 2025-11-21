@@ -8,8 +8,9 @@ Demo video of the full pipeline running locally: [video](https://drive.google.co
 
 Vercel App (Vision and LLM API not connected): [App](https://ac215-histori-cam.vercel.app/)
 
-#### Progress updates
+NOTE: All evidence is located in "docs" for the submission
 
+#### Progress updates
 - [x] Log-in and Sign-up System complete with supabase 
 - [x] Backend building description retrieval complete with supabase
 - [x] Linked flutter APP with Vercel
@@ -126,6 +127,9 @@ uv run python src/scraper/gcs_manager.py upload \
 - `data/image_data.csv` - Image data from Wikipedia baseline scrape
 - `data/images/` - Downloaded images organized by building ID
 - `data/images/image_manifest.csv` - Image metadata (URLs, dimensions, hashes)
+
+#### Dataset Version Control (DVC)
+TBD
 
 ### Phase 2: LLM-RAG Pipeline
 
