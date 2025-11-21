@@ -133,8 +133,7 @@ class _LoginScreenState extends State<LoginScreen>
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFFE63946)
-                                    .withOpacity(0.3),
+                                color: const Color(0xFFE63946).withOpacity(0.3),
                                 blurRadius: 20,
                                 spreadRadius: 5,
                               ),
