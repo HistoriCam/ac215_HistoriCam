@@ -12,8 +12,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:historicam/main.dart';
 import 'package:historicam/screens/login_screen.dart';
+import 'test_helpers.dart';
 
 void main() {
+  setUpAll(() async {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    await initializeSupabaseForTest();
+  });
+
   testWidgets('HistoriCam app smoke test', (WidgetTester tester) async {
     // Initialize with empty cameras to avoid permission issues in tests
     cameras = [];

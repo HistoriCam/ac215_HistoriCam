@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:historicam/main.dart';
 import 'package:historicam/screens/login_screen.dart';
+import 'test_helpers.dart';
 
 void main() {
   // Set up test environment
-  TestWidgetsFlutterBinding.ensureInitialized();
+  setUpAll(() async {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    await initializeSupabaseForTest();
+  });
 
   group('HistoriCam App Integration Tests', () {
     testWidgets('app should launch and display login screen',
