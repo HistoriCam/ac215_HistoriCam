@@ -41,7 +41,7 @@ NOTE: APIs are located in app/mobile/lib/services
 
 This project follows AC215 MLOps best practices with containerized microservices and GCP deployment:
 
-![Architecture Diagram](design/HistoriCam_architecture.png)
+![Architecture Diagram](docs/design/technical_architecture.png)
 
 ```
 ┌──────────────────┐        ┌──────────────────┐
