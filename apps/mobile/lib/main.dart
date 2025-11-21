@@ -25,7 +25,6 @@ Future<void> main() async {
 
   // Validate Supabase configuration
   if (!SupabaseConfig.isConfigured()) {
-    // App will show error message in debug mode
     debugPrint('WARNING: Supabase not configured properly!');
   }
 
