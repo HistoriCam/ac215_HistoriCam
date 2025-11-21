@@ -7,6 +7,7 @@ on:
     paths:
       - 'apps/mobile/lib/**'
       - 'apps/mobile/pubspec.yaml'
+      - '.github/workflows/flutter_docs.yml'
   workflow_dispatch:
 
 jobs:
