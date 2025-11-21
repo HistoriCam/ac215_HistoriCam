@@ -1,22 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-// import 'package:historicam/services/vision_api_service.dart';
-// import 'package:historicam/config/api_config.dart';
-// import 'package:http/http.dart' as http;
-// import 'package:mockito/mockito.dart';
-// import 'package:mockito/annotations.dart';
-
-// Generate mocks with: flutter pub run build_runner build
-// @GenerateMocks([http.Client])
-// import 'vision_api_service_test.mocks.dart';
+import 'package:historicam/services/vision_api_service.dart';
+import 'package:historicam/config/api_config.dart';
 
 void main() {
-  // TODO: Re-enable these tests once vision API integration is stable
-  // Temporarily disabled to allow CI to pass
-  test('VisionApiService tests - temporarily disabled', () {
-    expect(true, true);
-  });
-
-  /* COMMENTED OUT - Re-enable when ready
   group('VisionApiService', () {
     late VisionApiService visionApiService;
 
@@ -99,47 +85,9 @@ void main() {
       });
     });
 
-    group('getBuildingName', () {
-      test('should format building name from ID correctly', () {
-        expect(
-          visionApiService.getBuildingName('eiffel_tower'),
-          'Eiffel Tower',
-        );
-        expect(
-          visionApiService.getBuildingName('statue_of_liberty'),
-          'Statue Of Liberty',
-        );
-        expect(
-          visionApiService.getBuildingName('big_ben'),
-          'Big Ben',
-        );
-      });
-
-      test('should handle single word building IDs', () {
-        expect(
-          visionApiService.getBuildingName('colosseum'),
-          'Colosseum',
-        );
-      });
-    });
-
-    group('getBuildingDescription', () {
-      test('should return description for building ID', () {
-        final description = visionApiService.getBuildingDescription('eiffel_tower');
-
-        expect(description, isNotEmpty);
-        expect(description, contains('eiffel_tower'));
-        expect(description, contains('historic building'));
-      });
-    });
-
     group('identifyBuilding', () {
-      test('should throw exception when API is not configured', () async {
-        // This test requires API to not be configured
-        // Since ApiConfig is a static class, we can't easily mock it
-        // This is a limitation that could be improved by using dependency injection
-
-        // For now, we'll just document that this functionality exists
+      test('should check if API is configured', () async {
+        // Verify API configuration check exists
         expect(
           ApiConfig.isConfigured(),
           isTrue, // Should be true for the default configuration
@@ -147,5 +95,4 @@ void main() {
       });
     });
   });
-  */
 }

@@ -275,9 +275,7 @@ class _ChatbotWidgetState extends State<ChatbotWidget> {
               decoration: BoxDecoration(
                 color: message.isUser
                     ? Color(0xFFE63946)
-                    : (message.isError
-                        ? Color(0xFFFFEBEE)
-                        : Color(0xFFF5F5F5)),
+                    : (message.isError ? Color(0xFFFFEBEE) : Color(0xFFF5F5F5)),
                 borderRadius: BorderRadius.circular(18),
                 border: message.isError
                     ? Border.all(color: Color(0xFFE63946).withOpacity(0.3))

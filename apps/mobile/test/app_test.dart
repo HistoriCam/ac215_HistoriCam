@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:historicam/main.dart';
 import 'package:historicam/screens/login_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'test_helpers.dart';
 
 void main() {
@@ -245,6 +246,122 @@ void main() {
 
       // Should now show Create Account button
       expect(find.text('Create Account'), findsOneWidget);
+    });
+  });
+
+  group('AuthWrapper Tests', () {
+    testWidgets('AuthWrapper should be a StatelessWidget',
+        (WidgetTester tester) async {
+      const wrapper = AuthWrapper();
+      expect(wrapper, isA<StatelessWidget>());
+    });
+
+    testWidgets('AuthWrapper should show loading indicator initially',
+        (WidgetTester tester) async {
+      cameras = [];
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: AuthWrapper(),
+        ),
+      );
+
+      // Initial state should show loading
+      await tester.pump();
+
+      // Verify loading indicator or appropriate screen is shown
+      expect(find.byType(Scaffold), findsWidgets);
+    });
+
+    testWidgets('AuthWrapper should use StreamBuilder',
+        (WidgetTester tester) async {
+      cameras = [];
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: AuthWrapper(),
+        ),
+      );
+
+      await tester.pump();
+
+      // Verify StreamBuilder is used
+      expect(find.byType(StreamBuilder<AuthState>), findsOneWidget);
+    });
+
+    testWidgets('AuthWrapper should handle auth state stream',
+        (WidgetTester tester) async {
+      cameras = [];
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: AuthWrapper(),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+
+      // App should handle auth state without crashing
+      expect(find.byType(MaterialApp), findsOneWidget);
+    });
+
+    testWidgets(
+        'AuthWrapper should show loading with CircularProgressIndicator',
+        (WidgetTester tester) async {
+      cameras = [];
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: AuthWrapper(),
+        ),
+      );
+
+      // Check initial loading state
+      await tester.pump();
+
+      // Should show loading indicator when waiting
+      final loading = find.byType(CircularProgressIndicator);
+      expect(loading, findsWidgets);
+    });
+
+    testWidgets('AuthWrapper should be centered in scaffold',
+        (WidgetTester tester) async {
+      cameras = [];
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: AuthWrapper(),
+        ),
+      );
+
+      await tester.pump();
+
+      // Verify Scaffold and Center widgets exist
+      expect(find.byType(Scaffold), findsWidgets);
+      expect(find.byType(Center), findsWidgets);
+    });
+  });
+
+  group('App Configuration Tests', () {
+    test('cameras list should be mutable', () {
+      cameras = [];
+      expect(cameras, isEmpty);
+
+      // Can be modified
+      cameras = [];
+      expect(cameras, isA<List>());
+    });
+
+    testWidgets('app should handle empty cameras list',
+        (WidgetTester tester) async {
+      cameras = [];
+
+      await tester.pumpWidget(const HistoriCamApp());
+      await tester.pump();
+
+      // Should not crash with empty cameras
+      expect(find.byType(MaterialApp), findsOneWidget);
     });
   });
 }
