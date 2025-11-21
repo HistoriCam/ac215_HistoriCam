@@ -42,6 +42,7 @@ jobs:
 
           # Create index redirect if it doesn't exist
           if [ ! -f ../../docs/app/index.html ]; then
+            mkdir -p ../../docs/app
             cat > ../../docs/app/index.html << 'EOF'
           <!DOCTYPE html>
           <html>
@@ -57,25 +58,32 @@ jobs:
           fi
 
       - name: Commit documentation
-        if: github.event_name == 'push'
+        # Run for both push and workflow_dispatch, but only on main branch
+        if: github.ref == 'refs/heads/main'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # Move to repo root
           cd ../..
+
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
 
-          # Show what files are being added
           echo "Files to be added:"
-          git status docs/app
+          ls -R docs/app || true
 
           git add docs/app
 
           # Check if there are changes to commit
-          if git diff --staged --quiet; then
+          if git diff --cached --quiet; then
             echo "No documentation changes to commit"
             git status
-          else
-            echo "Committing documentation changes..."
-            git status --short
-            git commit -m "Update Flutter documentation"
-            git push
+            exit 0
           fi
+
+          echo "Committing documentation changes..."
+          git status --short
+
+          # [skip ci] prevents this commit from re-triggering the workflow, if desired
+          git commit -m "chore: update Flutter documentation [skip ci]"
+          git push
