@@ -12,9 +12,6 @@ dependencies = [
     "bs4>=0.0.2",
 ]
 
-# gcs_utils is mounted at runtime via volume mount
-# Install at runtime with: uv pip install -e /app/lib/gcs_utils
-
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"

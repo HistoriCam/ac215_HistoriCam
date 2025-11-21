@@ -1,6 +1,5 @@
 #!/bin/bash
 # Upload all scraped data (images, CSVs, manifests) to GCS with versioning
-# Uses shared lib/gcs_utils framework
 
 set -e
 
@@ -37,90 +36,131 @@ if [ ! -f "/data/buildings_names_metadata.csv" ]; then
     exit 1
 fi
 
-# Use Python script with shared GCS utilities
-uv run python << PYEOF
-import sys
-import os
-from pathlib import Path
+# Step 1: Upload images
+echo ""
+echo "Step 1/4: Uploading images..."
+echo "----------------------------------------"
 
-# Add lib to path
-sys.path.insert(0, '/app/lib')
+# Find manifest file
+MANIFEST_PATH="/data/images/combined_manifest.csv"
+if [ ! -f "$MANIFEST_PATH" ]; then
+    MANIFEST_PATH=$(find /data/images -name "*_manifest.csv" -type f | head -n 1)
+    if [ -z "$MANIFEST_PATH" ]; then
+        echo "Error: No manifest file found"
+        exit 1
+    fi
+    echo "Using manifest: $(basename $MANIFEST_PATH)"
+fi
 
-from gcs_utils import GCSDataManager
+# Upload all image files
+IMAGE_COUNT=0
+TOTAL_SIZE=0
 
-bucket_name = "${BUCKET}"
-version = "${VERSION}"
+for ext in jpg JPG jpeg JPEG png PNG tif TIF tiff TIFF; do
+    for img in /data/images/*.$ext; do
+        if [ -f "$img" ]; then
+            filename=$(basename "$img")
+            gsutil -q cp "$img" "gs://$BUCKET/images/$VERSION/$filename"
+            IMAGE_COUNT=$((IMAGE_COUNT + 1))
+            SIZE=$(stat -f%z "$img" 2>/dev/null || stat -c%s "$img" 2>/dev/null)
+            TOTAL_SIZE=$((TOTAL_SIZE + SIZE))
+        fi
+    done
+done
 
-print("Initializing GCS Data Manager...")
-manager = GCSDataManager(bucket_name)
+echo "✓ Uploaded $IMAGE_COUNT images"
+echo "  Size: $((TOTAL_SIZE / 1024 / 1024)) MB"
 
-# Step 1: Upload images with versioning
-print("\nStep 1/3: Uploading images...")
-print("----------------------------------------")
+# Step 2: Upload image manifest
+echo ""
+echo "Step 2/4: Uploading image manifest..."
+echo "----------------------------------------"
 
-# Find combined manifest or use first available manifest
-manifest_path = Path('/data/images/combined_manifest.csv')
-if not manifest_path.exists():
-    # Try to find any manifest
-    manifests = list(Path('/data/images').glob('*_manifest.csv'))
-    if manifests:
-        manifest_path = manifests[0]
-        print(f"Using manifest: {manifest_path.name}")
-    else:
-        print("Error: No manifest file found")
-        sys.exit(1)
+gsutil -q cp "$MANIFEST_PATH" "gs://$BUCKET/manifests/$VERSION/image_manifest.csv"
+echo "✓ Uploaded image_manifest.csv"
 
-stats = manager.upload_images_with_versioning(
-    Path('/data/images'),
-    manifest_path,
-    version=version
-)
+# Upload any additional manifests
+MANIFEST_COUNT=0
+for manifest in /data/images/*_manifest.csv; do
+    if [ -f "$manifest" ] && [ "$manifest" != "$MANIFEST_PATH" ]; then
+        filename=$(basename "$manifest")
+        gsutil -q cp "$manifest" "gs://$BUCKET/manifests/$VERSION/$filename"
+        MANIFEST_COUNT=$((MANIFEST_COUNT + 1))
+        echo "✓ Uploaded $filename"
+    fi
+done
 
-print(f"\n✓ Uploaded {stats['images_uploaded']} images")
-print(f"  Version: {stats['version']}")
-print(f"  Size: {stats['bytes_uploaded'] / (1024*1024):.2f} MB")
+if [ $MANIFEST_COUNT -eq 0 ]; then
+    echo "No additional manifest files found"
+fi
 
-# Step 2: Upload CSV files
-print("\nStep 2/3: Uploading CSV data...")
-print("----------------------------------------")
+# Step 3: Upload CSV files
+echo ""
+echo "Step 3/4: Uploading CSV data..."
+echo "----------------------------------------"
 
-csv_files = [
-    ('/data/buildings_names.csv', 'buildings'),
-    ('/data/buildings_names_metadata.csv', 'metadata'),
-    ('/data/buildings_info.csv', 'metadata')
-]
+if [ -f "/data/buildings_names.csv" ]; then
+    gsutil -q cp "/data/buildings_names.csv" "gs://$BUCKET/csv/buildings/$VERSION/buildings_names.csv"
+    echo "✓ Uploaded buildings_names.csv"
+else
+    echo "⊗ Skipping buildings_names.csv (not found)"
+fi
 
-for csv_path_str, data_type in csv_files:
-    csv_path = Path(csv_path_str)
-    if csv_path.exists():
-        manager.upload_csv_with_versioning(csv_path, data_type, version=version)
-    else:
-        print(f"⊗ Skipping {csv_path.name} (not found)")
+if [ -f "/data/buildings_names_metadata.csv" ]; then
+    gsutil -q cp "/data/buildings_names_metadata.csv" "gs://$BUCKET/csv/metadata/$VERSION/buildings_names_metadata.csv"
+    echo "✓ Uploaded buildings_names_metadata.csv"
+else
+    echo "⊗ Skipping buildings_names_metadata.csv (not found)"
+fi
 
-# Step 3: Upload additional manifests
-print("\nStep 3/3: Uploading additional manifests...")
-print("----------------------------------------")
+if [ -f "/data/buildings_info.csv" ]; then
+    gsutil -q cp "/data/buildings_info.csv" "gs://$BUCKET/csv/metadata/$VERSION/buildings_info.csv"
+    echo "✓ Uploaded buildings_info.csv"
+else
+    echo "⊗ Skipping buildings_info.csv (not found)"
+fi
 
-manifest_count = 0
-for manifest in Path('/data/images').glob('*_manifest.csv'):
-    if manifest != manifest_path:  # Skip already uploaded manifest
-        gcs_path = f"manifests/{version}/{manifest.name}"
-        try:
-            blob = manager.bucket.blob(gcs_path)
-            blob.upload_from_filename(str(manifest))
-            print(f"✓ Uploaded {manifest.name}")
-            manifest_count += 1
-        except Exception as e:
-            print(f"Failed to upload {manifest.name}: {e}")
+# Step 4: Update version metadata
+echo ""
+echo "Step 4/4: Updating version metadata..."
+echo "----------------------------------------"
 
-if manifest_count == 0:
-    print("No additional manifest files found")
+# Download existing metadata or create new
+METADATA_FILE="/tmp/versions.json"
+if gsutil -q stat "gs://$BUCKET/metadata/versions.json" 2>/dev/null; then
+    gsutil -q cp "gs://$BUCKET/metadata/versions.json" "$METADATA_FILE"
+else
+    echo '{"versions": []}' > "$METADATA_FILE"
+fi
 
-print("\n" + "="*50)
-print("✓ UPLOAD COMPLETE!")
-print("="*50)
+# Add new version using Python
+python3 << PYEOF
+import json
+from datetime import datetime
 
+with open("$METADATA_FILE", "r") as f:
+    metadata = json.load(f)
+
+# Add new version entry
+metadata["versions"].append({
+    "version": "$VERSION",
+    "timestamp": datetime.utcnow().isoformat() + "Z",
+    "images_count": $IMAGE_COUNT,
+    "size_bytes": $TOTAL_SIZE
+})
+
+with open("$METADATA_FILE", "w") as f:
+    json.dump(metadata, f, indent=2)
 PYEOF
+
+# Upload updated metadata
+gsutil -q cp "$METADATA_FILE" "gs://$BUCKET/metadata/versions.json"
+echo "✓ Updated versions.json"
+
+echo ""
+echo "="*50
+echo "✓ UPLOAD COMPLETE!"
+echo "="*50
 
 echo ""
 echo "Version: $VERSION"
