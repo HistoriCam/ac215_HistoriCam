@@ -79,9 +79,9 @@ void main() {
 
         final result = visionApiService.parseResponse(apiResponse);
 
-        expect(result['success'], false);
-        expect(result['error'], 'parse_error');
-        expect(result['message'], contains('Failed to parse'));
+        expect(result['success'], isFalse);
+        expect(result['error'], equals('unknown'));
+        expect(result['message'], contains('Unknown response status'));
       });
     });
 
