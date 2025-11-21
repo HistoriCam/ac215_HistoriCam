@@ -1,5 +1,6 @@
 import os
 import argparse
+import sys
 import pandas as pd
 import json
 import time
@@ -38,33 +39,24 @@ llm_client = genai.Client(
 
 # Initialize the GenerativeModel with specific system instructions
 SYSTEM_INSTRUCTION = """
-You are an AI assistant specialized in cheese knowledge. Your responses are based solely on the information provided in the text chunks given to you. Do not use any external knowledge or make assumptions beyond what is explicitly stated in these chunks.
+You are an AI assistant specialized in landmark knowledge. Your responses are based solely on the information provided in the text chunks given to you. Do not use any external knowledge or make assumptions beyond what is explicitly stated in these chunks.
 
 When answering a query:
 1. Carefully read all the text chunks provided.
 2. Identify the most relevant information from these chunks to address the user's question.
 3. Formulate your response using only the information found in the given chunks.
 4. If the provided chunks do not contain sufficient information to answer the query, state that you don't have enough information to provide a complete answer.
-5. Always maintain a professional and knowledgeable tone, befitting a cheese expert.
+5. Always maintain a professional and knowledgeable tone, befitting a tour guide.
 6. If there are contradictions in the provided chunks, mention this in your response and explain the different viewpoints presented.
 
 Remember:
-- You are an expert in cheese, but your knowledge is limited to the information in the provided chunks.
+- You are an expert in landmarks, but your knowledge is limited to the information in the provided chunks.
 - Do not invent information or draw from knowledge outside of the given text chunks.
-- If asked about topics unrelated to cheese, politely redirect the conversation back to cheese-related subjects.
+- If asked about topics unrelated to landmarks, politely redirect the conversation back to landmark-related subjects.
 - Be concise in your responses while ensuring you cover all relevant information from the chunks.
 
-Your goal is to provide accurate, helpful information about cheese based solely on the content of the text chunks you receive with each query.
+Your goal is to provide accurate, helpful information about landmarks based solely on the content of the text chunks you receive with each query.
 """
-
-building_mappings = {
-    "Adolphus Busch Hall": {"source": "Wikipedia"},
-    "Austin Hall": {"source": "Wikipedia"},
-    "Burden Hall": {"source": "Wikipedia"},
-    "Cabot Science Library": {"source": "Wikipedia"},
-    "Carpenter Center for the Visual Arts": {"source": "Wikipedia"},
-    "Memorial Hall": {"source": "Wikipedia"}
-}
 
 
 def generate_query_embedding(query):
@@ -124,12 +116,6 @@ def load_text_embeddings(df, collection, batch_size=500):
         lambda x: hashlib.sha256(x.encode()).hexdigest()[:16])
     df["id"] = hashed_buildings + "-" + df["id"]
 
-    metadata = {
-        "building": df["building"].tolist()[0]
-    }
-    if metadata["building"] in building_mappings:
-        building_mapping = building_mappings[metadata["building"]]
-
     # Process data in batches
     total_inserted = 0
     for i in range(0, df.shape[0], batch_size):
@@ -138,13 +124,11 @@ def load_text_embeddings(df, collection, batch_size=500):
 
         ids = batch["id"].tolist()
         documents = batch["chunk"].tolist()
-        metadatas = [metadata for item in batch["building"].tolist()]
         embeddings = batch["embedding"].tolist()
 
         collection.add(
             ids=ids,
             documents=documents,
-            metadatas=metadatas,
             embeddings=embeddings
         )
         total_inserted += len(batch)
@@ -354,7 +338,7 @@ def query(method="char-split"):
     print("\n\nResults:", results)
 
 
-def chat(method="char-split"):
+def chat(method="char-split", question=None):
     print("chat()")
 
     # Connect to chroma DB
@@ -362,7 +346,11 @@ def chat(method="char-split"):
     # Get a collection object from an existing collection, by name. If it doesn't exist, create it.
     collection_name = f"{method}-collection"
 
-    query = "Who is Adolphus Busch Hall named after?"
+    # Use the provided question if available, otherwise fall back to sample
+    if question is None or question == "":
+        query = "Who is Adolphus Busch Hall named after?"
+    else:
+        query = question
     query_embedding = generate_query_embedding(query)
     print("Query:", query)
     #print("Embedding values:", query_embedding)
@@ -379,9 +367,9 @@ def chat(method="char-split"):
     #print(len(results["documents"][0]))
 
     INPUT_PROMPT = f"""
-	{query}
-	{"\n".join(results["documents"][0])}
-	"""
+    {query}
+    {"\n".join(results["documents"][0])}
+    """
 
     #print("INPUT_PROMPT: ", INPUT_PROMPT)
     response = llm_client.models.generate_content(
@@ -487,7 +475,29 @@ def main(args=None):
         query(method=args.chunk_type)
 
     if args.chat:
-        chat(method=args.chunk_type)
+        # Determine question: direct flag > file > interactive prompt > default
+        question = None
+        if hasattr(args, "question") and args.question:
+            question = args.question
+        elif hasattr(args, "question_file") and args.question_file:
+            try:
+                with open(args.question_file, "r") as qf:
+                    question = qf.read().strip()
+            except Exception as e:
+                print(f"Failed to read question file '{args.question_file}': {e}")
+                question = None
+        else:
+            # Interactive prompt if running in a TTY
+            try:
+                if sys.stdin.isatty():
+                    user_q = input("Enter your question (leave blank to use default sample): ").strip()
+                    if user_q:
+                        question = user_q
+            except Exception:
+                # Non-interactive environment or input error -> leave question as None
+                question = None
+
+        chat(method=args.chunk_type, question=question)
 
     if args.get:
         get(method=args.chunk_type)
@@ -538,6 +548,14 @@ if __name__ == "__main__":
     )
     parser.add_argument("--chunk_type", default="char-split",
                         help="char-split | recursive-split | semantic-split")
+    parser.add_argument(
+        "--question",
+        help="Question text to use with --chat",
+    )
+    parser.add_argument(
+        "--question-file",
+        help="Path to a file containing the question text",
+    )
 
     args = parser.parse_args()
 
