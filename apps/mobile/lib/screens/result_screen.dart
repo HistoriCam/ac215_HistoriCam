@@ -14,7 +14,8 @@ class ResultScreen extends StatefulWidget {
   State<ResultScreen> createState() => _ResultScreenState();
 }
 
-class _ResultScreenState extends State<ResultScreen> with SingleTickerProviderStateMixin {
+class _ResultScreenState extends State<ResultScreen>
+    with SingleTickerProviderStateMixin {
   bool _isLoading = true;
   String _buildingName = '';
   String _buildingDescription = '';
@@ -35,7 +36,8 @@ class _ResultScreenState extends State<ResultScreen> with SingleTickerProviderSt
         if (mounted) {
           setState(() {
             _currentCharIndex++;
-            _displayedDescription = _buildingDescription.substring(0, _currentCharIndex);
+            _displayedDescription =
+                _buildingDescription.substring(0, _currentCharIndex);
           });
           _startTypingAnimation();
         }

@@ -157,7 +157,8 @@ class VisionApiService {
           final building = data[0];
           return {
             'name': building['name'] ?? 'Unknown Building',
-            'description': building['description'] ?? 'No description available.',
+            'description':
+                building['description'] ?? 'No description available.',
           };
         } else {
           // Building not found in database
@@ -167,7 +168,8 @@ class VisionApiService {
           };
         }
       } else {
-        throw Exception('Failed to fetch building info: ${response.statusCode}');
+        throw Exception(
+            'Failed to fetch building info: ${response.statusCode}');
       }
     } catch (e) {
       // Return fallback data on error
