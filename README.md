@@ -4,7 +4,38 @@ HistoriCam is a mobile-first web application that combines computer vision, geol
 
 ## Milestone 4 Specifics
 
-here is a demo of the full pipeline running locally: [video](https://drive.google.com/file/d/1xDccEPMYJSxnadXA0BW5U6aER20OuOAM/view?usp=sharing)
+Demo video of the full pipeline running locally: [video](https://drive.google.com/file/d/1xDccEPMYJSxnadXA0BW5U6aER20OuOAM/view?usp=sharing)
+
+Vercel App (Vision and LLM API not connected): [App](https://ac215-histori-cam.vercel.app/)
+
+#### Progress updates
+
+- [x] Log-in and Sign-up System complete with supabase 
+- [x] Backend building description retrieval complete with supabase
+- [x] Linked flutter APP with Vercel
+- [x] Vision Model with Vertex AI integration
+- [x] Vision model API which takes in image and returns most similar building's index
+- [x] Added Camera switch feature to access all device cameras
+- [x] Added tests for Flutter APP
+- [x] LLM-RAG with ChromaDB completed. 
+- [x] LLM chat API takes in text and context and returns responses
+- [x] LLM Finetuning pipeline complete
+- [x] CI pipeline implemented for flutter linting, tests and autodocumetation generation
+- [x] CD pipeline with vercel complete
+- [x] End-to-End App functional locally
+
+
+NOTE: APIs are located in app/mobile/lib/services
+
+#### TODO before MS5
+
+- [ ] Collect more images for better image retrieval in Vertex AI
+- [ ] Better finetuning for the LLM model with more data
+- [ ] Build a buildings description dataset to display initial information about the buidling (Using dummy descriptions)
+- [ ] Deploy Vision and Language Models to the cloud
+- [ ] Have a Supabase DB tracking user history
+- [ ] Implement the Location based building prediction fallback 
+
 
 ## Architecture
 
