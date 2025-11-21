@@ -239,8 +239,8 @@ void main() {
       // Initially should show Login button
       expect(find.text('Login'), findsOneWidget);
 
-      // Tap the toggle to switch to signup mode
-      await tester.tap(find.text('Sign Up'));
+      // Find and tap the toggle button (it's a TextButton with RichText)
+      await tester.tap(find.byType(TextButton));
       await tester.pump();
 
       // Should now show Create Account button
