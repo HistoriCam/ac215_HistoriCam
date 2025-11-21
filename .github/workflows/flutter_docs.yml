@@ -3,13 +3,7 @@ name: Generate Flutter Documentation
 on:
   push:
     branches:
-      - main
-    paths:
-      - 'apps/mobile/lib/**'
-      - 'apps/mobile/pubspec.yaml'
-  pull_request:
-    branches:
-      - main
+      - [ master ]
     paths:
       - 'apps/mobile/lib/**'
       - 'apps/mobile/pubspec.yaml'
