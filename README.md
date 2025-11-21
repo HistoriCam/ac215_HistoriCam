@@ -8,8 +8,9 @@ Demo video of the full pipeline running locally: [video](https://drive.google.co
 
 Vercel App (Vision and LLM API not connected): [App](https://ac215-histori-cam.vercel.app/)
 
-#### Progress updates
+NOTE: All evidence is located in "docs" for the submission
 
+#### Progress updates
 - [x] Log-in and Sign-up System complete with supabase 
 - [x] Backend building description retrieval complete with supabase
 - [x] Linked flutter APP with Vercel
@@ -43,6 +44,8 @@ This project follows AC215 MLOps best practices with containerized microservices
 
 ![Architecture Diagram](docs/design/technical_architecture.png)
 
+We also run the data extraction sperately at the begining but it is not an active component:
+
 ```
 ┌──────────────────┐        ┌──────────────────┐
 │  Scraper Service │ -----> │    GCP Bucket    │
@@ -56,7 +59,7 @@ ac215_HistoriCam/
 ├── services/                   # Backend microservices (FastAPI)
 │   ├── scraper/               # Data collection & image scraping
 │   ├── api/                   # Main API service
-│   └── vision/                # Vision model API (Cloud Run)
+│   └── vision/                # Vision model API
 │
 ├── apps/mobile/               # Flutter mobile app
 │
@@ -65,12 +68,11 @@ ac215_HistoriCam/
 │   └── vision-model/         # Vision model training
 │
 ├── data/                      # Scraped building data & images
-├── design/                    # UI/UX mockups
+├── docs/                      # Project documentation
 └── secrets/                   # GCP credentials (gitignored)
 ```
 
 ## Getting Started
-
 ### Prerequisites
 
 - [uv](https://docs.astral.sh/uv/) - Fast Python package manager
@@ -82,7 +84,7 @@ ac215_HistoriCam/
   - Vertex AI
   - Cloud Run / GKE
 
-### Initial Setup
+### Initial Setup (For Local Deploument)
 
 1. **Clone the repository**
    ```bash
@@ -90,13 +92,11 @@ ac215_HistoriCam/
    cd ac215_HistoriCam
    ```
 
-2. **Set up GCP credentials** (if using cloud storage)
-   - Follow the complete setup guide in [GCS_SETUP.md](GCS_SETUP.md)
+2. **Set up GCP credentials**
    - Place service account JSON in `secrets/gcs-service-account.json`
    - The secrets directory is gitignored for security
 
 ## Complete Pipeline Guide
-
 ### Phase 1: Data Collection (Scraper Service)
 
 The scraper service collects building data and images from Wikipedia and Wikimedia Commons.
@@ -120,34 +120,6 @@ uv run python src/scraper/gcs_manager.py upload \
     /data/images/image_manifest.csv
 ```
 
-#### Using Local Python (Alternative)
-
-```bash
-cd services/scraper
-
-# Install dependencies with uv
-uv sync
-
-# Run scraping pipeline
-# Step 1: Scrape building names from Wikipedia
-uv run python src/run.py
-
-# Step 2: Scrape images from Wikimedia Commons
-uv run python src/scraper/scrape_images.py \
-    ../../data/buildings_names_metadata.csv \
-    ../../data/images
-
-# Step 3: Validate images (optional)
-uv run python src/scraper/validation.py ../../data/images
-
-# Step 4: Upload to GCS (optional, requires GCP setup)
-export GOOGLE_APPLICATION_CREDENTIALS="../../secrets/gcs-service-account.json"
-uv run python src/scraper/gcs_manager.py upload \
-    historicam-images \
-    ../../data/images \
-    ../../data/images/image_manifest.csv
-```
-
 **Output Files:**
 - `data/buildings_names.csv` - Base building data (id, name, source_url)
 - `data/buildings_names_metadata.csv` - Enriched with lat/lon/aliases from Wikidata
@@ -156,31 +128,17 @@ uv run python src/scraper/gcs_manager.py upload \
 - `data/images/` - Downloaded images organized by building ID
 - `data/images/image_manifest.csv` - Image metadata (URLs, dimensions, hashes)
 
-**Available CLI Options:**
-```bash
-# Skip metadata scraping (faster)
-uv run python src/run.py --skip-metadata
+#### Dataset Version Control (DVC)
+TBD
 
-# Only scrape metadata from existing CSV
-uv run python src/run.py --metadata-only -i ../../data/buildings_names.csv
-
-# Scrape specific number of images per building
-uv run python src/scraper/scrape_images.py <csv> <output_dir> --max-images 5
-```
-
-**Docker Details:**
-- **Dockerfile**: Uses Python 3.11 slim with uv package manager
-- **Volumes**: Mounts source code, data directory, and secrets
-- **pyproject.toml**: Dependencies include requests, google-cloud-storage, pillow, pandas
-
-### Phase 1.5: LLM-RAG Pipeline
+### Phase 2: LLM-RAG Pipeline
 
 The LLM-RAG service processes building information to create a retrieval-augmented generation system for answering questions about buildings.
 
 #### Prerequisites
 
 1. **Set up GCP credentials**
-   - Place service account JSON in `secrets/llm-service-account.json`
+   - Place service account JSON in `secrets/gcs-service-account.json`
    - Update `GCP_PROJECT` in `docker-shell.sh` with your project ID
 
 2. **Prepare input data**
@@ -194,39 +152,6 @@ cd ml/llm-rag
 
 # Build and start containers (ChromaDB + LLM-RAG CLI)
 ./docker-shell.sh
-
-# Inside container - Full RAG pipeline:
-
-# Step 1: Chunk the text data
-uv run python cli.py --chunk --chunk_type char-split
-
-# Step 2: Generate embeddings
-uv run python cli.py --embed --chunk_type char-split
-
-# Step 3: Load embeddings into ChromaDB
-uv run python cli.py --load --chunk_type char-split
-
-# Step 4: Test with a query
-uv run python cli.py --query --chunk_type char-split
-
-# Step 5: Chat with the LLM (RAG-enabled)
-uv run python cli.py --chat --chunk_type char-split
-
-# Step 6: Use the LLM agent
-uv run python cli.py --agent --chunk_type char-split
-```
-
-#### Alternative Chunking Methods
-
-```bash
-# Character-based splitting (default)
-uv run python cli.py --chunk --chunk_type char-split
-
-# Recursive character splitting
-uv run python cli.py --chunk --chunk_type recursive-split
-
-# Semantic splitting (groups by meaning)
-uv run python cli.py --chunk --chunk_type semantic-split
 ```
 
 #### Pipeline Architecture
@@ -254,42 +179,41 @@ The LLM-RAG system:
 - `ml/llm-rag/outputs/embeddings-[method]-[building].jsonl` - Embedded chunks
 - `ml/llm-rag/docker-volumes/chromadb/` - Persistent vector database
 
-### Phase 2: ML Training Pipeline
+### Phase 3: Vision Pipeline
+Vision model uses vertexAI and you can follow documentation in services/vision to set up the credentials and env.
 
-The ML pipeline trains image classification models using Vertex AI.
+### Run Locally
 
 ```bash
-cd ml
+cd services/vision
 
-# Build Docker image
-docker build -t historicam-ml .
+# 1. Set up environment (first time only)
+cp .env.example .env
 
-# Run training (customize as needed)
-docker run --rm \
-  -v "$(pwd)/data":/app/data \
-  -v "$(pwd)/models":/app/models \
-  -e GOOGLE_APPLICATION_CREDENTIALS=/app/secrets/gcs-service-account.json \
-  historicam-ml
+# Edit .env with your VERTEX_ENDPOINT_ID
 
-# Or run locally with uv (when pyproject.toml is added)
-# uv run python src/train.py
+# 2. Start API server
+./docker-shell.sh
 ```
-
-**Docker Details:**
-- **Dockerfile**: Uses official uv base image (ghcr.io/astral-sh/uv:python3.11-bookworm-slim)
-- **Entry point**: `uv run python src/train.py`
-- **Data**: Fetches versioned data from GCS
-
-
-**Docker Details:**
-- **Dockerfile**: TBD (to be implemented)
-- **pyproject.toml**: Dependencies include requests (FastAPI to be added)
-- **Endpoints**: Will serve predictions and building information
 
 ### Phase 4: Mobile Application
 
 The Flutter mobile app provides the user interface.
 
+#### Prerequisites
+
+1. **Set up GCP credentials**
+   - Place Supbase credentials in: secrets/supabase_key.env formatted to:
+
+```env   
+{
+  "SUPABASE_KEY": "API_KEY"
+}
+```
+
+
+
+#### Build Locally
 ```bash
 cd apps/mobile
 
@@ -300,19 +224,13 @@ flutter pub get
 flutter run
 
 # Build for production
-flutter build apk --release              # Android
-flutter build ios --release              # iOS (macOS only)
 flutter build web --release  
+flutter run --dart-define-from-file=../../secrets/supabase_key.env
 ```
-
-**Platform-specific setup:**
-- **Android**: Requires Android Studio and Android SDK
-- **iOS**: Requires Xcode (macOS only) and CocoaPods
-- See [apps/mobile/README.md](apps/mobile/README.md) for detailed instructions
 
 ## Team
 
-AC215 Fall 2024
+AC215 Fall 2025
 
 ## License
 
