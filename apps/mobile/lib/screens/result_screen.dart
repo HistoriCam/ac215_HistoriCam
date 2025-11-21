@@ -57,9 +57,12 @@ class _ResultScreenState extends State<ResultScreen> with SingleTickerProviderSt
         final confidence = parsed['confidence'];
         final status = parsed['status'];
 
+        // Fetch building information from Supabase
+        final buildingInfo = await _visionApi.fetchBuildingInfo(buildingId);
+
         setState(() {
-          _buildingName = _visionApi.getBuildingName(buildingId);
-          final baseDescription = _visionApi.getBuildingDescription(buildingId);
+          _buildingName = buildingInfo['name']!;
+          final baseDescription = buildingInfo['description']!;
 
           // Add confidence info to description
           if (status == 'uncertain') {

@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import '../config/api_config.dart';
+import '../config/supabase_config.dart';
 
 class VisionApiService {
   /// Identifies a building from an image file
@@ -117,13 +118,71 @@ class VisionApiService {
     }
   }
 
+  /// Fetch building information from Supabase by building_id
+  ///
+  /// Args:
+  ///   buildingId: The numeric building ID (as string)
+  ///
+  /// Returns:
+  ///   Map containing 'name' and 'description' keys
+  ///
+  /// Throws:
+  ///   Exception if the fetch fails
+  Future<Map<String, String>> fetchBuildingInfo(String buildingId) async {
+    try {
+      // Convert buildingId to integer for querying
+      final id = int.tryParse(buildingId);
+      if (id == null) {
+        throw Exception('Invalid building ID: $buildingId');
+      }
+
+      // Query Supabase for building information
+      final uri = Uri.parse(
+        '${SupabaseConfig.supabaseUrl}/rest/v1/building_descriptions?id=eq.$id&select=name,description',
+      );
+
+      final response = await http.get(
+        uri,
+        headers: {
+          'apikey': SupabaseConfig.supabaseKey,
+          'Authorization': 'Bearer ${SupabaseConfig.supabaseKey}',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+
+        if (data.isNotEmpty) {
+          final building = data[0];
+          return {
+            'name': building['name'] ?? 'Unknown Building',
+            'description': building['description'] ?? 'No description available.',
+          };
+        } else {
+          // Building not found in database
+          return {
+            'name': 'Building $buildingId',
+            'description': 'Information not available for this building.',
+          };
+        }
+      } else {
+        throw Exception('Failed to fetch building info: ${response.statusCode}');
+      }
+    } catch (e) {
+      // Return fallback data on error
+      return {
+        'name': 'Building $buildingId',
+        'description': 'Error fetching building information: $e',
+      };
+    }
+  }
+
   /// Get a human-readable building name from building_id
   ///
-  /// This is a placeholder - you'll want to implement a proper mapping
-  /// from building IDs to full names, possibly from a database or API
+  /// This is deprecated - use fetchBuildingInfo instead
+  @deprecated
   String getBuildingName(String buildingId) {
-    // TODO: Implement proper building ID to name mapping
-    // For now, just return the building ID formatted nicely
     return buildingId
         .replaceAll('_', ' ')
         .split(' ')
@@ -133,11 +192,9 @@ class VisionApiService {
 
   /// Get a building description
   ///
-  /// This is a placeholder - you'll want to fetch this from your backend
-  /// or a database that contains building information
+  /// This is deprecated - use fetchBuildingInfo instead
+  @deprecated
   String getBuildingDescription(String buildingId) {
-    // TODO: Implement proper building description fetching
-    // This could come from another API endpoint or local database
     return 'Information about $buildingId. This is a historic building with significant architectural and cultural importance.';
   }
 }
