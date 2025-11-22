@@ -1,0 +1,82 @@
+[
+  {
+    "question": "What makes Johnston Gate so iconic?",
+    "answer": "Well, Johnston Gate isn't just any entrance; it's the oldest of Harvard's gates, dating back to 1889! Designed by McKim, Mead & White, it stands as a symbol of passage and tradition, marking the transition from the bustling streets of Cambridge into the historic Harvard Yard. Its Georgian Revival style is quite striking!"
+  },
+  {
+    "question": "Can you explain the history behind the John Harvard Statue?",
+    "answer": "Ah, the 'Statue of Three Lies'! Sculpted by Daniel Chester French in 1884, it's not actually a likeness of John Harvard! No contemporary portrait existed, so French used a Harvard student as a model. Also, it states he was a 'Founder' when he was actually a benefactor, and it says '1638' when Harvard was founded in 1636. Quite the tale, isn't it?"
+  },
+  {
+    "question": "What's the architectural style of Memorial Hall and why is it so grand?",
+    "answer": "Memorial Hall is a stunning example of High Victorian Gothic architecture, built between 1870 and 1877. Its grandeur is intentional, serving as a memorial to Harvard men who died in the Civil War. The soaring arches and stained glass windows are truly breathtaking, especially Annenberg Hall which is modeled after a medieval great hall!"
+  },
+  {
+    "question": "Tell me about Widener Library's history and why it's so massive.",
+    "answer": "Widener Library is a monument to Harry Elkins Widener, a Harvard alumnus who perished on the Titanic. His mother, Eleanor Elkins Widener, donated the library with the stipulation that it house his extensive book collection and that the building's exterior remain unchanged. That's why it's so large! There's even an urban legend that Mrs. Widener insisted that all future librarians must weigh as much as her son to prevent the library from sinking into the ground. (That's not true, but it's a good story!)"
+  },
+  {
+    "question": "Why is the Harvard Lampoon building designed to look like a face?",
+    "answer": "The Harvard Lampoon building, completed in 1909, is a whimsical example of architecture designed to mirror the satirical humor of the Lampoon magazine. Its 'face' design is purely for fun and to stand out! It's a playful nod to the magazine's irreverent spirit."
+  },
+  {
+    "question": "What can you tell me about the Fogg Museum's architecture?",
+    "answer": "The Fogg Museum, particularly its Arthur M. Sackler Building designed by James Stirling, is known for its postmodern style. It combines historical references with modern elements, making it a unique architectural statement. It contains materials from various periods and cultures. It's a building that really makes you think!"
+  },
+  {
+    "question": "How did Harvard acquire its collection of glass flowers?",
+    "answer": "The Ware Collection of Blaschka Glass Models of Plants, commonly known as the 'Glass Flowers,' was commissioned by Harvard from Leopold and Rudolf Blaschka, a father and son duo in Germany. From 1887 to 1936, they crafted these incredibly detailed glass models for botanical study. It's an amazing example of art meeting science!"
+  },
+  {
+    "question": "What is the significance of Tercentenary Theatre?",
+    "answer": "Tercentenary Theatre isn't actually a theatre in the traditional sense; it's the large grassy space between Widener Library and Memorial Church. It's significant because it's the site of Harvard's Commencement ceremonies and other major university events. Think of it as Harvard's central gathering place!"
+  },
+  {
+    "question": "Tell me about the history of Harvard's Science Center.",
+    "answer": "The Science Center, designed by Josep Lluís Sert and completed in 1973, was intended to consolidate science departments. Its Brutalist architecture, while sometimes controversial, is quite striking. It serves as a central hub for science education and research at Harvard. It even boasts a Polaroid Camera Museum!"
+  },
+  {
+    "question": "Why is the Harvard Art Museums complex so important?",
+    "answer": "The Harvard Art Museums complex, comprising the Fogg, Busch-Reisinger, and Arthur M. Sackler Museums, is important because it houses a vast collection spanning various periods and cultures. The Renzo Piano-designed renovation unified these museums into a single, state-of-the-art facility, enhancing the visitor experience and promoting interdisciplinary study."
+  },
+  {
+    "question": "What's unique about the architecture of Sever Hall?",
+    "answer": "Sever Hall, designed by H.H. Richardson, is known for its Romanesque Revival style. Its massive brick structure and distinctive arched entrance create a sense of solidity and permanence. Richardson was a master of proportion and detail, making Sever Hall one of his most admired works."
+  },
+  {
+    "question": "How did Harvard Yard evolve into its current layout?",
+    "answer": "Harvard Yard evolved gradually over centuries. Originally a simple open space, it became enclosed by buildings and fences, creating a more defined and protected environment. The placement of dormitories, libraries, and chapels around the Yard reflects the changing priorities of the university over time. It's a living history lesson in urban planning!"
+  },
+  {
+    "question": "What can you tell me about the Beker Library at Harvard Business School?",
+    "answer": "The Baker Library, designed in the Georgian Revival style, is a central landmark at Harvard Business School. Its impressive facade and grand reading room create a sense of scholarly importance. It houses a vast collection of business and economic materials, supporting the research and education of future business leaders. The reading room is one of the quietest spots on campus!"
+  },
+  {
+    "question": "What is the significance of the Peabody Museum of Archaeology and Ethnology?",
+    "answer": "The Peabody Museum houses an extensive collection of artifacts from around the world, representing diverse cultures and historical periods. Its exhibits offer valuable insights into human history and cultural diversity. It's a treasure trove for anyone interested in anthropology and archaeology!"
+  },
+  {
+    "question": "Why is Annenberg Hall such a special place for Harvard freshmen?",
+    "answer": "Annenberg Hall serves as the primary dining hall for Harvard freshmen. Its magnificent architecture, reminiscent of a medieval great hall, creates a sense of tradition and community. It's where freshmen bond over meals and form lasting friendships. Plus, it's rumored to be the inspiration for the Great Hall in the 'Harry Potter' films!"
+  },
+  {
+    "question": "Can you describe the architectural style of the Radcliffe Quadrangle?",
+    "answer": "The Radcliffe Quadrangle, originally the heart of Radcliffe College, features a mix of architectural styles, primarily Collegiate Gothic and Georgian Revival. Its dormitories and academic buildings create a peaceful and scholarly atmosphere. It's a beautiful and serene part of the Harvard campus."
+  },
+  {
+    "question": "What's the story behind the name of Harvard's Dunster House?",
+    "answer": "Dunster House is named after Henry Dunster, Harvard's first president. It's one of the original River Houses, known for its Collegiate Gothic architecture and strong sense of community. Each house has its own unique traditions and character!"
+  },
+  {
+    "question": "What are some of the unique features of Lowell House?",
+    "answer": "Lowell House is known for its distinctive bell tower and enclosed courtyard. Its architectural style is Collegiate Gothic, creating a sense of tradition and grandeur. It's also rumored to have secret tunnels, though I can't confirm that! Every house has its mysteries!"
+  },
+  {
+    "question": "How does the design of the Harvard Law School Library reflect its purpose?",
+    "answer": "The Harvard Law School Library's design emphasizes functionality and scholarly pursuit. Its large reading rooms and extensive stacks provide ample space for research and study. The building's architecture is generally more functional than ornamental, reflecting its focus on legal scholarship. It's a serious place for serious study!"
+  },
+  {
+    "question": "What's the role of the Harvard University Archives, and where is it located?",
+    "answer": "The Harvard University Archives preserves the history of Harvard University. It's located in Pusey Library and houses a vast collection of documents, photographs, and artifacts related to Harvard's past. It's an invaluable resource for researchers and anyone interested in the history of this great institution!"
+  }
+]
