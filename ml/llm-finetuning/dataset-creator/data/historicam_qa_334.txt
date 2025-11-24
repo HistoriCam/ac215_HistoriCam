@@ -1,0 +1,82 @@
+[
+  {
+    "question": "What makes Johnston Gate so special?",
+    "answer": "Ah, Johnston Gate! It's the oldest of Harvard's gates, dating back to 1889. It's built of wood and iron, a striking contrast to the later, more grandiose gates. It marks the original entrance to Harvard Yard and symbolizes the transition from the outside world into the academic sanctuary. You'll notice the intricate ironwork; it's a beautiful example of late 19th-century craftsmanship."
+  },
+  {
+    "question": "Can you explain the architectural style of Memorial Hall?",
+    "answer": "Certainly! Memorial Hall is a prime example of High Victorian Gothic architecture. Notice the polychromatic brickwork—the use of different colored bricks to create patterns and visual interest. The soaring arches, the pointed windows, and the overall vertical emphasis are all hallmarks of the Gothic Revival style. It was designed by William Robert Ware and Henry Van Brunt, and it's one of the most visually stunning buildings on campus."
+  },
+  {
+    "question": "What's the story behind the statue of John Harvard?",
+    "answer": "Ah, the 'Statue of Three Lies'! The statue is not actually a likeness of John Harvard himself—no authentic portrait of him exists. The inscription says 'John Harvard, Founder, 1638,' but Harvard was founded in 1636, not 1638. And the man who posed for the statue was actually a Harvard student. But, regardless of the inaccuracies, it remains an iconic symbol of the university."
+  },
+  {
+    "question": "Why is Widener Library so important?",
+    "answer": "Widener Library is the heart of Harvard's vast library system. It houses an enormous collection of books and manuscripts, and it's a crucial resource for students and researchers. It was donated by Eleanor Elkins Widener in memory of her son, Harry Elkins Widener, who died on the Titanic. The Beaux-Arts architectural style is quite impressive, reflecting the grand scale of its purpose."
+  },
+  {
+    "question": "Tell me about the Fogg Museum and its collections.",
+    "answer": "The Fogg Museum is part of the Harvard Art Museums. It boasts an encyclopedic collection spanning various periods and cultures, from ancient art to modern works. Its special strength lies in its collection of Italian Renaissance paintings, early American art, and a significant collection of drawings. The building itself, designed by Richard Meier, is a modern architectural marvel with its light-filled courtyard."
+  },
+  {
+    "question": "What's the significance of Tercentenary Theatre?",
+    "answer": "Tercentenary Theatre isn't a theatre in the traditional sense. It's the open space in Harvard Yard where commencement ceremonies are held. It's named in honor of Harvard's 300th anniversary in 1936. The surrounding buildings—Massachusetts Hall, Harvard Hall, and Holworthy Hall—create a beautiful and historic backdrop for these important events."
+  },
+  {
+    "question": "What can you tell me about Harvard Hall?",
+    "answer": "Harvard Hall is a survivor! Built in 1766, it's the oldest surviving building in Harvard Yard. It replaced an earlier Harvard Hall that burned down in 1764, destroying the college's library. Today, it houses classrooms and offices, and it stands as a testament to Harvard's enduring history."
+  },
+  {
+    "question": "How did Massachusetts Hall get its name?",
+    "answer": "Massachusetts Hall, constructed between 1718 and 1720, was named in honor of the Province of Massachusetts Bay, which provided funding for its construction. It's one of the oldest dormitories in the United States and has housed countless Harvard students over the centuries."
+  },
+  {
+    "question": "What's unique about the architecture of Sever Hall?",
+    "answer": "Sever Hall, designed by H.H. Richardson, is a masterpiece of Romanesque Revival architecture. Its massive brick walls, round arches, and minimal ornamentation create a sense of solidity and permanence. The acoustic archway is a particularly striking feature, showcasing Richardson's innovative approach to design."
+  },
+  {
+    "question": "Why is Annenberg Hall so grand?",
+    "answer": "Annenberg Hall is the freshman dining hall at Harvard, and it's designed to impress! The architecture is inspired by the great halls of Oxford and Cambridge universities. The soaring ceilings, stained glass windows, and long wooden tables create a truly awe-inspiring dining experience for incoming students."
+  },
+  {
+    "question": "Tell me about the Busch-Reisinger Museum.",
+    "answer": "The Busch-Reisinger Museum is dedicated to the art of the German-speaking countries of Central and Northern Europe. It's unique in its focus, and it houses a diverse collection of paintings, sculptures, prints, and drawings from Germany, Austria, and Switzerland. The collection is important for its Bauhaus-related holdings."
+  },
+  {
+    "question": "What is the Carpenter Center?",
+    "answer": "The Carpenter Center for the Visual Arts, designed by Le Corbusier, is the only building in North America designed by the famous architect. It's a Brutalist masterpiece, characterized by its exposed concrete, geometric forms, and emphasis on functionality. It houses studios, classrooms, and exhibition spaces for the visual arts program."
+  },
+  {
+    "question": "Why is the Science Center so...unique?",
+    "answer": "The Science Center, designed by Josep Lluís Sert, is a bold example of Brutalist architecture. Its pre-cast concrete panels, modular design, and elevated walkways were intended to create a dynamic and interconnected space for scientific research and education. It's a bit of a controversial building, but it's definitely a landmark!"
+  },
+  {
+    "question": "What is the Arthur M. Sackler Museum known for?",
+    "answer": "The Arthur M. Sackler Museum, part of the Harvard Art Museums, specializes in Asian, ancient, and Islamic art. Its collection includes a wide range of objects, from ancient ceramics and sculptures to Islamic manuscripts and textiles. The museum's focus on cross-cultural connections makes it an invaluable resource for scholars and art lovers."
+  },
+  {
+    "question": "Tell me about the history of the Peabody Museum.",
+    "answer": "The Peabody Museum of Archaeology and Ethnology is one of the oldest anthropological museums in the world. Its collections span the globe, documenting human cultures and civilizations from prehistoric times to the present day. The museum's research and exhibitions have played a significant role in shaping our understanding of human history and diversity."
+  },
+  {
+    "question": "What's the story behind the glass flowers at the Harvard Museum of Natural History?",
+    "answer": "The Glass Flowers, or the Ware Collection of Blaschka Glass Models of Plants, is a unique and stunning exhibit at the Harvard Museum of Natural History. These incredibly lifelike glass models were created by Leopold and Rudolf Blaschka, a father-and-son team of Czech artists. They're a testament to the intersection of art and science."
+  },
+  {
+    "question": "What is so culturally significant about the Radcliffe Quadrangle?",
+    "answer": "The Radcliffe Quadrangle represents an important chapter in the history of women's education. It was the heart of Radcliffe College, which was founded in 1879 as a sister institution to Harvard. The buildings in the Quadrangle—including Agassiz House and Eliot Hall—are testaments to the dedication and achievements of women scholars."
+  },
+  {
+    "question": "What's the purpose of the Harvard Lampoon building?",
+    "answer": "The Harvard Lampoon building is home to the Harvard Lampoon, the university's undergraduate humor magazine. The building's whimsical design—it resembles a giant ibis—reflects the magazine's satirical spirit. It's a unique and quirky landmark on the Harvard campus."
+  },
+  {
+    "question": "Tell me a bit about the Houghton Library.",
+    "answer": "Houghton Library is Harvard's principal repository for rare books and manuscripts. Its collections include literary manuscripts, historical documents, and early printed books. It's a treasure trove for researchers and scholars interested in the history of literature and culture."
+  },
+  {
+    "question": "What makes Phillips Brooks House Association (PBHA) important?",
+    "answer": "The Phillips Brooks House Association (PBHA) is a student-run, non-profit organization at Harvard dedicated to community service. It was founded in 1900, and the building itself—Phillips Brooks House—serves as a center for PBHA's activities. It represents Harvard's commitment to social responsibility and civic engagement."
+  }
+]

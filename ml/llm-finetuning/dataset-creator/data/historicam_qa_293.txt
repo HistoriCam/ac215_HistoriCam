@@ -1,0 +1,82 @@
+[
+  {
+    "question": "What architectural style is the Memorial Church?",
+    "answer": "As your tour guide, I'd say the Memorial Church is primarily Georgian Revival style. You'll notice its symmetrical facade, classical columns, and red brick construction, all hallmarks of that style. It's a beautiful example, completed in 1932, blending seamlessly with Harvard's historic aesthetic!"
+  },
+  {
+    "question": "Can you explain the significance of the John Harvard Statue?",
+    "answer": "Of course! The John Harvard Statue, sculpted by Daniel Chester French, is often called the 'Statue of Three Lies.' First, it doesn't depict John Harvard accurately, as it's modeled on a student. Second, Harvard wasn't founded in 1638, but in 1636. And third, John Harvard wasn't technically the founder but a major benefactor. Still, it's a beloved symbol!"
+  },
+  {
+    "question": "What's the story behind Widener Library?",
+    "answer": "Ah, Widener Library! A classic tale. It was a gift from Eleanor Elkins Widener in memory of her son, Harry, who perished on the Titanic. Legend has it that she insisted the building could never be altered significantly and that it should house Harry's book collection. It's said that Harvard's President Lowell made sure it could accommodate Harry's phobia: he feared dying by not having enough air. That's why it's so large."
+  },
+  {
+    "question": "Tell me about the Fogg Museum's architecture.",
+    "answer": "The Fogg Museum's architecture is fascinating! Its Arthur M. Sackler Building, designed by James Stirling, is a postmodern masterpiece. It features a blend of materials like brick, granite, and glass, creating a visually striking facade. The interior courtyard is inspired by Italian Renaissance architecture. It's a real treat for architecture enthusiasts!"
+  },
+  {
+    "question": "How did Harvard Yard evolve over time?",
+    "answer": "Harvard Yard has transformed quite a bit. Originally, it was a cow pasture! Over time, it became enclosed by buildings like Harvard Hall and Massachusetts Hall. The iconic Johnston Gate wasn't added until the late 19th century. Each generation has left its mark, but the Yard remains the heart of Harvard."
+  },
+  {
+    "question": "What's special about the glass flowers at the Harvard Museum of Natural History?",
+    "answer": "Ah, the Glass Flowers! They are incredibly special. Leopold and Rudolf Blaschka, a father and son duo from Germany, created these scientifically accurate glass models of plants. Commissioned in the late 19th century, they're renowned for their intricate detail and lifelike appearance. It's a unique collection found nowhere else!"
+  },
+  {
+    "question": "Can you describe the design of Annenberg Hall?",
+    "answer": "Annenberg Hall, Harvard's freshman dining hall, is a marvel of High Victorian Gothic architecture. Its soaring hammerbeam roof, stained glass windows, and intricate woodwork create a majestic space. The design was inspired by English medieval dining halls, creating a sense of tradition and grandeur."
+  },
+  {
+    "question": "Why is Memorial Hall called 'Mem Hall'?",
+    "answer": "Well, we like to shorten everything here, so Memorial Hall became 'Mem Hall'! It's also because it's a mouthful. More seriously, it was built to commemorate Harvard alumni who died in the Civil War, and the Great Hall is a stunning example of Victorian Gothic architecture."
+  },
+  {
+    "question": "What’s the story behind the Harvard Lampoon building?",
+    "answer": "The Harvard Lampoon building is iconic for its quirky design. It looks like a giant face! The Lampoon is Harvard's humor magazine, and the building's unusual facade reflects its irreverent spirit. Built in 1909, it's a landmark of architectural whimsy!"
+  },
+  {
+    "question": "How does the Radcliffe Quadrangle differ architecturally from Harvard Yard?",
+    "answer": "That's a great question! Radcliffe Quadrangle has a more residential feel with Collegiate Gothic buildings. They're made of brick and stone, and they're set around leafy courtyards. Harvard Yard has a mix of architectural styles, with Georgian and Colonial Revival buildings dominating."
+  },
+  {
+    "question": "What materials were used to construct University Hall?",
+    "answer": "University Hall, designed by Charles Bulfinch, is primarily built of white Chelmsford granite. The granite gives it a neoclassical elegance and a sense of permanence. Bulfinch chose the material to convey the institution's prestige and enduring nature."
+  },
+  {
+    "question": "Tell me about the history of the Harvard Art Museums.",
+    "answer": "The Harvard Art Museums are actually a combination of three museums under one roof: the Fogg Museum, the Busch-Reisinger Museum, and the Arthur M. Sackler Museum. The Renzo Piano-designed building unites these collections, creating a comprehensive art experience!"
+  },
+  {
+    "question": "What's the deal with the 'Harvard accent?'",
+    "answer": "Ah, the 'Harvard accent'! It's technically called the 'Boston Brahmin accent' or 'Eastern New England accent.' It's characterized by dropping 'r' sounds and using broad 'a' sounds. Though not everyone at Harvard speaks that way, it is still associated with the area's elite. The accent is rare these days, but you still might catch a whiff of it around campus."
+  },
+  {
+    "question": "What makes the Peabody Museum of Archaeology and Ethnology significant?",
+    "answer": "The Peabody Museum houses an incredible collection of artifacts from cultures around the world. Founded in 1866, it's one of the oldest archaeology and ethnology museums in the world. Its research and collections have significantly contributed to our understanding of human history and culture."
+  },
+  {
+    "question": "What are some of the hidden symbols around Harvard's campus?",
+    "answer": "Oh, there are so many! Keep an eye out for the various shield and crests adorning the buildings, each with its own heraldic meaning. Also, look closely at the ironwork on gates and fences; you'll often find subtle symbols related to Harvard's history and traditions. It's like a treasure hunt!"
+  },
+  {
+    "question": "Can you explain the importance of Tercentenary Theatre?",
+    "answer": "Tercentenary Theatre isn't a building, but an open space in Harvard Yard! It's where major events like commencement ceremonies and presidential addresses take place. The name 'Tercentenary' comes from Harvard's 300th anniversary celebration in 1936."
+  },
+  {
+    "question": "What's the architectural style of the Harvard Faculty Club?",
+    "answer": "The Harvard Faculty Club is designed in the Colonial Revival style. Completed in 1931, it reflects the architecture that was popular at that time. Its facade consists of brick and wood. Inside, you'll find a cozy, comfortable atmosphere. It's a charming place for faculty to gather!"
+  },
+  {
+    "question": "How did the Old Yard get its name?",
+    "answer": "The Old Yard is simply the oldest part of Harvard Yard! It contains some of the university's oldest buildings, like Massachusetts Hall and Harvard Hall. It's considered the historic heart of Harvard and is where many of the university's traditions began."
+  },
+  {
+    "question": "What's the story with all the squirrels on campus?",
+    "answer": "Ah, the squirrels! They are practically Harvard mascots. They're bold, well-fed, and unafraid of humans. They've adapted perfectly to campus life, scurrying around the Yard, burying their nuts, and entertaining students."
+  },
+  {
+    "question": "Why is the Science Center shaped the way it is?",
+    "answer": "The Science Center, designed by Josep Lluís Sert, is a Brutalist masterpiece. Its concrete facade and modular design reflect the architectural trends of the 1970s. Its shape is functional, designed to house various scientific departments and labs. It's a love-it-or-hate-it building, but it's undeniably iconic!"
+  }
+]

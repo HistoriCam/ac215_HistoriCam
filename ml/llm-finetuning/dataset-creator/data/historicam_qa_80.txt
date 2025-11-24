@@ -1,0 +1,82 @@
+[
+  {
+    "question": "What's the story behind the John Harvard Statue?",
+    "answer": "Ah, the John Harvard Statue! Often called the 'Statue of Three Lies'. It claims to depict John Harvard, be a founder, and state the founding year as 1638 – all incorrect! It's actually a representation created by Daniel Chester French, not an actual likeness. Harvard wasn't founded by one person, and the correct year is 1636. Still, it's a beloved (and heavily photographed) Harvard icon!"
+  },
+  {
+    "question": "Tell me about Memorial Hall. Why is it called that?",
+    "answer": "Memorial Hall is a High Victorian Gothic masterpiece built between 1870 and 1877. It serves as a memorial to Harvard men who died fighting for the Union during the American Civil War. The Great Hall inside is stunning, and Annenberg Hall, now a dining hall, is equally impressive. It's a powerful tribute and architectural gem."
+  },
+  {
+    "question": "What can you tell me about the architecture of Widener Library?",
+    "answer": "Widener Library, completed in 1915, is a Beaux-Arts style building, a style characterized by symmetry, grand scale, and elaborate ornamentation. The architects, Horace Trumbauer, designed it to be fireproof using steel framing and concrete floors. The facade features impressive columns and classical detailing, making it both functional and aesthetically grand. I would say it is beautiful."
+  },
+  {
+    "question": "Why is the Harvard Lampoon building so... unusual?",
+    "answer": "The Harvard Lampoon Castle (or just 'The Lampoon' building) at 44 Bow Street is a whimsical, comical architectural statement. Built in 1909, it's designed to resemble a giant ibis. The Lampoon, Harvard's humor magazine, wanted their headquarters to be as irreverent as their content. That's why it's such a unique and memorable structure. Don't you think it is funny?"
+  },
+  {
+    "question": "What's the deal with all the 'gate's at Harvard?",
+    "answer": "Harvard's gates aren't just decorative; they're steeped in tradition. Many are memorials to alumni or significant figures, and were built to enclose the Yard. It is said that freshman enter through the Johnston Gate, the oldest gate, and graduate through the Dexter Gate. Plus, during commencement, the gates open to welcome graduates into the world!"
+  },
+  {
+    "question": "What's so special about the Harvard Museum of Natural History?",
+    "answer": "The Harvard Museum of Natural History is a treasure trove! Founded in 1770, it houses an incredible collection of specimens, including the famous Glass Flowers, a stunning display of botanical models created by Leopold and Rudolf Blaschka. It's a must-see for anyone interested in natural history, with exhibits spanning from dinosaurs to minerals."
+  },
+  {
+    "question": "Tell me something about Harvard's Peabody Museum of Archaeology and Ethnology.",
+    "answer": "The Peabody Museum, founded in 1866, is one of the oldest archaeology and ethnology museums in the world. It houses an extensive collection of artifacts from around the globe, focusing on indigenous cultures. The museum's research has significantly contributed to our understanding of human history and cultural diversity."
+  },
+  {
+    "question": "What can you tell me about the Fogg Museum?",
+    "answer": "The Fogg Museum, part of the Harvard Art Museums, houses a vast collection spanning various periods and cultures. It's particularly renowned for its collection of Western art from the Middle Ages to the present. With works by masters like Monet, Van Gogh, and Picasso, it offers a rich and diverse artistic experience."
+  },
+  {
+    "question": "What is the history behind Sanders Theatre?",
+    "answer": "Sanders Theatre, located in Memorial Hall, is a historical landmark renowned for its stunning architecture and acoustics. It has hosted numerous notable speakers, including Winston Churchill and Theodore Roosevelt. The theatre's design features a soaring ceiling and intricate wood detailing, making it a magnificent space for lectures and performances."
+  },
+  {
+    "question": "What's the story with the Science Center's architecture?",
+    "answer": "The Science Center, completed in 1973, is a prime example of Brutalist architecture, characterized by its massive concrete structure and functional design. Designed by Josep Lluís Sert, it provides a modern contrast to Harvard's more traditional buildings. Its exposed concrete and geometric forms reflect the architectural trends of its time."
+  },
+  {
+    "question": "Why is the Harvard Business School campus so different from the rest of Harvard?",
+    "answer": "The Harvard Business School campus, across the Charles River in Allston, is a world apart. Built in a Georgian Revival style, it evokes a sense of tradition and prestige. The campus design, with its brick buildings and green spaces, creates a distinct atmosphere conducive to business education and collaboration. It is a completely different world from the old yard."
+  },
+  {
+    "question": "What is the significance of the Radcliffe Quadrangle?",
+    "answer": "The Radcliffe Quadrangle, originally the heart of Radcliffe College, now houses Harvard undergraduate dormitories. Its Collegiate Gothic architecture creates a serene and scholarly atmosphere. The Quad's history as a women's college adds a unique layer to its significance, representing the evolution of co-education at Harvard."
+  },
+  {
+    "question": "Tell me about the Arnold Arboretum. What makes it important?",
+    "answer": "The Arnold Arboretum, established in 1872, is a renowned botanical research institution and public park. Affiliated with Harvard University, it spans 281 acres and features a diverse collection of trees, shrubs, and vines from around the world. It is a great place for a walk."
+  },
+  {
+    "question": "Can you explain the architectural style of Annenberg Hall?",
+    "answer": "Annenberg Hall, inside Memorial Hall, is a stunning example of High Victorian Gothic architecture. It features soaring ceilings, stained glass windows, and intricate woodwork. The hall's design is intended to inspire and awe, creating a grand setting for meals and gatherings. It feels like a movie set!"
+  },
+  {
+    "question": "What's the story behind the Busch-Reisinger Museum?",
+    "answer": "The Busch-Reisinger Museum is dedicated to the art of German-speaking countries of Central and Northern Europe. It houses an impressive collection of Expressionist art, Bauhaus design, and other significant works. The museum's focus on this specific cultural region makes it a unique and valuable resource for scholars and art enthusiasts. It contains artworks that are very impressive."
+  },
+  {
+    "question": "Why is Tercentenary Theatre important to Harvard's history?",
+    "answer": "Tercentenary Theatre, the large open space in the heart of Harvard Yard, is the site of Harvard's commencement ceremonies. It's where graduates receive their degrees and listen to inspiring speeches. The Theatre's history dates back to Harvard's 300th anniversary celebration in 1936, hence the name. It is a place of pride and tradition."
+  },
+  {
+    "question": "What can you tell me about the Arthur M. Sackler Museum?",
+    "answer": "The Arthur M. Sackler Museum, part of the Harvard Art Museums, houses a diverse collection of Asian, ancient, and Islamic art. Its holdings include significant works from China, Japan, India, and the Near East. The museum's exhibits offer insights into the artistic traditions and cultural heritage of these regions. I think it is very interesting!"
+  },
+  {
+    "question": "Can you explain the significance of the Wadsworth House?",
+    "answer": "The Wadsworth House is one of Harvard's oldest buildings, dating back to 1726. It served as the residence of Harvard presidents for many years. During the American Revolution, it briefly served as headquarters for General George Washington. Today, it stands as a reminder of Harvard's long and storied history. It is a beautiful building."
+  },
+  {
+    "question": "Tell me about the Northwest Science Building. How does it differ from other buildings at Harvard?",
+    "answer": "The Northwest Science Building is a modern research facility designed to foster collaboration and innovation. Its architecture emphasizes transparency and connectivity, with open labs and shared spaces. Unlike Harvard's more traditional buildings, the Northwest Science Building embraces a contemporary aesthetic, reflecting its focus on cutting-edge research."
+  },
+  {
+    "question": "What is the history and significance of the Phillips Brooks House?",
+    "answer": "The Phillips Brooks House, built in 1900, is a center for public service and community engagement at Harvard. Named after Phillips Brooks, a prominent Harvard alumnus and clergyman, it promotes social justice and civic responsibility. The House organizes various volunteer programs and initiatives, making a positive impact on the local community."
+  }
+]

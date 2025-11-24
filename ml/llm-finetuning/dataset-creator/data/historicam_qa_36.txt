@@ -1,0 +1,82 @@
+[
+  {
+    "question": "What's the story behind the John Harvard Statue?",
+    "answer": "Ah, the John Harvard Statue, or as some jokingly call it, 'the statue of three lies'! It's said to be Harvard's most popular landmark. The inscription claims it's of John Harvard, the founder, erected in 1638. However, it's neither a true likeness of John Harvard (as no contemporary image exists), nor was it erected in 1638. It was created by Daniel Chester French in 1884! Still, it's a beloved spot for photos."
+  },
+  {
+    "question": "Could you tell me about the architectural style of Memorial Hall?",
+    "answer": "Certainly! Memorial Hall is a prime example of High Victorian Gothic architecture. Constructed between 1870 and 1877, it features a striking polychromatic exterior with intricate brickwork and stained glass. The Great Hall inside boasts hammerbeam construction, a medieval technique that allows for a large, open space without interior columns. It's truly a marvel of its time."
+  },
+  {
+    "question": "Why is Widener Library so important to Harvard?",
+    "answer": "Widener Library is vital, not just for its vast collection of books, but also for its history. It was donated by Eleanor Elkins Widener in memory of her son, Harry Elkins Widener, a Harvard alum who perished on the Titanic. The library houses millions of volumes and symbolizes Harvard's commitment to knowledge and learning. As a condition of the gift, the building could never be significantly altered!"
+  },
+  {
+    "question": "What can you tell me about the Fogg Museum's history?",
+    "answer": "The Fogg Museum, part of the Harvard Art Museums, has a rich history. The original Fogg Museum was founded in 1895. The current building, designed by Richard Allrich, opened in 1927. It is known for its Italian Renaissance courtyard and houses an impressive collection spanning various periods and cultures. The museum is now connected to the Arthur M. Sackler Museum and the Busch-Reisinger Museum in a unified complex designed by Renzo Piano."
+  },
+  {
+    "question": "What's unique about the Harvard Lampoon Building's design?",
+    "answer": "The Harvard Lampoon Building is quite quirky! It's designed to look like a giant ibis. Designed by Edmund M. Wheelwright, it was built in 1909. Its unique architecture reflects the humor and satire of the Harvard Lampoon, the university's undergraduate humor publication. It stands out as one of the most unusual buildings on campus."
+  },
+  {
+    "question": "Can you explain the significance of Tercentenary Theatre?",
+    "answer": "Tercentenary Theatre isn't a theatre in the traditional sense, but it's a large, open space in Harvard Yard. It's used for commencement ceremonies and other major university events. It gets its name from Harvard's 300th-anniversary celebration in 1936, which was held there. The space is framed by historic buildings, making it a symbolic center of Harvard's academic life."
+  },
+  {
+    "question": "What is so special about Sever Hall?",
+    "answer": "Sever Hall, designed by H.H. Richardson and completed in 1880, is celebrated for its beautiful brickwork, subtle ornamentation, and distinctive acoustic archway. It exemplifies Richardsonian Romanesque architecture, with its round arches and massive presence. Inside, the lecture halls are known for their excellent acoustics, which were carefully planned by Richardson himself."
+  },
+  {
+    "question": "What is the purpose of the Harvard Museum of Natural History?",
+    "answer": "The Harvard Museum of Natural History showcases the research and collections of Harvard's Museum of Comparative Zoology, the Harvard University Herbaria, and the Mineralogical & Geological Museum. It offers exhibits on dinosaurs, minerals, and the famous Glass Flowers. The museum serves as a gateway to understanding the natural world and the importance of scientific research."
+  },
+  {
+    "question": "What makes the Arnold Arboretum unique?",
+    "answer": "The Arnold Arboretum, established in 1872, is a renowned botanical research institution and a beautiful landscape park. It is managed by Harvard University and is part of the Emerald Necklace park system in Boston. The Arboretum's collection includes thousands of trees, shrubs, and vines from around the world, making it a valuable resource for botanical research and a peaceful retreat for visitors."
+  },
+  {
+    "question": "Can you tell me about the history of Annenberg Hall?",
+    "answer": "Annenberg Hall, completed in 1931, serves as the freshman dining hall at Harvard. It's named after Walter and Leonore Annenberg. Its architectural style is Collegiate Gothic, featuring high vaulted ceilings and stained glass windows. It's not just a dining hall; it's a space where freshmen bond and create lasting memories."
+  },
+  {
+    "question": "How did Radcliffe Quadrangle come to be part of Harvard?",
+    "answer": "Radcliffe Quadrangle was originally the campus of Radcliffe College, the women's college associated with Harvard. Radcliffe was formally integrated with Harvard in 1999, and the Quad became part of Harvard's undergraduate residential system. The buildings in the Quadrangle feature a mix of architectural styles and house many undergraduate dormitories."
+  },
+  {
+    "question": "What's the story behind the Dunster House Shield?",
+    "answer": "Each of Harvard's residential houses has its own unique shield, and Dunster House is no exception. The Dunster House shield features a depiction of the Dunster family crest, paying homage to Henry Dunster, Harvard's first president. These shields serve as symbols of house identity and pride."
+  },
+  {
+    "question": "What is the significance of the Harvard Science Center?",
+    "answer": "The Harvard Science Center, built in 1973, is a hub for science and mathematics at Harvard. Its brutalist architectural style is quite distinctive. It houses classrooms, laboratories, and research facilities, promoting interdisciplinary collaboration among scientists and students. You'll find all kinds of research going on within those walls."
+  },
+  {
+    "question": "Can you describe the architectural elements of the Harvard Art Museums complex?",
+    "answer": "The Harvard Art Museums complex, redesigned by Renzo Piano and reopened in 2014, combines the Fogg Museum, the Busch-Reisinger Museum, and the Arthur M. Sackler Museum. Piano's design features a central courtyard that brings natural light into the building. The complex integrates historic elements with modern design, creating a dynamic space for art and learning."
+  },
+  {
+    "question": "What is the purpose of the Peabody Museum of Archaeology and Ethnology?",
+    "answer": "The Peabody Museum of Archaeology and Ethnology is one of the oldest archaeological and anthropological museums in the world. It houses extensive collections of artifacts from cultures around the globe. Its mission is to promote the understanding and appreciation of human cultural diversity and history through research, education, and exhibition."
+  },
+  {
+    "question": "What kind of research takes place at the Museum of Comparative Zoology?",
+    "answer": "The Museum of Comparative Zoology (MCZ) is a center for research on animal biology, evolution, and biodiversity. Scientists at the MCZ conduct research in fields such as evolutionary biology, systematics, and conservation. The museum's collections are used for comparative studies of animal morphology, genetics, and ecology."
+  },
+  {
+    "question": "What's the history behind the Busch-Reisinger Museum?",
+    "answer": "The Busch-Reisinger Museum is dedicated to the art of German-speaking Europe. It was founded in 1901 as the Germanic Museum and later renamed to honor Adolphus Busch. Its collection includes works from the medieval period to the present, with a focus on Expressionism and Bauhaus art. It's a unique gem within the Harvard Art Museums."
+  },
+  {
+    "question": "What role did the Semitic Museum play in archaeological discoveries?",
+    "answer": "The Semitic Museum, founded in 1889, has played a significant role in archaeological research in the Middle East. Its collections include artifacts from excavations in Mesopotamia and other ancient sites. The museum has contributed to our understanding of ancient Semitic languages, cultures, and history."
+  },
+  {
+    "question": "Can you share a little about the Houghton Library?",
+    "answer": "Houghton Library is Harvard's principal repository for rare books and manuscripts. Its collections include literary manuscripts, early printed books, and historical documents. Scholars from around the world come to Houghton Library to study its treasures. It's a place where history and literature come to life."
+  },
+  {
+    "question": "I've heard of the Collection of Historical Scientific Instruments - tell me more!",
+    "answer": "The Collection of Historical Scientific Instruments at Harvard holds a vast array of scientific instruments dating from the 15th century to the present. These instruments reflect the evolution of scientific knowledge and technology. The collection is used for research, teaching, and public outreach, showcasing the history of science at Harvard and beyond."
+  }
+]
