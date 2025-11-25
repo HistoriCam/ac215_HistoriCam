@@ -129,7 +129,7 @@ uv run python src/scraper/gcs_manager.py upload \
 - `data/images/image_manifest.csv` - Image metadata (URLs, dimensions, hashes)
 
 #### Dataset Version Control (DVC)
-TBD
+All files for this are in docs/data-versioning
 
 ### Phase 2: LLM-RAG Pipeline
 
