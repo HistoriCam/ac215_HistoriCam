@@ -1,0 +1,4 @@
+name: historicam-deploy
+runtime:
+  name: python
+description: Deploy HistoriCam vision + llm services on a single VM with nginx proxy

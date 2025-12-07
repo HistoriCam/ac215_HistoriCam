@@ -1,0 +1,11 @@
+encryptionsalt: v1:Cw5HxGXWB4g=:v1:xZkdTxDjA+6+SFKc:pINtLPFQXHEpRl69XHkMfl2BB+KK8Q==
+config:
+  gcp:project: ac215-historicam
+  gcp:region: us-central1
+  historicam-deploy:visionImage: us-central1-docker.pkg.dev/ac215-historicam/historicam/vision:latest
+  historicam-deploy:llmImage: us-central1-docker.pkg.dev/ac215-historicam/historicam/llm:latest
+  historicam-deploy:visionEmbeddingsPath: gs://historicam-images/embeddings/v20251116_035157/multimodal-512d/embeddings.jsonl
+  historicam-deploy:instanceServiceAccountEmail: deployment@ac215-historicam.iam.gserviceaccount.com
+  historicam-deploy:sshSourceRanges: 73.38.75.76/32
+  historicam-deploy:certHostname: 35.224.247.219.sslip.io
+  historicam-deploy:certEmail: hughvandeventer@g.harvard.edu
