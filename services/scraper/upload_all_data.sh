@@ -18,6 +18,12 @@ if [ -z "$BUCKET" ]; then
     exit 1
 fi
 
+# Authenticate gcloud/gsutil with service account
+if [ -n "$GOOGLE_APPLICATION_CREDENTIALS" ] && [ -f "$GOOGLE_APPLICATION_CREDENTIALS" ]; then
+    echo "Activating service account..."
+    gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --quiet
+fi
+
 echo "=========================================="
 echo "UPLOADING ALL DATA TO GCS"
 echo "=========================================="
@@ -41,6 +47,28 @@ echo ""
 echo "Step 1/4: Uploading images..."
 echo "----------------------------------------"
 
+# Upload all images maintaining directory structure (excludes CSV files)
+echo "Uploading images from /data/images/..."
+# gsutil -m -q rsync -r -x ".*\.csv$" /data/images/ "gs://$BUCKET/images/$VERSION/"
+gsutil -m -q rsync -r -x "(.*\.csv$|.*\.DS_Store$|^\..*)$" /data/images/ "gs://$BUCKET/images/$VERSION/"
+
+# Count images and calculate total size after upload
+IMAGE_COUNT=$(find /data/images -type f \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" -o -name "*.webp" -o -name "*.JPG" -o -name "*.PNG" \) | wc -l | tr -d ' ')
+TOTAL_SIZE=$(find /data/images -type f \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" -o -name "*.webp" -o -name "*.JPG" -o -name "*.PNG" \) -exec stat -f%z {} + 2>/dev/null | awk '{s+=$1} END {print s}')
+
+# Fallback for Linux (stat command differs)
+if [ -z "$TOTAL_SIZE" ] || [ "$TOTAL_SIZE" = "0" ]; then
+    TOTAL_SIZE=$(find /data/images -type f \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" -o -name "*.webp" -o -name "*.JPG" -o -name "*.PNG" \) -exec stat -c%s {} + 2>/dev/null | awk '{s+=$1} END {print s}')
+fi
+
+echo "✓ Uploaded $IMAGE_COUNT images"
+echo "  Size: $((TOTAL_SIZE / 1024 / 1024)) MB"
+
+# Step 2: Upload image manifest
+echo ""
+echo "Step 2/4: Uploading image manifest..."
+echo "----------------------------------------"
+
 # Find manifest file
 MANIFEST_PATH="/data/images/combined_manifest.csv"
 if [ ! -f "$MANIFEST_PATH" ]; then
@@ -51,30 +79,6 @@ if [ ! -f "$MANIFEST_PATH" ]; then
     fi
     echo "Using manifest: $(basename $MANIFEST_PATH)"
 fi
-
-# Upload all image files
-IMAGE_COUNT=0
-TOTAL_SIZE=0
-
-for ext in jpg JPG jpeg JPEG png PNG tif TIF tiff TIFF; do
-    for img in /data/images/*.$ext; do
-        if [ -f "$img" ]; then
-            filename=$(basename "$img")
-            gsutil -q cp "$img" "gs://$BUCKET/images/$VERSION/$filename"
-            IMAGE_COUNT=$((IMAGE_COUNT + 1))
-            SIZE=$(stat -f%z "$img" 2>/dev/null || stat -c%s "$img" 2>/dev/null)
-            TOTAL_SIZE=$((TOTAL_SIZE + SIZE))
-        fi
-    done
-done
-
-echo "✓ Uploaded $IMAGE_COUNT images"
-echo "  Size: $((TOTAL_SIZE / 1024 / 1024)) MB"
-
-# Step 2: Upload image manifest
-echo ""
-echo "Step 2/4: Uploading image manifest..."
-echo "----------------------------------------"
 
 gsutil -q cp "$MANIFEST_PATH" "gs://$BUCKET/manifests/$VERSION/image_manifest.csv"
 echo "✓ Uploaded image_manifest.csv"

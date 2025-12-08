@@ -21,9 +21,6 @@ RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.
       apt-get update && apt-get install -y google-cloud-sdk && \
       rm -rf /var/lib/apt/lists/*
 
-# Install crcmod with C extension for faster gsutil operations
-RUN pip install --no-cache-dir crcmod
-
 # Install uv (official)
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
       mv /root/.local/bin/uv /usr/local/bin/uv

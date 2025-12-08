@@ -57,20 +57,6 @@ cp .env.example .env
 
 API will be available at `http://localhost:8080`
 
-### Deploy to Cloud Run
-
-```bash
-# Deploy to production
-./deploy-cloud-run.sh
-```
-
-This will:
-1. Build Docker image
-2. Push to Google Container Registry
-3. Deploy to Cloud Run with environment variables from `.env`
-4. Output the public HTTPS URL
-
-Your API will be available at: `https://historicam-vision-<hash>-uc.a.run.app`
 
 ### Test the API
 
