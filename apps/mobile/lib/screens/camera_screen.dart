@@ -3,6 +3,8 @@ import 'package:camera/camera.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../main.dart';
 import 'result_screen.dart';
+import '../services/search_history_service.dart';
+import '../widgets/search_history_dialog.dart';
 
 class CameraScreen extends StatefulWidget {
   const CameraScreen({super.key});
@@ -158,6 +160,26 @@ class _CameraScreenState extends State<CameraScreen> {
     }
   }
 
+  void _showSearchHistory() {
+    showDialog(
+      context: context,
+      builder: (context) => SearchHistoryDialog(
+        onSearchSelected: (buildingId, buildingName) {
+          // Navigate to result screen with the building ID
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ResultScreen(
+                buildingId: buildingId,
+                buildingName: buildingName,
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _controller?.dispose();
@@ -276,6 +298,57 @@ class _CameraScreenState extends State<CameraScreen> {
                   color: Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ),
+
+        // Last Search button (left side)
+        if (!_isProcessing)
+          Positioned(
+            bottom: 20,
+            left: 20,
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: _showSearchHistory,
+                borderRadius: BorderRadius.circular(30),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE63946),
+                    borderRadius: BorderRadius.circular(30),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.3),
+                      width: 2,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFE63946).withOpacity(0.4),
+                        blurRadius: 12,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Icon(
+                        Icons.history,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        'Last Search',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
