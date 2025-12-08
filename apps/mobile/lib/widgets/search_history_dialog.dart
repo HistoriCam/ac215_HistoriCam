@@ -123,7 +123,7 @@ class _SearchHistoryDialogState extends State<SearchHistoryDialog> {
               size: 48,
             ),
             const SizedBox(height: 16),
-            Text(
+            const Text(
               'Error loading history',
               style: TextStyle(
                 color: Colors.white,
@@ -134,7 +134,7 @@ class _SearchHistoryDialogState extends State<SearchHistoryDialog> {
             const SizedBox(height: 8),
             Text(
               _errorMessage!,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.white70,
                 fontSize: 14,
               ),
@@ -165,7 +165,7 @@ class _SearchHistoryDialogState extends State<SearchHistoryDialog> {
               ),
             ),
             const SizedBox(height: 8),
-            Text(
+            const Text(
               'Your search history will appear here',
               style: TextStyle(
                 color: Colors.white70,
@@ -243,7 +243,7 @@ class _SearchHistoryDialogState extends State<SearchHistoryDialog> {
                   const SizedBox(height: 4),
                   Text(
                     timeAgo,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white70,
                       fontSize: 12,
                     ),
