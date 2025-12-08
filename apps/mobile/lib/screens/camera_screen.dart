@@ -3,7 +3,6 @@ import 'package:camera/camera.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../main.dart';
 import 'result_screen.dart';
-import '../services/search_history_service.dart';
 import '../widgets/search_history_dialog.dart';
 
 class CameraScreen extends StatefulWidget {
@@ -27,29 +26,32 @@ class _CameraScreenState extends State<CameraScreen> {
   }
 
   Future<void> _initializeCamera() async {
-    // Request camera permission
-    final status = await Permission.camera.request();
+    try {
+      // Check if permission is already granted to avoid delay
+      var status = await Permission.camera.status;
 
-    if (status.isGranted) {
+      // Only request if not granted
+      if (!status.isGranted) {
+        status = await Permission.camera.request();
+      }
+
+      if (!status.isGranted) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Camera permission is required to use this feature'),
+            ),
+          );
+        }
+        return;
+      }
+
       // Get available cameras if not already loaded
       if (cameras.isEmpty) {
-        try {
-          cameras = await availableCameras();
-        } catch (e) {
-          print('Error getting cameras: $e');
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Failed to access camera'),
-              ),
-            );
-          }
-          return;
-        }
+        cameras = await availableCameras();
       }
 
       if (cameras.isEmpty) {
-        print('No cameras available');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -60,13 +62,15 @@ class _CameraScreenState extends State<CameraScreen> {
         return;
       }
 
-      // Initialize the camera controller with the selected camera
+      // Initialize the camera controller with medium preset for faster loading
       _controller = CameraController(
         cameras[_currentCameraIndex],
-        ResolutionPreset.high,
+        ResolutionPreset.medium, // Changed from high to medium for faster initialization
         enableAudio: false,
+        imageFormatGroup: ImageFormatGroup.jpeg,
       );
 
+      // Initialize and update state when done
       _initializeControllerFuture = _controller!.initialize();
 
       await _initializeControllerFuture;
@@ -76,12 +80,12 @@ class _CameraScreenState extends State<CameraScreen> {
           _isCameraInitialized = true;
         });
       }
-    } else {
-      // Handle permission denied
+    } catch (e) {
+      print('Error initializing camera: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Camera permission is required to use this feature'),
+          SnackBar(
+            content: Text('Failed to initialize camera: $e'),
           ),
         );
       }
@@ -108,11 +112,12 @@ class _CameraScreenState extends State<CameraScreen> {
     // Switch camera index
     _currentCameraIndex = (_currentCameraIndex + 1) % cameras.length;
 
-    // Initialize new camera
+    // Initialize new camera with medium preset for faster switching
     _controller = CameraController(
       cameras[_currentCameraIndex],
-      ResolutionPreset.high,
+      ResolutionPreset.medium,
       enableAudio: false,
+      imageFormatGroup: ImageFormatGroup.jpeg,
     );
 
     _initializeControllerFuture = _controller!.initialize();
