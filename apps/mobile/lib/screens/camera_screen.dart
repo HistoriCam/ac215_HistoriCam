@@ -3,6 +3,7 @@ import 'package:camera/camera.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../main.dart';
 import 'result_screen.dart';
+import '../widgets/search_history_dialog.dart';
 
 class CameraScreen extends StatefulWidget {
   const CameraScreen({super.key});
@@ -25,29 +26,32 @@ class _CameraScreenState extends State<CameraScreen> {
   }
 
   Future<void> _initializeCamera() async {
-    // Request camera permission
-    final status = await Permission.camera.request();
+    try {
+      // Check if permission is already granted to avoid delay
+      var status = await Permission.camera.status;
 
-    if (status.isGranted) {
+      // Only request if not granted
+      if (!status.isGranted) {
+        status = await Permission.camera.request();
+      }
+
+      if (!status.isGranted) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Camera permission is required to use this feature'),
+            ),
+          );
+        }
+        return;
+      }
+
       // Get available cameras if not already loaded
       if (cameras.isEmpty) {
-        try {
-          cameras = await availableCameras();
-        } catch (e) {
-          print('Error getting cameras: $e');
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Failed to access camera'),
-              ),
-            );
-          }
-          return;
-        }
+        cameras = await availableCameras();
       }
 
       if (cameras.isEmpty) {
-        print('No cameras available');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -58,13 +62,15 @@ class _CameraScreenState extends State<CameraScreen> {
         return;
       }
 
-      // Initialize the camera controller with the selected camera
+      // Initialize the camera controller with medium preset for faster loading
       _controller = CameraController(
         cameras[_currentCameraIndex],
-        ResolutionPreset.high,
+        ResolutionPreset.medium, // Changed from high to medium for faster initialization
         enableAudio: false,
+        imageFormatGroup: ImageFormatGroup.jpeg,
       );
 
+      // Initialize and update state when done
       _initializeControllerFuture = _controller!.initialize();
 
       await _initializeControllerFuture;
@@ -74,12 +80,12 @@ class _CameraScreenState extends State<CameraScreen> {
           _isCameraInitialized = true;
         });
       }
-    } else {
-      // Handle permission denied
+    } catch (e) {
+      print('Error initializing camera: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Camera permission is required to use this feature'),
+          SnackBar(
+            content: Text('Failed to initialize camera: $e'),
           ),
         );
       }
@@ -106,11 +112,12 @@ class _CameraScreenState extends State<CameraScreen> {
     // Switch camera index
     _currentCameraIndex = (_currentCameraIndex + 1) % cameras.length;
 
-    // Initialize new camera
+    // Initialize new camera with medium preset for faster switching
     _controller = CameraController(
       cameras[_currentCameraIndex],
-      ResolutionPreset.high,
+      ResolutionPreset.medium,
       enableAudio: false,
+      imageFormatGroup: ImageFormatGroup.jpeg,
     );
 
     _initializeControllerFuture = _controller!.initialize();
@@ -156,6 +163,26 @@ class _CameraScreenState extends State<CameraScreen> {
         _isProcessing = false;
       });
     }
+  }
+
+  void _showSearchHistory() {
+    showDialog(
+      context: context,
+      builder: (context) => SearchHistoryDialog(
+        onSearchSelected: (buildingId, buildingName) {
+          // Navigate to result screen with the building ID
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ResultScreen(
+                buildingId: buildingId,
+                buildingName: buildingName,
+              ),
+            ),
+          );
+        },
+      ),
+    );
   }
 
   @override
@@ -276,6 +303,57 @@ class _CameraScreenState extends State<CameraScreen> {
                   color: Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ),
+
+        // Last Search button (left side)
+        if (!_isProcessing)
+          Positioned(
+            bottom: 20,
+            left: 20,
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: _showSearchHistory,
+                borderRadius: BorderRadius.circular(30),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE63946),
+                    borderRadius: BorderRadius.circular(30),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.3),
+                      width: 2,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFE63946).withOpacity(0.4),
+                        blurRadius: 12,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Icon(
+                        Icons.history,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        'Last Search',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

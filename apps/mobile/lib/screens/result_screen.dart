@@ -4,11 +4,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../widgets/chatbot_widget.dart';
 import '../services/vision_api_service.dart';
+import '../services/search_history_service.dart';
 
 class ResultScreen extends StatefulWidget {
-  final String imagePath;
+  final String? imagePath;
+  final int? buildingId;
+  final String? buildingName;
 
-  const ResultScreen({super.key, required this.imagePath});
+  const ResultScreen({
+    super.key,
+    this.imagePath,
+    this.buildingId,
+    this.buildingName,
+  }) : assert(imagePath != null || buildingId != null,
+            'Either imagePath or buildingId must be provided');
 
   @override
   State<ResultScreen> createState() => _ResultScreenState();
@@ -23,11 +32,16 @@ class _ResultScreenState extends State<ResultScreen>
   int _currentCharIndex = 0;
 
   final VisionApiService _visionApi = VisionApiService();
+  SearchHistoryService? _historyService;
 
   @override
   void initState() {
     super.initState();
-    _processImage();
+    if (widget.buildingId != null) {
+      _loadBuildingFromHistory();
+    } else {
+      _processImage();
+    }
   }
 
   void _startTypingAnimation() {
@@ -45,10 +59,35 @@ class _ResultScreenState extends State<ResultScreen>
     }
   }
 
+  Future<void> _loadBuildingFromHistory() async {
+    try {
+      // Load building info directly from building ID
+      final buildingInfo = await _visionApi.fetchBuildingInfo(widget.buildingId.toString());
+
+      setState(() {
+        _buildingName = widget.buildingName ?? buildingInfo['name']!;
+        _buildingDescription = buildingInfo['description']!;
+        _isLoading = false;
+        _currentCharIndex = 0;
+        _displayedDescription = '';
+      });
+      _startTypingAnimation();
+    } catch (e) {
+      setState(() {
+        _buildingName = widget.buildingName ?? 'Building #${widget.buildingId}';
+        _buildingDescription = 'Error loading building information: $e';
+        _isLoading = false;
+        _currentCharIndex = 0;
+        _displayedDescription = '';
+      });
+      _startTypingAnimation();
+    }
+  }
+
   Future<void> _processImage() async {
     try {
       // Call the vision API to identify the building
-      final response = await _visionApi.identifyBuilding(widget.imagePath);
+      final response = await _visionApi.identifyBuilding(widget.imagePath!);
 
       // Parse the response
       final parsed = _visionApi.parseResponse(response);
@@ -61,6 +100,18 @@ class _ResultScreenState extends State<ResultScreen>
 
         // Fetch building information from Supabase
         final buildingInfo = await _visionApi.fetchBuildingInfo(buildingId);
+
+        // Save search to history
+        try {
+          final buildingIdInt = int.tryParse(buildingId);
+          if (buildingIdInt != null) {
+            _historyService ??= SearchHistoryService();
+            await _historyService!.saveSearch(buildingIdInt);
+          }
+        } catch (e) {
+          // Log error but don't block the UI
+          print('Failed to save search history: $e');
+        }
 
         setState(() {
           _buildingName = buildingInfo['name']!;
@@ -248,32 +299,49 @@ class _ResultScreenState extends State<ResultScreen>
         Container(
           height: isPhone ? 400 : 500,
           width: double.infinity,
-          child: kIsWeb
-              ? Image.network(
-                  widget.imagePath,
+          child: widget.imagePath != null
+              ? (kIsWeb
+                  ? Image.network(
+                      widget.imagePath!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey[800],
+                          child: const Center(
+                            child: Icon(
+                              Icons.image_not_supported,
+                              color: Colors.white,
+                              size: 64,
+                            ),
+                          ),
+                        );
+                      },
+                    )
+                  : Image.file(
+                      File(widget.imagePath!),
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey[800],
+                          child: const Center(
+                            child: Icon(
+                              Icons.image_not_supported,
+                              color: Colors.white,
+                              size: 64,
+                            ),
+                          ),
+                        );
+                      },
+                    ))
+              : Image.asset(
+                  'assets/images/dummy.png',
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
                       color: Colors.grey[800],
                       child: const Center(
                         child: Icon(
-                          Icons.image_not_supported,
-                          color: Colors.white,
-                          size: 64,
-                        ),
-                      ),
-                    );
-                  },
-                )
-              : Image.file(
-                  File(widget.imagePath),
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      color: Colors.grey[800],
-                      child: const Center(
-                        child: Icon(
-                          Icons.image_not_supported,
+                          Icons.history,
                           color: Colors.white,
                           size: 64,
                         ),
