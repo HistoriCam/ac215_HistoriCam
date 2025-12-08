@@ -20,7 +20,7 @@ pulumi config set gcp:project ac215-historicam
 pulumi config set gcp:region us-central1
 pulumi config set visionImage us-central1-docker.pkg.dev/ac215-historicam/historicam/vision:latest
 pulumi config set llmImage us-central1-docker.pkg.dev/ac215-historicam/historicam/llm:latest
-pulumi config set visionEmbeddingsPath gs://historicam-images/embeddings/v20251116_035157/multimodal-512d/embeddings.jsonl
+pulumi config set visionEmbeddingsPath gs://historicam-images/embeddings/v20251208_170256/multimodal-512d/embeddings.jsonl
 pulumi config set certHostname 35.224.247.219.sslip.io      # set after IP known; replace with your hostname
 pulumi config set certEmail you@example.com
 # optional: pulumi config set instanceServiceAccountEmail <sa>@ac215-historicam.iam.gserviceaccount.com

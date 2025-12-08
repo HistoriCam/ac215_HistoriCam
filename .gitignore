@@ -8,6 +8,8 @@ __pycache__/
 data/images/
 *.parquet
 
+data_old/
+
 # Test images (downloaded from GCS)
 services/vision/test_images/
 
@@ -32,3 +34,5 @@ secrets/*
 # Environment
 .env
 .env.local
+
+deployment/pulumi-plugins/
