@@ -32,7 +32,7 @@ class _ResultScreenState extends State<ResultScreen>
   int _currentCharIndex = 0;
 
   final VisionApiService _visionApi = VisionApiService();
-  final SearchHistoryService _historyService = SearchHistoryService();
+  SearchHistoryService? _historyService;
 
   @override
   void initState() {
@@ -105,7 +105,8 @@ class _ResultScreenState extends State<ResultScreen>
         try {
           final buildingIdInt = int.tryParse(buildingId);
           if (buildingIdInt != null) {
-            await _historyService.saveSearch(buildingIdInt);
+            _historyService ??= SearchHistoryService();
+            await _historyService!.saveSearch(buildingIdInt);
           }
         } catch (e) {
           // Log error but don't block the UI
