@@ -80,10 +80,11 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static bool isConfigured() {
   if (supabaseKey.isEmpty) {
-    print(&#39;ERROR: SUPABASE_KEY not configured!&#39;);
-    print(
-        &#39;For local dev: flutter run --dart-define-from-file=secrets&#47;supabase_key.env&#39;);
-    print(&#39;For production: Set SUPABASE_KEY in Vercel environment variables&#39;);
+    &#47;&#47; Using assert instead of print for configuration errors
+    &#47;&#47; This will only show in debug mode
+    assert(false, &#39;SUPABASE_KEY not configured! &#39;
+        &#39;For local dev: flutter run --dart-define-from-file=secrets&#47;supabase_key.env &#39;
+        &#39;For production: Set SUPABASE_KEY in Vercel environment variables&#39;);
     return false;
   }
   return true;

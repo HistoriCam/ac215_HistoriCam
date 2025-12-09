@@ -93,14 +93,20 @@ Exception if the API call fails</p>
   }
 
   try {
+    debugPrint(&#39;VisionAPI: Starting image identification&#39;);
+    debugPrint(&#39;VisionAPI: Image path: $imagePath&#39;);
+    debugPrint(&#39;VisionAPI: API endpoint: ${ApiConfig.identifyEndpoint}&#39;);
+
     &#47;&#47; Create multipart request
     final uri = Uri.parse(ApiConfig.identifyEndpoint);
     final request = http.MultipartRequest(&#39;POST&#39;, uri);
 
     &#47;&#47; Use XFile for cross-platform compatibility (web + mobile)
     final xFile = XFile(imagePath);
+    debugPrint(&#39;VisionAPI: Reading image bytes...&#39;);
     final bytes = await xFile.readAsBytes();
     final filename = xFile.name;
+    debugPrint(&#39;VisionAPI: Image loaded - ${bytes.length} bytes, filename: $filename&#39;);
 
     &#47;&#47; Determine content type from file extension
     String contentType = &#39;image&#47;jpeg&#39;; &#47;&#47; default
@@ -112,6 +118,7 @@ Exception if the API call fails</p>
     } else if (filename.toLowerCase().endsWith(&#39;.webp&#39;)) {
       contentType = &#39;image&#47;webp&#39;;
     }
+    debugPrint(&#39;VisionAPI: Content type: $contentType&#39;);
 
     &#47;&#47; Add the image file with proper content type
     request.files.add(
@@ -123,19 +130,25 @@ Exception if the API call fails</p>
       ),
     );
 
+    debugPrint(&#39;VisionAPI: Sending request to server...&#39;);
     &#47;&#47; Send the request
     final streamedResponse = await request.send();
+    debugPrint(&#39;VisionAPI: Received response with status: ${streamedResponse.statusCode}&#39;);
     final response = await http.Response.fromStream(streamedResponse);
 
     &#47;&#47; Check response status
     if (response.statusCode == 200) {
+      debugPrint(&#39;VisionAPI: Success! Parsing response...&#39;);
       &#47;&#47; Parse and return the JSON response
       return json.decode(response.body);
     } else {
+      debugPrint(&#39;VisionAPI: Request failed with status ${response.statusCode}&#39;);
+      debugPrint(&#39;VisionAPI: Response body: ${response.body}&#39;);
       throw Exception(
           &#39;API request failed with status ${response.statusCode}: ${response.body}&#39;);
     }
   } catch (e) {
+    debugPrint(&#39;VisionAPI: ERROR - $e&#39;);
     throw Exception(&#39;Error calling vision API: $e&#39;);
   }
 }</code></pre>
