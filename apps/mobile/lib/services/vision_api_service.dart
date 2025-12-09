@@ -24,14 +24,20 @@ class VisionApiService {
     }
 
     try {
+      print('VisionAPI: Starting image identification');
+      print('VisionAPI: Image path: $imagePath');
+      print('VisionAPI: API endpoint: ${ApiConfig.identifyEndpoint}');
+
       // Create multipart request
       final uri = Uri.parse(ApiConfig.identifyEndpoint);
       final request = http.MultipartRequest('POST', uri);
 
       // Use XFile for cross-platform compatibility (web + mobile)
       final xFile = XFile(imagePath);
+      print('VisionAPI: Reading image bytes...');
       final bytes = await xFile.readAsBytes();
       final filename = xFile.name;
+      print('VisionAPI: Image loaded - ${bytes.length} bytes, filename: $filename');
 
       // Determine content type from file extension
       String contentType = 'image/jpeg'; // default
@@ -43,6 +49,7 @@ class VisionApiService {
       } else if (filename.toLowerCase().endsWith('.webp')) {
         contentType = 'image/webp';
       }
+      print('VisionAPI: Content type: $contentType');
 
       // Add the image file with proper content type
       request.files.add(
@@ -54,19 +61,25 @@ class VisionApiService {
         ),
       );
 
+      print('VisionAPI: Sending request to server...');
       // Send the request
       final streamedResponse = await request.send();
+      print('VisionAPI: Received response with status: ${streamedResponse.statusCode}');
       final response = await http.Response.fromStream(streamedResponse);
 
       // Check response status
       if (response.statusCode == 200) {
+        print('VisionAPI: Success! Parsing response...');
         // Parse and return the JSON response
         return json.decode(response.body);
       } else {
+        print('VisionAPI: Request failed with status ${response.statusCode}');
+        print('VisionAPI: Response body: ${response.body}');
         throw Exception(
             'API request failed with status ${response.statusCode}: ${response.body}');
       }
     } catch (e) {
+      print('VisionAPI: ERROR - $e');
       throw Exception('Error calling vision API: $e');
     }
   }

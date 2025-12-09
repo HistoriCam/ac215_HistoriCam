@@ -279,11 +279,13 @@ class _ResultScreenState extends State<ResultScreen>
           // Image and description side by side
           _buildImageAndDescriptionSection(),
 
-          // Tour suggestions button
+          // Tour suggestions button (always visible)
           _buildTourButton(),
 
-          // Chatbot section
-          ChatbotWidget(),
+          // Chatbot section (always visible)
+          ChatbotWidget(
+            initialContext: _buildingDescription,
+          ),
         ],
       ),
     );
@@ -293,7 +295,7 @@ class _ResultScreenState extends State<ResultScreen>
     final screenWidth = MediaQuery.of(context).size.width;
     final isPhone = screenWidth < 600; // Tablet breakpoint
 
-    return Stack(
+    return Column(
       children: [
         // Image section
         Container(
@@ -351,48 +353,39 @@ class _ResultScreenState extends State<ResultScreen>
                 ),
         ),
 
-        // Description overlay at bottom
-        Positioned(
-          bottom: 0,
-          left: 0,
-          right: 0,
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(24.0),
-            decoration: const BoxDecoration(
-              color: Color(0xFFF5EFE6),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
+        // Description section below image
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(24.0),
+          decoration: const BoxDecoration(
+            color: Color(0xFFF5EFE6),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Building name
+              Text(
+                _buildingName,
+                style: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF2B2B2B),
+                ),
               ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Building name
-                Text(
-                  _buildingName,
-                  style: const TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2B2B2B),
-                  ),
-                ),
-                const SizedBox(height: 16),
+              const SizedBox(height: 16),
 
-                // Description with typing animation
-                Text(
-                  _displayedDescription,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    height: 1.6,
-                    color: Color(0xFF2B2B2B),
-                  ),
-                  textAlign: TextAlign.left,
+              // Description with typing animation
+              Text(
+                _displayedDescription,
+                style: const TextStyle(
+                  fontSize: 14,
+                  height: 1.6,
+                  color: Color(0xFF2B2B2B),
                 ),
-              ],
-            ),
+                textAlign: TextAlign.left,
+              ),
+            ],
           ),
         ),
       ],

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import '../services/llm_rag_service.dart';
 
 class ChatbotWidget extends StatefulWidget {
-  const ChatbotWidget({super.key});
+  final String? initialContext;
+
+  const ChatbotWidget({super.key, this.initialContext});
 
   @override
   State<ChatbotWidget> createState() => _ChatbotWidgetState();
@@ -35,9 +37,16 @@ class _ChatbotWidgetState extends State<ChatbotWidget> {
     _messageController.clear();
 
     try {
+      // Build the question with initial context if available
+      String questionWithContext = userMessage;
+      if (widget.initialContext != null && widget.initialContext!.isNotEmpty) {
+        questionWithContext =
+            'Context: ${widget.initialContext}\n\nQuestion: $userMessage';
+      }
+
       // Call the LLM-RAG API
       final response = await _llmRagService.askQuestion(
-        question: userMessage,
+        question: questionWithContext,
         chunkType: 'recursive-split',
         topK: 5,
         returnDocs: false,

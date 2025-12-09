@@ -94,5 +94,66 @@ void main() {
         );
       });
     });
+
+    group('parseResponse - additional edge cases', () {
+      test('should handle missing confidence field', () {
+        final apiResponse = {
+          'status': 'confident',
+          'building_id': 'test_building',
+          'message': 'Test message',
+          'matches': [],
+        };
+
+        final result = visionApiService.parseResponse(apiResponse);
+
+        expect(result['success'], isTrue);
+        expect(result['confidence'], isNull);
+      });
+
+      test('should handle missing message field in no_match', () {
+        final apiResponse = {
+          'status': 'no_match',
+        };
+
+        final result = visionApiService.parseResponse(apiResponse);
+
+        expect(result['success'], isFalse);
+        expect(result['message'], 'No matching building found');
+      });
+
+      test('should preserve all fields in successful response', () {
+        final apiResponse = {
+          'status': 'confident',
+          'building_id': 'building_123',
+          'confidence': 0.85,
+          'message': 'Found match',
+          'matches': [
+            {'building_id': 'building_123', 'confidence': 0.85},
+            {'building_id': 'building_456', 'confidence': 0.45}
+          ],
+        };
+
+        final result = visionApiService.parseResponse(apiResponse);
+
+        expect(result['success'], isTrue);
+        expect(result['matches'], isNotNull);
+        expect((result['matches'] as List).length, 2);
+      });
+
+      test('should handle null values gracefully', () {
+        final apiResponse = {
+          'status': 'confident',
+          'building_id': null,
+          'confidence': null,
+          'message': null,
+          'matches': null,
+        };
+
+        final result = visionApiService.parseResponse(apiResponse);
+
+        expect(result['success'], isTrue);
+        expect(result['buildingId'], isNull);
+      });
+    });
   });
 }
