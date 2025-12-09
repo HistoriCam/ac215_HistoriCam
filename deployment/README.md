@@ -70,3 +70,9 @@ curl -X POST https://<certHostname>/llm/chat \
   -H "Content-Type: application/json" \
   -d '{"question":"Hi"}'
 ```
+
+Easy SSH (Need IAP TCP fowarding permission)
+```bash
+gcloud compute instances list --format="table(name,zone,EXTERNAL_IP)"
+gcloud compute ssh <instance> --zone us-central1-a --project ac215-historicam --tunnel-through-iap
+```
