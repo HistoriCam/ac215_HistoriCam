@@ -43,7 +43,7 @@ void main() {
 
       expect(originalSize, greaterThan(targetMaxSize));
 
-      final compressionRatio = originalSize / targetMaxSize;
+      const compressionRatio = originalSize / targetMaxSize;
       expect(compressionRatio, greaterThan(10));
     });
 
@@ -56,7 +56,7 @@ void main() {
       expect(maxDimension, lessThan(500));
 
       // Should significantly reduce file size
-      final estimatedReduction = (100 - imageQuality) / 100;
+      const estimatedReduction = (100 - imageQuality) / 100;
       expect(estimatedReduction, greaterThan(0.7)); // >70% reduction
     });
   });
@@ -65,7 +65,7 @@ void main() {
     testWidgets('upload button should have upload icon',
         (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: Icon(Icons.upload),
           ),
@@ -78,7 +78,7 @@ void main() {
     testWidgets('capture button should have camera icon',
         (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: Icon(Icons.camera),
           ),

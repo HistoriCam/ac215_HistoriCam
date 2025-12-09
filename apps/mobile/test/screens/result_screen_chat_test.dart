@@ -12,7 +12,7 @@ void main() {
       const String buildingDescription = 'Test building description';
       const String expectedContextPrefix = 'Context: ';
 
-      final contextWithDescription =
+      const contextWithDescription =
           '$expectedContextPrefix$buildingDescription\n\nQuestion: Test question';
 
       expect(contextWithDescription, contains(buildingDescription));
@@ -101,7 +101,7 @@ void main() {
       const String context = 'Building info here';
       const String userQuestion = 'Where to next?';
 
-      final formattedQuestion = 'Context: $context\n\nQuestion: $userQuestion';
+      const formattedQuestion = 'Context: $context\n\nQuestion: $userQuestion';
 
       expect(formattedQuestion, contains(context));
       expect(formattedQuestion, contains(userQuestion));

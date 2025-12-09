@@ -34,7 +34,7 @@ void main() {
       const String context = 'Building with "quotes" and \'apostrophes\' & symbols';
       const String question = 'Tell me more';
 
-      final formatted = 'Context: $context\n\nQuestion: $question';
+      const formatted = 'Context: $context\n\nQuestion: $question';
 
       expect(formatted, contains('"quotes"'));
       expect(formatted, contains('\'apostrophes\''));
@@ -45,7 +45,7 @@ void main() {
       const String context = 'Line 1\nLine 2\nLine 3';
       const String question = 'What is this?';
 
-      final formatted = 'Context: $context\n\nQuestion: $question';
+      const formatted = 'Context: $context\n\nQuestion: $question';
 
       expect(formatted.split('\n').length, greaterThan(3));
       expect(formatted, contains('Line 1'));

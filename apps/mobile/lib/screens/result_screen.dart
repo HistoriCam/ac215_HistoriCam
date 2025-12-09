@@ -211,7 +211,7 @@ class _ResultScreenState extends State<ResultScreen>
             onPressed: () => Navigator.pop(context),
           ),
           const SizedBox(width: 8),
-          Icon(
+          const Icon(
             Icons.camera_alt,
             color: Colors.white,
             size: 28,
@@ -220,7 +220,7 @@ class _ResultScreenState extends State<ResultScreen>
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 'HistoriCam',
                 style: TextStyle(
                   color: Colors.white,
@@ -243,14 +243,14 @@ class _ResultScreenState extends State<ResultScreen>
   }
 
   Widget _buildLoadingState() {
-    return Center(
+    return const Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           CircularProgressIndicator(
             color: Color(0xFFE63946),
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
           Text(
             'Analyzing building...',
             style: TextStyle(
@@ -259,7 +259,7 @@ class _ResultScreenState extends State<ResultScreen>
               fontWeight: FontWeight.w500,
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           Text(
             'Please wait while we identify the landmark',
             style: TextStyle(
@@ -298,7 +298,7 @@ class _ResultScreenState extends State<ResultScreen>
     return Column(
       children: [
         // Image section
-        Container(
+        SizedBox(
           height: isPhone ? 400 : 500,
           width: double.infinity,
           child: widget.imagePath != null

@@ -283,7 +283,7 @@ class _CameraScreenState extends State<CameraScreen> {
       color: const Color(0xFFE63946),
       child: Row(
         children: [
-          Icon(
+          const Icon(
             Icons.camera_alt,
             color: Colors.white,
             size: 32,
@@ -292,7 +292,7 @@ class _CameraScreenState extends State<CameraScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 'HistoriCam',
                 style: TextStyle(
                   color: Colors.white,
@@ -316,14 +316,14 @@ class _CameraScreenState extends State<CameraScreen> {
 
   Widget _buildCameraPreview() {
     if (!_isCameraInitialized) {
-      return Center(
+      return const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CircularProgressIndicator(
               color: Color(0xFFE63946),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Text(
               'Initializing camera...',
               style: TextStyle(color: Colors.white70),
@@ -359,7 +359,7 @@ class _CameraScreenState extends State<CameraScreen> {
                 color: Colors.black.withOpacity(0.6),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Text(
+              child: const Text(
                 'Point your camera at a historic building',
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -456,14 +456,14 @@ class _CameraScreenState extends State<CameraScreen> {
         if (_isProcessing)
           Container(
             color: Colors.black.withOpacity(0.7),
-            child: Center(
+            child: const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   CircularProgressIndicator(
                     color: Color(0xFFE63946),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   Text(
                     'Processing image...',
                     style: TextStyle(
@@ -509,7 +509,7 @@ class _CameraScreenState extends State<CameraScreen> {
                       ),
                     ],
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.upload,
                     color: Colors.white,
                     size: 28,
@@ -538,7 +538,7 @@ class _CameraScreenState extends State<CameraScreen> {
                       ),
                     ],
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.camera,
                     color: Colors.white,
                     size: 36,
@@ -548,7 +548,7 @@ class _CameraScreenState extends State<CameraScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          Text(
+          const Text(
             'Tap to capture or upload',
             style: TextStyle(
               color: Colors.white70,

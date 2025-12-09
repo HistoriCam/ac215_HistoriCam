@@ -146,17 +146,17 @@ class _SearchHistoryDialogState extends State<SearchHistoryDialog> {
     }
 
     if (_searchHistory == null || _searchHistory!.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.all(32.0),
+      return const Padding(
+        padding: EdgeInsets.all(32.0),
         child: Column(
           children: [
-            const Icon(
+            Icon(
               Icons.search_off,
               color: Colors.white54,
               size: 64,
             ),
-            const SizedBox(height: 16),
-            const Text(
+            SizedBox(height: 16),
+            Text(
               'No Previous Searches',
               style: TextStyle(
                 color: Colors.white,
@@ -164,8 +164,8 @@ class _SearchHistoryDialogState extends State<SearchHistoryDialog> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 8),
-            const Text(
+            SizedBox(height: 8),
+            Text(
               'Your search history will appear here',
               style: TextStyle(
                 color: Colors.white70,

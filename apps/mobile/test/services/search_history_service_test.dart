@@ -59,9 +59,9 @@ void main() {
       final entry = SearchHistoryEntry.fromJson(json);
       final after = DateTime.now();
 
-      expect(entry.createdAt.isAfter(before.subtract(Duration(seconds: 1))),
+      expect(entry.createdAt.isAfter(before.subtract(const Duration(seconds: 1))),
           isTrue);
-      expect(entry.createdAt.isBefore(after.add(Duration(seconds: 1))), isTrue);
+      expect(entry.createdAt.isBefore(after.add(const Duration(seconds: 1))), isTrue);
     });
 
     test('toJson should convert entry to JSON correctly', () {

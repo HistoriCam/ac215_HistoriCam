@@ -140,7 +140,7 @@ void main() {
     test('compression should reduce file size significantly', () {
       const originalSize = 2000000; // 2MB
       const targetSize = 200000; // 200KB
-      final compressionRatio = originalSize / targetSize;
+      const compressionRatio = originalSize / targetSize;
 
       expect(compressionRatio, greaterThanOrEqualTo(10));
     });
