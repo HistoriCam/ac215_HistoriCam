@@ -214,5 +214,168 @@ void main() {
       final decoration = captureButton.decoration as BoxDecoration;
       expect(decoration.shape, BoxShape.circle);
     });
+
+    testWidgets('should display upload button icon',
+        (WidgetTester tester) async {
+      cameras = [];
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: CameraScreen(),
+        ),
+      );
+
+      // Verify upload icon exists
+      expect(find.byIcon(Icons.upload), findsOneWidget);
+    });
+
+    testWidgets('should have GestureDetector for buttons',
+        (WidgetTester tester) async {
+      cameras = [];
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: CameraScreen(),
+        ),
+      );
+
+      // Should have gesture detectors for interactive elements
+      expect(find.byType(GestureDetector), findsWidgets);
+    });
+
+    testWidgets('should display header Row layout',
+        (WidgetTester tester) async {
+      cameras = [];
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: CameraScreen(),
+        ),
+      );
+
+      // Header should have Row layout
+      final rowFinder = find.ancestor(
+        of: find.text('HistoriCam'),
+        matching: find.byType(Row),
+      );
+      expect(rowFinder, findsWidgets);
+    });
+
+    testWidgets('should use expanded widget for camera preview',
+        (WidgetTester tester) async {
+      cameras = [];
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: CameraScreen(),
+        ),
+      );
+
+      // Camera preview should be in an Expanded widget
+      expect(find.byType(Expanded), findsWidgets);
+    });
+
+    testWidgets('should display multiple Container widgets',
+        (WidgetTester tester) async {
+      cameras = [];
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: CameraScreen(),
+        ),
+      );
+
+      // Multiple containers for layout and styling
+      expect(find.byType(Container), findsWidgets);
+    });
+
+    testWidgets('should have SizedBox for spacing',
+        (WidgetTester tester) async {
+      cameras = [];
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: CameraScreen(),
+        ),
+      );
+
+      // SizedBox used for spacing
+      expect(find.byType(SizedBox), findsWidgets);
+    });
+
+    testWidgets('should display header text with correct content',
+        (WidgetTester tester) async {
+      cameras = [];
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: CameraScreen(),
+        ),
+      );
+
+      // Verify exact header texts
+      expect(find.text('HistoriCam'), findsOneWidget);
+      expect(find.text('Your Personal Tour Guide'), findsOneWidget);
+    });
+
+    testWidgets('should have Center widget for loading state',
+        (WidgetTester tester) async {
+      cameras = [];
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: CameraScreen(),
+        ),
+      );
+
+      // Loading state should be centered
+      expect(find.byType(Center), findsWidgets);
+    });
+
+    testWidgets('loading state should have Column layout',
+        (WidgetTester tester) async {
+      cameras = [];
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: CameraScreen(),
+        ),
+      );
+
+      // Loading column should exist
+      final columnInCenter = find.descendant(
+        of: find.byType(Center),
+        matching: find.byType(Column),
+      );
+      expect(columnInCenter, findsWidgets);
+    });
+
+    testWidgets('should initialize with empty cameras list',
+        (WidgetTester tester) async {
+      cameras = [];
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: CameraScreen(),
+        ),
+      );
+
+      // Should build without crashing
+      expect(find.byType(CameraScreen), findsOneWidget);
+    });
+
+    testWidgets('should display correct loading message',
+        (WidgetTester tester) async {
+      cameras = [];
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: CameraScreen(),
+        ),
+      );
+
+      // Exact loading message
+      expect(find.text('Initializing camera...'), findsOneWidget);
+    });
   });
 }
