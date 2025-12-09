@@ -197,6 +197,19 @@ docker run -d --restart always --name llm --network historicam-net \\
   {llm_image} \\
   /bin/bash -c "cd /app && /.venv/bin/uvicorn server:app --host 0.0.0.0 --port 8000"
 
+# Wait for ChromaDB and pre-load embeddings into Chroma via LLM CLI
+echo "Waiting for ChromaDB to become ready..."
+for i in $(seq 1 30); do
+  if curl -s http://chromadb:8000/api/v1/collections >/dev/null 2>&1; then
+    echo "ChromaDB is ready."
+    break
+  fi
+  sleep 2
+done
+
+echo "Loading embeddings into ChromaDB (recursive-split)..."
+docker exec llm /bin/bash -c "export CHROMADB_HOST=chromadb CHROMADB_PORT=8000; source /.venv/bin/activate; python cli.py --chunk --embed --load --chunk_type recursive-split" || echo "Chroma load failed"
+
 # Nginx proxy
 docker run -d --restart always --name nginx --network historicam-net \\
   -p 80:80 -p 443:443 \\

@@ -13,7 +13,7 @@ class ApiConfig {
   /// - iOS simulator: http://localhost:8080
   /// - Android emulator: http://10.0.2.2:8080
   // static const String visionApiUrl = 'http://localhost:8080';
-  static const String visionApiUrl = 'https://35.224.247.219.sslip.io/vision';
+  static const String visionApiUrl = 'https://34.171.180.197.sslip.io/vision';
 
   /// LLM-RAG API base URL
   ///
@@ -24,7 +24,7 @@ class ApiConfig {
   ///
   /// For production, update with your deployed URL
   // static const String llmRagApiUrl = 'http://localhost:8001';
-  static const String llmRagApiUrl = 'https://35.224.247.219.sslip.io/llm';
+  static const String llmRagApiUrl = 'https://34.171.180.197.sslip.io/llm';
 
   /// Validate that the API URL has been configured
   static bool isConfigured() {

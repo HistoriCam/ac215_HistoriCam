@@ -1,0 +1,9 @@
+encryptionsalt: v1:gWRLWpd2wkM=:v1:dcc9EVoUh3HCLB/4:kFnKkJ/iIFWrc1ceLIH0tWF1j49Ijg==
+config:
+  gcp:project: ac215-historicam
+  gcp:region: us-central1
+  historicam-k8s:visionImage: us-central1-docker.pkg.dev/ac215-historicam/historicam/vision:latest
+  historicam-k8s:llmImage: us-central1-docker.pkg.dev/ac215-historicam/historicam/llm:latest
+  historicam-k8s:visionEmbeddingsPath: gs://historicam-images/embeddings/v20251208_170256/multimodal-512d/embeddings.jsonl
+  historicam-k8s:ingressHost: 34.171.180.197.sslip.io
+  historicam-k8s:certEmail: hughvandeventer@g.harvard.edu
