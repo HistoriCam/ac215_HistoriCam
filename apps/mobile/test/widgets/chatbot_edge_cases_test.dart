@@ -14,7 +14,6 @@ void main() {
 
     test('should handle null initial context', () {
       const String? context = null;
-      const String userMessage = 'Test question';
 
       final shouldPrependContext = context != null && context.isNotEmpty;
 
