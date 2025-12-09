@@ -82,7 +82,7 @@ class _CameraScreenState extends State<CameraScreen> {
         });
       }
     } catch (e) {
-      print('Error initializing camera: $e');
+      debugPrint('Error initializing camera: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -159,7 +159,7 @@ class _CameraScreenState extends State<CameraScreen> {
         });
       }
     } catch (e) {
-      print('Error taking picture: $e');
+      debugPrint('Error taking picture: $e');
       setState(() {
         _isProcessing = false;
       });
@@ -180,45 +180,51 @@ class _CameraScreenState extends State<CameraScreen> {
         maxHeight: 320,
       );
 
-      if (image != null && mounted) {
-        print('Selected image path: ${image.path}');
-        print('Selected image name: ${image.name}');
+      if (image != null) {
+        debugPrint('Selected image path: ${image.path}');
+        debugPrint('Selected image name: ${image.name}');
 
         // Verify the file is readable
         final bytes = await image.readAsBytes();
-        print('Image size: ${bytes.length} bytes');
+        debugPrint('Image size: ${bytes.length} bytes');
 
-        // Navigate to result screen with the uploaded image
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ResultScreen(imagePath: image.path),
-          ),
-        ).then((_) {
+        if (mounted) {
+          // Navigate to result screen with the uploaded image
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ResultScreen(imagePath: image.path),
+            ),
+          );
+
           // Resume camera when returning
+          if (mounted) {
+            setState(() {
+              _isProcessing = false;
+            });
+          }
+        }
+      } else {
+        debugPrint('No image selected');
+        if (mounted) {
           setState(() {
             _isProcessing = false;
           });
-        });
-      } else {
-        print('No image selected');
+        }
+      }
+    } catch (e) {
+      debugPrint('Error picking image: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to pick image'),
+            duration: Duration(seconds: 5),
+          ),
+        );
         setState(() {
           _isProcessing = false;
         });
       }
-    } catch (e) {
-      print('Error picking image: $e');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to pick image: $e'),
-            duration: Duration(seconds: 5),
-          ),
-        );
-      }
-      setState(() {
-        _isProcessing = false;
-      });
     }
   }
 

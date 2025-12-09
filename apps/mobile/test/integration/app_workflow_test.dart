@@ -118,7 +118,7 @@ void main() {
       expect(chatContext, buildingDesc);
 
       // Step 3: User asks question with context
-      if (chatContext != null && chatContext.isNotEmpty) {
+      if (chatContext.isNotEmpty) {
         final questionWithContext = 'Context: $chatContext\n\nQuestion: Test';
         contextPrepended = questionWithContext.contains(chatContext);
       }

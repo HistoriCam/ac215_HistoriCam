@@ -3,10 +3,10 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   group('Chatbot Widget Edge Cases', () {
     test('should handle empty initial context', () {
-      const String? context = '';
+      const String context = '';
       const String userMessage = 'Test question';
 
-      final shouldPrependContext = context != null && context.isNotEmpty;
+      final shouldPrependContext = context.isNotEmpty;
 
       expect(shouldPrependContext, isFalse);
       expect(userMessage, 'Test question');

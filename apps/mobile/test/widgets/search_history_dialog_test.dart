@@ -6,14 +6,12 @@ import 'package:historicam/services/search_history_service.dart';
 void main() {
   group('SearchHistoryDialog', () {
     testWidgets('should display title correctly', (WidgetTester tester) async {
-      bool callbackCalled = false;
-
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: SearchHistoryDialog(
               onSearchSelected: (buildingId, buildingName) {
-                callbackCalled = true;
+                // Callback is set but not tested here
               },
             ),
           ),

@@ -23,10 +23,11 @@ class SupabaseConfig {
   /// Validate that Supabase is properly configured
   static bool isConfigured() {
     if (supabaseKey.isEmpty) {
-      print('ERROR: SUPABASE_KEY not configured!');
-      print(
-          'For local dev: flutter run --dart-define-from-file=secrets/supabase_key.env');
-      print('For production: Set SUPABASE_KEY in Vercel environment variables');
+      // Using assert instead of print for configuration errors
+      // This will only show in debug mode
+      assert(false, 'SUPABASE_KEY not configured! '
+          'For local dev: flutter run --dart-define-from-file=secrets/supabase_key.env '
+          'For production: Set SUPABASE_KEY in Vercel environment variables');
       return false;
     }
     return true;

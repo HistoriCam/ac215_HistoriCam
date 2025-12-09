@@ -110,7 +110,7 @@ class _ResultScreenState extends State<ResultScreen>
           }
         } catch (e) {
           // Log error but don't block the UI
-          print('Failed to save search history: $e');
+          debugPrint('Failed to save search history: $e');
         }
 
         setState(() {
@@ -144,7 +144,7 @@ class _ResultScreenState extends State<ResultScreen>
         _startTypingAnimation();
       }
     } catch (e) {
-      print('Error calling vision API: $e');
+      debugPrint('Error calling vision API: $e');
 
       // Fallback to dummy data if API fails
       try {
