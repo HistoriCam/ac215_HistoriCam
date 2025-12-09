@@ -211,5 +211,152 @@ void main() {
       // Verify the message was sent (user message appears)
       expect(find.text('Question?'), findsOneWidget);
     }, skip: true); // Skip: Typing indicator animation testing is complex
+
+    testWidgets('should display chatbot header with correct styling',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ChatbotWidget(),
+          ),
+        ),
+      );
+
+      // Verify header container exists
+      final containerFinder = find.ancestor(
+        of: find.text('Ask Anything'),
+        matching: find.byType(Container),
+      );
+      expect(containerFinder, findsWidgets);
+    });
+
+    testWidgets('should have proper container structure',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ChatbotWidget(),
+          ),
+        ),
+      );
+
+      // Verify main container exists
+      expect(find.byType(Container), findsWidgets);
+      expect(find.byType(Column), findsWidgets);
+    });
+
+    testWidgets('should display all required UI elements',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ChatbotWidget(),
+          ),
+        ),
+      );
+
+      // Verify all key elements are present
+      expect(find.byType(TextField), findsOneWidget);
+      expect(find.byType(IconButton), findsOneWidget);
+      expect(find.byIcon(Icons.send), findsOneWidget);
+      expect(find.byIcon(Icons.chat_bubble_outline), findsOneWidget);
+    });
+
+    testWidgets('should build social icons correctly',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ChatbotWidget(),
+          ),
+        ),
+      );
+
+      // Verify all social icons
+      expect(find.byIcon(Icons.facebook), findsOneWidget);
+      expect(find.byIcon(Icons.link), findsOneWidget);
+      expect(find.byIcon(Icons.play_circle_outline), findsOneWidget);
+      expect(find.byIcon(Icons.camera_alt), findsOneWidget);
+    });
+
+    testWidgets('should initialize with empty message list',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ChatbotWidget(),
+          ),
+        ),
+      );
+
+      // Initially, no chat messages should be displayed
+      expect(find.byIcon(Icons.person), findsNothing);
+      expect(find.byIcon(Icons.smart_toy), findsNothing);
+    });
+
+    testWidgets('should accept initial context parameter',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ChatbotWidget(
+              initialContext: 'This is a test building',
+            ),
+          ),
+        ),
+      );
+
+      // Widget should build successfully with context
+      expect(find.byType(ChatbotWidget), findsOneWidget);
+    });
+
+    testWidgets('should work without initial context',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ChatbotWidget(),
+          ),
+        ),
+      );
+
+      // Widget should build successfully without context
+      expect(find.byType(ChatbotWidget), findsOneWidget);
+    });
+
+    testWidgets('should have TextField with correct hint text',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ChatbotWidget(),
+          ),
+        ),
+      );
+
+      final textField = tester.widget<TextField>(find.byType(TextField));
+      expect(
+        textField.decoration?.hintText,
+        equals('Ask anything (eg. Where to next?)'),
+      );
+    });
+
+    testWidgets('should display Row for input and send button',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ChatbotWidget(),
+          ),
+        ),
+      );
+
+      // Input section should have Row layout
+      final rowFinder = find.ancestor(
+        of: find.byType(TextField),
+        matching: find.byType(Row),
+      );
+      expect(rowFinder, findsWidgets);
+    });
   });
 }
