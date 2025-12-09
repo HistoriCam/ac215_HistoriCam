@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import '../services/llm_rag_service.dart';
 
 class ChatbotWidget extends StatefulWidget {
-  const ChatbotWidget({super.key});
+  final String? initialContext;
+
+  const ChatbotWidget({super.key, this.initialContext});
 
   @override
   State<ChatbotWidget> createState() => _ChatbotWidgetState();
@@ -35,9 +37,16 @@ class _ChatbotWidgetState extends State<ChatbotWidget> {
     _messageController.clear();
 
     try {
+      // Build the question with initial context if available
+      String questionWithContext = userMessage;
+      if (widget.initialContext != null && widget.initialContext!.isNotEmpty) {
+        questionWithContext =
+            'Context: ${widget.initialContext}\n\nQuestion: $userMessage';
+      }
+
       // Call the LLM-RAG API
       final response = await _llmRagService.askQuestion(
-        question: userMessage,
+        question: questionWithContext,
         chunkType: 'recursive-split',
         topK: 5,
         returnDocs: false,
@@ -84,7 +93,7 @@ class _ChatbotWidgetState extends State<ChatbotWidget> {
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
             blurRadius: 15,
-            offset: Offset(0, 5),
+            offset: const Offset(0, 5),
           ),
         ],
       ),
@@ -94,7 +103,7 @@ class _ChatbotWidgetState extends State<ChatbotWidget> {
           // Chatbot header
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: Color(0xFF2B2B2B),
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(16),
@@ -105,18 +114,18 @@ class _ChatbotWidgetState extends State<ChatbotWidget> {
               children: [
                 Container(
                   padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: Color(0xFFE63946),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.chat_bubble_outline,
                     color: Colors.white,
                     size: 20,
                   ),
                 ),
                 const SizedBox(width: 12),
-                Text(
+                const Text(
                   'Ask Anything',
                   style: TextStyle(
                     color: Colors.white,
@@ -125,7 +134,7 @@ class _ChatbotWidgetState extends State<ChatbotWidget> {
                   ),
                 ),
                 const Spacer(),
-                Text(
+                const Text(
                   '(eg. Where to next?)',
                   style: TextStyle(
                     color: Colors.white70,
@@ -140,7 +149,7 @@ class _ChatbotWidgetState extends State<ChatbotWidget> {
           // Messages area
           if (_messages.isNotEmpty)
             Container(
-              constraints: BoxConstraints(
+              constraints: const BoxConstraints(
                 maxHeight: 300,
               ),
               child: ListView.builder(
@@ -162,7 +171,7 @@ class _ChatbotWidgetState extends State<ChatbotWidget> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Color(0xFFF5F5F5),
+                      color: const Color(0xFFF5F5F5),
                       borderRadius: BorderRadius.circular(18),
                     ),
                     child: Row(
@@ -188,18 +197,18 @@ class _ChatbotWidgetState extends State<ChatbotWidget> {
                 Expanded(
                   child: TextField(
                     controller: _messageController,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.black,
                       fontSize: 14,
                     ),
                     decoration: InputDecoration(
                       hintText: 'Ask anything (eg. Where to next?)',
-                      hintStyle: TextStyle(
+                      hintStyle: const TextStyle(
                         color: Colors.grey,
                         fontSize: 14,
                       ),
                       filled: true,
-                      fillColor: Color(0xFFF5F5F5),
+                      fillColor: const Color(0xFFF5F5F5),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(25),
                         borderSide: BorderSide.none,
@@ -214,12 +223,12 @@ class _ChatbotWidgetState extends State<ChatbotWidget> {
                 ),
                 const SizedBox(width: 8),
                 Container(
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: Color(0xFFE63946),
                     shape: BoxShape.circle,
                   ),
                   child: IconButton(
-                    icon: Icon(Icons.send, color: Colors.white),
+                    icon: const Icon(Icons.send, color: Colors.white),
                     onPressed: _sendMessage,
                   ),
                 ),
@@ -257,11 +266,11 @@ class _ChatbotWidgetState extends State<ChatbotWidget> {
           if (!message.isUser) ...[
             Container(
               padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Color(0xFFE63946),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.smart_toy,
                 color: Colors.white,
                 size: 16,
@@ -285,8 +294,8 @@ class _ChatbotWidgetState extends State<ChatbotWidget> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (message.isError)
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8),
+                    const Padding(
+                      padding: EdgeInsets.only(right: 8),
                       child: Icon(
                         Icons.warning_amber_rounded,
                         color: Color(0xFFE63946),
@@ -314,11 +323,11 @@ class _ChatbotWidgetState extends State<ChatbotWidget> {
             const SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Color(0xFF2B2B2B),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.person,
                 color: Colors.white,
                 size: 16,
@@ -333,14 +342,14 @@ class _ChatbotWidgetState extends State<ChatbotWidget> {
   Widget _buildTypingDot(int index) {
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0.0, end: 1.0),
-      duration: Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 600),
       builder: (context, value, child) {
         return Opacity(
           opacity: (value + index * 0.3) % 1.0,
           child: Container(
             width: 8,
             height: 8,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: Colors.grey,
               shape: BoxShape.circle,
             ),
@@ -358,7 +367,7 @@ class _ChatbotWidgetState extends State<ChatbotWidget> {
   Widget _buildSocialIcon(IconData icon) {
     return Container(
       padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Color(0xFF2B2B2B),
         shape: BoxShape.circle,
       ),

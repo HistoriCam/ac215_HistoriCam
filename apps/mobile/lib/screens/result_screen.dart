@@ -110,7 +110,7 @@ class _ResultScreenState extends State<ResultScreen>
           }
         } catch (e) {
           // Log error but don't block the UI
-          print('Failed to save search history: $e');
+          debugPrint('Failed to save search history: $e');
         }
 
         setState(() {
@@ -144,7 +144,7 @@ class _ResultScreenState extends State<ResultScreen>
         _startTypingAnimation();
       }
     } catch (e) {
-      print('Error calling vision API: $e');
+      debugPrint('Error calling vision API: $e');
 
       // Fallback to dummy data if API fails
       try {
@@ -211,7 +211,7 @@ class _ResultScreenState extends State<ResultScreen>
             onPressed: () => Navigator.pop(context),
           ),
           const SizedBox(width: 8),
-          Icon(
+          const Icon(
             Icons.camera_alt,
             color: Colors.white,
             size: 28,
@@ -220,7 +220,7 @@ class _ResultScreenState extends State<ResultScreen>
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 'HistoriCam',
                 style: TextStyle(
                   color: Colors.white,
@@ -243,14 +243,14 @@ class _ResultScreenState extends State<ResultScreen>
   }
 
   Widget _buildLoadingState() {
-    return Center(
+    return const Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           CircularProgressIndicator(
             color: Color(0xFFE63946),
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
           Text(
             'Analyzing building...',
             style: TextStyle(
@@ -259,7 +259,7 @@ class _ResultScreenState extends State<ResultScreen>
               fontWeight: FontWeight.w500,
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           Text(
             'Please wait while we identify the landmark',
             style: TextStyle(
@@ -279,11 +279,13 @@ class _ResultScreenState extends State<ResultScreen>
           // Image and description side by side
           _buildImageAndDescriptionSection(),
 
-          // Tour suggestions button
+          // Tour suggestions button (always visible)
           _buildTourButton(),
 
-          // Chatbot section
-          ChatbotWidget(),
+          // Chatbot section (always visible)
+          ChatbotWidget(
+            initialContext: _buildingDescription,
+          ),
         ],
       ),
     );
@@ -293,10 +295,10 @@ class _ResultScreenState extends State<ResultScreen>
     final screenWidth = MediaQuery.of(context).size.width;
     final isPhone = screenWidth < 600; // Tablet breakpoint
 
-    return Stack(
+    return Column(
       children: [
         // Image section
-        Container(
+        SizedBox(
           height: isPhone ? 400 : 500,
           width: double.infinity,
           child: widget.imagePath != null
@@ -351,48 +353,39 @@ class _ResultScreenState extends State<ResultScreen>
                 ),
         ),
 
-        // Description overlay at bottom
-        Positioned(
-          bottom: 0,
-          left: 0,
-          right: 0,
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(24.0),
-            decoration: const BoxDecoration(
-              color: Color(0xFFF5EFE6),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
+        // Description section below image
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(24.0),
+          decoration: const BoxDecoration(
+            color: Color(0xFFF5EFE6),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Building name
+              Text(
+                _buildingName,
+                style: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF2B2B2B),
+                ),
               ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Building name
-                Text(
-                  _buildingName,
-                  style: const TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2B2B2B),
-                  ),
-                ),
-                const SizedBox(height: 16),
+              const SizedBox(height: 16),
 
-                // Description with typing animation
-                Text(
-                  _displayedDescription,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    height: 1.6,
-                    color: Color(0xFF2B2B2B),
-                  ),
-                  textAlign: TextAlign.left,
+              // Description with typing animation
+              Text(
+                _displayedDescription,
+                style: const TextStyle(
+                  fontSize: 14,
+                  height: 1.6,
+                  color: Color(0xFF2B2B2B),
                 ),
-              ],
-            ),
+                textAlign: TextAlign.left,
+              ),
+            ],
           ),
         ),
       ],

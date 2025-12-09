@@ -64,7 +64,7 @@ void main() {
       );
 
       // Verify capture button text
-      expect(find.text('Tap to capture'), findsOneWidget);
+      expect(find.text('Tap to capture or upload'), findsOneWidget);
 
       // Verify camera icon in capture button
       expect(find.byIcon(Icons.camera), findsOneWidget);
@@ -172,7 +172,7 @@ void main() {
       );
 
       // Camera controls should be visible
-      expect(find.text('Tap to capture'), findsOneWidget);
+      expect(find.text('Tap to capture or upload'), findsOneWidget);
 
       // Capture button container should exist
       expect(

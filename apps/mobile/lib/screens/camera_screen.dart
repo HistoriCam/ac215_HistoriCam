@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:image_picker/image_picker.dart';
 import '../main.dart';
 import 'result_screen.dart';
 import '../widgets/search_history_dialog.dart';
@@ -81,7 +82,7 @@ class _CameraScreenState extends State<CameraScreen> {
         });
       }
     } catch (e) {
-      print('Error initializing camera: $e');
+      debugPrint('Error initializing camera: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -158,10 +159,72 @@ class _CameraScreenState extends State<CameraScreen> {
         });
       }
     } catch (e) {
-      print('Error taking picture: $e');
+      debugPrint('Error taking picture: $e');
       setState(() {
         _isProcessing = false;
       });
+    }
+  }
+
+  Future<void> _pickImage() async {
+    setState(() {
+      _isProcessing = true;
+    });
+
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 15, // Very low quality for smallest file size
+        maxWidth: 320, // Minimal resolution to match camera captures
+        maxHeight: 320,
+      );
+
+      if (image != null) {
+        debugPrint('Selected image path: ${image.path}');
+        debugPrint('Selected image name: ${image.name}');
+
+        // Verify the file is readable
+        final bytes = await image.readAsBytes();
+        debugPrint('Image size: ${bytes.length} bytes');
+
+        if (mounted) {
+          // Navigate to result screen with the uploaded image
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ResultScreen(imagePath: image.path),
+            ),
+          );
+
+          // Resume camera when returning
+          if (mounted) {
+            setState(() {
+              _isProcessing = false;
+            });
+          }
+        }
+      } else {
+        debugPrint('No image selected');
+        if (mounted) {
+          setState(() {
+            _isProcessing = false;
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint('Error picking image: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to pick image'),
+            duration: Duration(seconds: 5),
+          ),
+        );
+        setState(() {
+          _isProcessing = false;
+        });
+      }
     }
   }
 
@@ -220,7 +283,7 @@ class _CameraScreenState extends State<CameraScreen> {
       color: const Color(0xFFE63946),
       child: Row(
         children: [
-          Icon(
+          const Icon(
             Icons.camera_alt,
             color: Colors.white,
             size: 32,
@@ -229,7 +292,7 @@ class _CameraScreenState extends State<CameraScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 'HistoriCam',
                 style: TextStyle(
                   color: Colors.white,
@@ -253,14 +316,14 @@ class _CameraScreenState extends State<CameraScreen> {
 
   Widget _buildCameraPreview() {
     if (!_isCameraInitialized) {
-      return Center(
+      return const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CircularProgressIndicator(
               color: Color(0xFFE63946),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Text(
               'Initializing camera...',
               style: TextStyle(color: Colors.white70),
@@ -296,7 +359,7 @@ class _CameraScreenState extends State<CameraScreen> {
                 color: Colors.black.withOpacity(0.6),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Text(
+              child: const Text(
                 'Point your camera at a historic building',
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -393,14 +456,14 @@ class _CameraScreenState extends State<CameraScreen> {
         if (_isProcessing)
           Container(
             color: Colors.black.withOpacity(0.7),
-            child: Center(
+            child: const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   CircularProgressIndicator(
                     color: Color(0xFFE63946),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   Text(
                     'Processing image...',
                     style: TextStyle(
@@ -421,37 +484,72 @@ class _CameraScreenState extends State<CameraScreen> {
       padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
       child: Column(
         children: [
-          // Capture button
-          GestureDetector(
-            onTap: _isProcessing ? null : _takePicture,
-            child: Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: _isProcessing ? Colors.grey : const Color(0xFFE63946),
-                border: Border.all(
-                  color: Colors.white,
-                  width: 4,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFFE63946).withOpacity(0.5),
-                    blurRadius: 20,
-                    spreadRadius: 2,
+          // Buttons row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Upload button
+              GestureDetector(
+                onTap: _isProcessing ? null : _pickImage,
+                child: Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: _isProcessing ? Colors.grey : const Color(0xFF17A2B8), // Greenish-blue color
+                    border: Border.all(
+                      color: Colors.white,
+                      width: 3,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF17A2B8).withOpacity(0.5),
+                        blurRadius: 15,
+                        spreadRadius: 1,
+                      ),
+                    ],
                   ),
-                ],
+                  child: const Icon(
+                    Icons.upload,
+                    color: Colors.white,
+                    size: 28,
+                  ),
+                ),
               ),
-              child: Icon(
-                Icons.camera,
-                color: Colors.white,
-                size: 36,
+              const SizedBox(width: 32),
+              // Capture button
+              GestureDetector(
+                onTap: _isProcessing ? null : _takePicture,
+                child: Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: _isProcessing ? Colors.grey : const Color(0xFFE63946),
+                    border: Border.all(
+                      color: Colors.white,
+                      width: 4,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFE63946).withOpacity(0.5),
+                        blurRadius: 20,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.camera,
+                    color: Colors.white,
+                    size: 36,
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
           const SizedBox(height: 16),
-          Text(
-            'Tap to capture',
+          const Text(
+            'Tap to capture or upload',
             style: TextStyle(
               color: Colors.white70,
               fontSize: 14,
