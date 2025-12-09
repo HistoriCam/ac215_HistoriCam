@@ -18,7 +18,7 @@ void main() {
         ),
       );
 
-      expect(find.text('Last Search'), findsOneWidget);
+      expect(find.text('Search History'), findsOneWidget);
     });
 
     testWidgets('should call callback when item is tapped',
