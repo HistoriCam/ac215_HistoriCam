@@ -1,0 +1,4 @@
+name: historicam-k8s
+runtime:
+  name: python
+description: GKE cluster + vision/llm/chroma with nginx ingress and loader job
