@@ -6,7 +6,7 @@
 
 | Metric | Coverage |
 |--------|----------|
-| **Lines** | **48.7%** |
+| **Lines** | **49.0%** |
 | **Functions** | **N/A%** |
 
 ### Test Statistics
@@ -19,7 +19,7 @@
 
 ### Coverage Status
 
-![Coverage Status](https://img.shields.io/badge/coverage-48.7%25-red)
+![Coverage Status](https://img.shields.io/badge/coverage-49.0%25-red)
 
 ### Coverage Guidelines
 

@@ -106,6 +106,13 @@ Map with 'name' and 'description' keys, or error information</p>
         &#39;error&#39;: &#39;no_match&#39;,
         &#39;message&#39;: apiResponse[&#39;message&#39;] ?? &#39;No matching building found&#39;,
       };
+    } else if (status == &#39;error&#39;) {
+      &#47;&#47; Error status from API
+      return {
+        &#39;success&#39;: false,
+        &#39;error&#39;: &#39;error&#39;,
+        &#39;message&#39;: apiResponse[&#39;message&#39;] ?? &#39;API error occurred&#39;,
+      };
     } else {
       &#47;&#47; Unknown status
       return {
