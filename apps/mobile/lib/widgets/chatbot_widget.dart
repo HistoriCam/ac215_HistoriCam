@@ -147,20 +147,21 @@ class _ChatbotWidgetState extends State<ChatbotWidget> {
           ),
 
           // Messages area
-          if (_messages.isNotEmpty)
-            Container(
-              constraints: const BoxConstraints(
-                maxHeight: 300,
-              ),
-              child: ListView.builder(
-                padding: const EdgeInsets.all(16),
-                shrinkWrap: true,
-                itemCount: _messages.length,
-                itemBuilder: (context, index) {
-                  return _buildMessageBubble(_messages[index]);
-                },
-              ),
+          Container(
+            constraints: const BoxConstraints(
+              maxHeight: 300,
             ),
+            child: _messages.isEmpty
+                ? const SizedBox.shrink()
+                : ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    shrinkWrap: true,
+                    itemCount: _messages.length,
+                    itemBuilder: (context, index) {
+                      return _buildMessageBubble(_messages[index]);
+                    },
+                  ),
+          ),
 
           // Typing indicator
           if (_isTyping)
