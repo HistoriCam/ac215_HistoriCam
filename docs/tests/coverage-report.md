@@ -6,12 +6,12 @@
 
 | Metric | Coverage |
 |--------|----------|
-| **Lines** | **44.4%** |
+| **Lines** | **48.7%** |
 | **Functions** | **N/A%** |
 
 ### Test Statistics
 
-- **Total Test Files**: 25
+- **Total Test Files**: 26
 - **Total Source Files**: 12
 - **Last Updated**: $TIMESTAMP
 - **Commit**: [$COMMIT_SHORT](https://github.com/HistoriCam/ac215_HistoriCam/commit/$COMMIT_SHA)
@@ -19,7 +19,7 @@
 
 ### Coverage Status
 
-![Coverage Status](https://img.shields.io/badge/coverage-44.4%25-red)
+![Coverage Status](https://img.shields.io/badge/coverage-48.7%25-red)
 
 ### Coverage Guidelines
 
