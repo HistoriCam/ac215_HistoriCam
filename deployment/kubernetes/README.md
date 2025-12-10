@@ -62,6 +62,31 @@ curl -I https://<ingressHost>/vision/
 curl -X POST https://<ingressHost>/llm/chat -H "Content-Type: application/json" -d '{"question":"Hi","chunk_type":"recursive-split"}'
 ```
 
+## Autoscaling
+- HPAs are deployed for vision and llm (CPU target 80%, min 1, max 4; requests 250m/512Mi, limits 500m/1Gi).
+- Watch scaling: `kubectl get hpa -w -n dev` and `kubectl get pods -w -n dev`
+- Load via ingress (replace with a small local image):  
+  ```bash
+  while true; do
+    seq 2000 | xargs -n1 -P32 sh -c \
+      'curl -sk -o /dev/null -w "." \
+        -F "image=@/path/to/small.jpg;type=image/jpeg" \
+        https://<ingressHost>/vision/identify'
+  done
+  ```
+- Load in-cluster (bypasses LB/TLS; needs a reachable image URL):  
+  ```bash
+  kubectl run loadgen --rm -it --image=appropriate/curl -n dev -- sh -c '
+    apk add --no-cache wget >/dev/null &&
+    wget -qO /tmp/img.jpg https://your-small-image-url.jpg &&
+    for j in $(seq 1 16); do
+      while true; do curl -s -o /dev/null -w "." -F image=@/tmp/img.jpg http://vision:8080/identify; done &
+    done
+    wait
+  '
+  ```
+- Stop load with Ctrl+C; HPAs scale back down over time.
+
 
 ## Maintenance
 - Always use the shared backend + `dev` stack to avoid accidental new clusters. If you see extra clusters, delete with `gcloud container clusters delete <name> --zone us-central1-a --project ac215-historicam` after confirming they are not in use.
