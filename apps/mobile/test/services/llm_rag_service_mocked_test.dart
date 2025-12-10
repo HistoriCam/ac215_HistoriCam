@@ -1,22 +1,17 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:mockito/annotations.dart';
-import 'package:mockito/mockito.dart';
 import 'package:historicam/services/llm_rag_service.dart';
 import 'package:historicam/config/api_config.dart';
-import 'dart:convert';
 
 import 'llm_rag_service_mocked_test.mocks.dart';
 
 @GenerateMocks([http.Client])
 void main() {
   group('LlmRagService with HTTP mocks', () {
-    late MockClient mockClient;
-    late LlmRagService service;
-
     setUp(() {
-      mockClient = MockClient();
-      service = LlmRagService();
+      // Mock client setup for future use
+      MockClient();
     });
 
     group('askQuestion configuration', () {

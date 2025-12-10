@@ -12,11 +12,9 @@ import 'vision_api_service_mocked_test.mocks.dart';
 void main() {
   group('VisionApiService with HTTP mocks', () {
     late MockClient mockClient;
-    late VisionApiService service;
 
     setUp(() {
       mockClient = MockClient();
-      service = VisionApiService();
     });
 
     group('identifyBuilding', () {
