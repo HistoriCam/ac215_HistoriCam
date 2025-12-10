@@ -246,7 +246,12 @@ class _LoginScreenState extends State<LoginScreen>
                       const SizedBox(height: 20),
 
                       // Toggle login/signup
-                      _buildToggleModeButton(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Expanded(child: _buildToggleModeButton()),
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -326,27 +331,34 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   Widget _buildSubmitButton() {
-    return Container(
+    return SizedBox(
       height: 56,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        gradient: const LinearGradient(
-          colors: [Color(0xFFE63946), Color(0xFFFF6B6B)],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFFE63946).withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
+      child: ElevatedButton(
+        onPressed: _isLoading ? null : _handleSubmit,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          padding: EdgeInsets.zero,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
           ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: _isLoading ? null : _handleSubmit,
-          borderRadius: BorderRadius.circular(16),
-          child: Center(
+        ),
+        child: Ink(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            gradient: const LinearGradient(
+              colors: [Color(0xFFE63946), Color(0xFFFF6B6B)],
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFFE63946).withOpacity(0.3),
+                blurRadius: 12,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Container(
+            alignment: Alignment.center,
             child: _isLoading
                 ? const SizedBox(
                     height: 24,

@@ -358,5 +358,76 @@ void main() {
       );
       expect(rowFinder, findsWidgets);
     });
+
+    testWidgets('should have Container widgets', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ChatbotWidget(),
+          ),
+        ),
+      );
+
+      // Should have multiple containers for layout
+      expect(find.byType(Container), findsWidgets);
+    });
+
+    testWidgets('should have ListView for messages', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ChatbotWidget(),
+          ),
+        ),
+      );
+
+      // Should have ListView for displaying messages
+      expect(find.byType(ListView), findsOneWidget);
+    });
+
+    testWidgets('should use Expanded widgets for layout', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ChatbotWidget(),
+          ),
+        ),
+      );
+
+      // Should use Expanded for flexible layout
+      expect(find.byType(Expanded), findsWidgets);
+    });
+
+    testWidgets('should have SizedBox for spacing', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ChatbotWidget(),
+          ),
+        ),
+      );
+
+      // Should use SizedBox for spacing
+      expect(find.byType(SizedBox), findsWidgets);
+    });
+
+    testWidgets('should have send icon button', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ChatbotWidget(),
+          ),
+        ),
+      );
+
+      // Send icon should be in an IconButton
+      expect(find.byIcon(Icons.send), findsOneWidget);
+
+      final iconButton = find.ancestor(
+        of: find.byIcon(Icons.send),
+        matching: find.byType(IconButton),
+      );
+      expect(iconButton, findsOneWidget);
+    });
   });
 }

@@ -180,7 +180,7 @@ void main() {
 
         final result = service.parseResponse(response);
         expect(result['success'], isFalse);
-        expect(result['error'], 'unknown');
+        expect(result['error'], 'error');
       });
 
       test('should handle invalid_image status', () {

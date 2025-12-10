@@ -115,6 +115,13 @@ class VisionApiService {
           'error': 'no_match',
           'message': apiResponse['message'] ?? 'No matching building found',
         };
+      } else if (status == 'error') {
+        // Error status from API
+        return {
+          'success': false,
+          'error': 'error',
+          'message': apiResponse['message'] ?? 'API error occurred',
+        };
       } else {
         // Unknown status
         return {
