@@ -245,6 +245,10 @@ vision_dep = k8s.apps.v1.Deployment(
                         image=vision_image,
                         ports=[k8s.core.v1.ContainerPortArgs(container_port=8080)],
                         env=[k8s.core.v1.EnvVarArgs(name=e["name"], value=e["value"]) for e in vision_env],
+                        resources=k8s.core.v1.ResourceRequirementsArgs(
+                            requests={"cpu": "250m", "memory": "512Mi"},
+                            limits={"cpu": "500m", "memory": "1Gi"},
+                        ),
                     )
                 ]
             ),
@@ -281,6 +285,10 @@ llm_dep = k8s.apps.v1.Deployment(
                         env=[k8s.core.v1.EnvVarArgs(name=e["name"], value=e["value"]) for e in llm_env],
                         command=["/bin/bash", "-c"],
                         args=["cd /app && /.venv/bin/uvicorn server:app --host 0.0.0.0 --port 8000"],
+                        resources=k8s.core.v1.ResourceRequirementsArgs(
+                            requests={"cpu": "250m", "memory": "512Mi"},
+                            limits={"cpu": "500m", "memory": "1Gi"},
+                        ),
                     )
                 ]
             ),
@@ -295,6 +303,61 @@ llm_svc = k8s.core.v1.Service(
     spec=k8s.core.v1.ServiceSpecArgs(
         selector={"app": "llm"},
         ports=[k8s.core.v1.ServicePortArgs(port=8000, target_port=8000)],
+    ),
+    opts=pulumi.ResourceOptions(provider=k8s_provider),
+)
+
+# Horizontal Pod Autoscalers (basic CPU-based autoscaling)
+vision_hpa = k8s.autoscaling.v2.HorizontalPodAutoscaler(
+    "vision-hpa",
+    metadata={"namespace": ns.metadata["name"]},
+    spec=k8s.autoscaling.v2.HorizontalPodAutoscalerSpecArgs(
+        scale_target_ref=k8s.autoscaling.v2.CrossVersionObjectReferenceArgs(
+            api_version="apps/v1",
+            kind="Deployment",
+            name=vision_dep.metadata["name"],
+        ),
+        min_replicas=1,
+        max_replicas=4,
+        metrics=[
+            k8s.autoscaling.v2.MetricSpecArgs(
+                type="Resource",
+                resource=k8s.autoscaling.v2.ResourceMetricSourceArgs(
+                    name="cpu",
+                    target=k8s.autoscaling.v2.MetricTargetArgs(
+                        type="Utilization",
+                        average_utilization=80,
+                    ),
+                ),
+            )
+        ],
+    ),
+    opts=pulumi.ResourceOptions(provider=k8s_provider),
+)
+
+llm_hpa = k8s.autoscaling.v2.HorizontalPodAutoscaler(
+    "llm-hpa",
+    metadata={"namespace": ns.metadata["name"]},
+    spec=k8s.autoscaling.v2.HorizontalPodAutoscalerSpecArgs(
+        scale_target_ref=k8s.autoscaling.v2.CrossVersionObjectReferenceArgs(
+            api_version="apps/v1",
+            kind="Deployment",
+            name=llm_dep.metadata["name"],
+        ),
+        min_replicas=1,
+        max_replicas=4,
+        metrics=[
+            k8s.autoscaling.v2.MetricSpecArgs(
+                type="Resource",
+                resource=k8s.autoscaling.v2.ResourceMetricSourceArgs(
+                    name="cpu",
+                    target=k8s.autoscaling.v2.MetricTargetArgs(
+                        type="Utilization",
+                        average_utilization=80,
+                    ),
+                ),
+            )
+        ],
     ),
     opts=pulumi.ResourceOptions(provider=k8s_provider),
 )
