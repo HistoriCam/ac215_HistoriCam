@@ -2,6 +2,17 @@
 
 Pulumi program spins up a GKE cluster, deploys vision + llm + chromadb, auto-loads Chroma, and fronts with nginx ingress + cert-manager TLS.
 
+## Backend & stack (shared)
+- State backend: `gs://ac215-historicam-pulumi-state-bucket`
+- Everyone must log in to this backend and use the same stack name (`dev`) to avoid creating extra clusters.
+  ```bash
+  pulumi logout || true
+  pulumi login gs://ac215-historicam-pulumi-state-bucket
+  pulumi stack select dev   # do NOT run stack init unless you truly want a new stack
+  pulumi whoami --verbose   # verify backend is the GCS bucket
+  pulumi stack ls           # should show dev
+  ```
+
 ## Config (Pulumi stack)
 - `gcp:project`: ac215-historicam
 - `gcp:region`: us-central1
@@ -24,10 +35,11 @@ Pulumi program spins up a GKE cluster, deploys vision + llm + chromadb, auto-loa
 - Loader Job `chroma-loader`: waits for chroma DNS + HTTP, runs `python cli.py --chunk --embed --load --chunk_type recursive-split` inside llm image.
 - Ingress `app-ingress`: regex paths `/vision(/|$)(.*)` → vision, `/llm(/|$)(.*)` → llm; TLS via cert-manager, secret `app-tls`, annotations for nginx + issuer.
 
-## Run
+## Run (setup + deploy)
 ```bash
 cd deployment/kubernetes
-pulumi stack init dev    # or select dev
+pulumi login gs://ac215-historicam-pulumi-state-bucket
+pulumi stack select dev
 pulumi config set gcp:project ac215-historicam
 pulumi config set gcp:region us-central1
 pulumi config set visionImage us-central1-docker.pkg.dev/ac215-historicam/historicam/vision:latest
@@ -50,7 +62,34 @@ curl -I https://<ingressHost>/vision/
 curl -X POST https://<ingressHost>/llm/chat -H "Content-Type: application/json" -d '{"question":"Hi","chunk_type":"recursive-split"}'
 ```
 
-## Notes
-- IngressHost must be set (use `EXTERNAL-IP>.sslip.io`). TLS via cert-manager/Let’s Encrypt HTTP01.
-- Loader populates only `recursive-split-collection`; pass `chunk_type="recursive-split"` to llm/chat or change the API default if desired.
-- If stuck on resources, ensure you’re on the correct cluster (`gcloud container clusters list`); old clusters consume quota. Delete stale clusters with `gcloud container clusters delete ...`.
+## Autoscaling
+- HPAs are deployed for vision and llm (CPU target 80%, min 1, max 4; requests 250m/512Mi, limits 500m/1Gi).
+- Watch scaling: `kubectl get hpa -w -n dev` and `kubectl get pods -w -n dev`
+- Load via ingress (replace with a small local image):  
+  ```bash
+  while true; do
+    seq 2000 | xargs -n1 -P32 sh -c \
+      'curl -sk -o /dev/null -w "." \
+        -F "image=@/path/to/small.jpg;type=image/jpeg" \
+        https://<ingressHost>/vision/identify'
+  done
+  ```
+- Load in-cluster (bypasses LB/TLS; needs a reachable image URL):  
+  ```bash
+  kubectl run loadgen --rm -it --image=appropriate/curl -n dev -- sh -c '
+    apk add --no-cache wget >/dev/null &&
+    wget -qO /tmp/img.jpg https://your-small-image-url.jpg &&
+    for j in $(seq 1 16); do
+      while true; do curl -s -o /dev/null -w "." -F image=@/tmp/img.jpg http://vision:8080/identify; done &
+    done
+    wait
+  '
+  ```
+- Stop load with Ctrl+C; HPAs scale back down over time.
+
+
+## Maintenance
+- Always use the shared backend + `dev` stack to avoid accidental new clusters. If you see extra clusters, delete with `gcloud container clusters delete <name> --zone us-central1-a --project ac215-historicam` after confirming they are not in use.
+- If ingress IP changes (after recreating ingress/cluster), update `ingressHost` to `<new_LB_IP>.sslip.io` and rerun `pulumi up`.
+- To inspect the live cluster without Pulumi: `gcloud container clusters get-credentials historicam-cluster-779d834 --zone us-central1-a --project ac215-historicam`.
+- Loader job only seeds `recursive-split-collection`; include `chunk_type="recursive-split"` in llm/chat calls unless you change the API default.
