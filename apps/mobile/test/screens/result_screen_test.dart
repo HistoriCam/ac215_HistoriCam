@@ -210,11 +210,11 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
 
-    testWidgets('should require either imagePath or buildingId',
-        (WidgetTester tester) async {
+    test('should require either imagePath or buildingId', () {
       // This test verifies the assertion in the constructor
+      // Note: We can't use const here because the assertion fails at compile time
       expect(
-        () => const ResultScreen(),
+        () => ResultScreen(),
         throwsAssertionError,
       );
     });
