@@ -81,5 +81,172 @@ void main() {
       expect(json['created_at'], '2024-01-15T10:30:00.000Z');
       // Note: toJson doesn't include building_name
     });
+
+    test('should create entry with required parameters', () {
+      final entry = SearchHistoryEntry(
+        id: 1,
+        uid: 'user123',
+        buildingId: 42,
+        createdAt: DateTime.now(),
+      );
+
+      expect(entry.id, 1);
+      expect(entry.uid, 'user123');
+      expect(entry.buildingId, 42);
+      expect(entry.buildingName, isNull);
+    });
+
+    test('should create entry with all parameters', () {
+      final now = DateTime.now();
+      final entry = SearchHistoryEntry(
+        id: 1,
+        uid: 'user123',
+        buildingId: 42,
+        createdAt: now,
+        buildingName: 'Test Building',
+      );
+
+      expect(entry.id, 1);
+      expect(entry.uid, 'user123');
+      expect(entry.buildingId, 42);
+      expect(entry.createdAt, now);
+      expect(entry.buildingName, 'Test Building');
+    });
+
+    test('fromJson should handle numeric uid', () {
+      final json = {
+        'id': 1,
+        'uid': 12345,
+        'building_id': 42,
+        'created_at': '2024-01-15T10:30:00.000Z',
+      };
+
+      final entry = SearchHistoryEntry.fromJson(json);
+      expect(entry.uid, '12345');
+    });
+
+    test('fromJson should parse ISO 8601 date correctly', () {
+      final json = {
+        'id': 1,
+        'uid': 'user123',
+        'building_id': 42,
+        'created_at': '2024-03-15T14:30:00.000Z',
+      };
+
+      final entry = SearchHistoryEntry.fromJson(json);
+      expect(entry.createdAt.year, 2024);
+      expect(entry.createdAt.month, 3);
+      expect(entry.createdAt.day, 15);
+    });
+
+    test('toJson should produce valid ISO 8601 date string', () {
+      final entry = SearchHistoryEntry(
+        id: 1,
+        uid: 'user123',
+        buildingId: 42,
+        createdAt: DateTime.utc(2024, 3, 15, 14, 30, 0),
+      );
+
+      final json = entry.toJson();
+      expect(json['created_at'], contains('2024-03-15'));
+      expect(json['created_at'], contains('14:30:00'));
+    });
+
+    test('should handle empty string uid', () {
+      final entry = SearchHistoryEntry(
+        id: 1,
+        uid: '',
+        buildingId: 42,
+        createdAt: DateTime.now(),
+      );
+
+      expect(entry.uid, '');
+    });
+
+    test('should handle different building IDs', () {
+      final entry1 = SearchHistoryEntry(
+        id: 1,
+        uid: 'user123',
+        buildingId: 0,
+        createdAt: DateTime.now(),
+      );
+
+      final entry2 = SearchHistoryEntry(
+        id: 2,
+        uid: 'user123',
+        buildingId: 999999,
+        createdAt: DateTime.now(),
+      );
+
+      expect(entry1.buildingId, 0);
+      expect(entry2.buildingId, 999999);
+    });
+
+    test('buildingName should be mutable', () {
+      final entry = SearchHistoryEntry(
+        id: 1,
+        uid: 'user123',
+        buildingId: 42,
+        createdAt: DateTime.now(),
+      );
+
+      expect(entry.buildingName, isNull);
+      entry.buildingName = 'New Building Name';
+      expect(entry.buildingName, 'New Building Name');
+    });
+
+    test('toJson should include all required fields', () {
+      final entry = SearchHistoryEntry(
+        id: 1,
+        uid: 'user123',
+        buildingId: 42,
+        createdAt: DateTime.now(),
+      );
+
+      final json = entry.toJson();
+
+      expect(json.containsKey('id'), isTrue);
+      expect(json.containsKey('uid'), isTrue);
+      expect(json.containsKey('building_id'), isTrue);
+      expect(json.containsKey('created_at'), isTrue);
+    });
+
+    test('fromJson and toJson should be consistent', () {
+      final originalJson = {
+        'id': 1,
+        'uid': 'user123',
+        'building_id': 42,
+        'created_at': '2024-01-15T10:30:00.000Z',
+      };
+
+      final entry = SearchHistoryEntry.fromJson(originalJson);
+      final newJson = entry.toJson();
+
+      expect(newJson['id'], originalJson['id']);
+      expect(newJson['uid'], originalJson['uid']);
+      expect(newJson['building_id'], originalJson['building_id']);
+    });
+  });
+
+  group('SearchHistoryService', () {
+    late SearchHistoryService service;
+
+    setUp(() {
+      service = SearchHistoryService();
+    });
+
+    test('should initialize correctly', () {
+      expect(service, isNotNull);
+      expect(service, isA<SearchHistoryService>());
+    });
+
+    test('should create multiple service instances', () {
+      final service1 = SearchHistoryService();
+      final service2 = SearchHistoryService();
+
+      expect(service1, isNotNull);
+      expect(service2, isNotNull);
+      expect(service1, isNot(same(service2)));
+    });
   });
 }

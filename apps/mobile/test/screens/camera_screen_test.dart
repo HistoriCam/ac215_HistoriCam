@@ -377,5 +377,59 @@ void main() {
       // Exact loading message
       expect(find.text('Initializing camera...'), findsOneWidget);
     });
+
+    testWidgets('should have upload icon button', (WidgetTester tester) async {
+      cameras = [];
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: CameraScreen(),
+        ),
+      );
+
+      // Upload icon should be present
+      expect(find.byIcon(Icons.upload), findsOneWidget);
+    });
+
+    testWidgets('should display history icon', (WidgetTester tester) async {
+      cameras = [];
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: CameraScreen(),
+        ),
+      );
+
+      // History icon should be visible
+      expect(find.byIcon(Icons.history), findsOneWidget);
+    });
+
+    testWidgets('should have flip camera icon', (WidgetTester tester) async {
+      cameras = [];
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: CameraScreen(),
+        ),
+      );
+
+      // Flip camera icon should exist
+      expect(find.byIcon(Icons.flip_camera_ios), findsOneWidget);
+    });
+
+    testWidgets('should build camera screen widget', (WidgetTester tester) async {
+      cameras = [];
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: CameraScreen(),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Widget should build successfully
+      expect(find.byType(CameraScreen), findsOneWidget);
+    });
   });
 }

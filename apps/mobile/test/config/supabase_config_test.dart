@@ -13,18 +13,34 @@ void main() {
           equals('https://mtsdyzpgwfbcimcendmn.supabase.co'));
     });
 
+    test('supabaseUrl should start with https', () {
+      expect(SupabaseConfig.supabaseUrl.startsWith('https://'), isTrue);
+    });
+
     test('isConfigured should return false when key is empty', () {
       // In test environment, SUPABASE_KEY is not set, so it defaults to ''
-      // Note: This will trigger an assertion in debug mode
-      // We need to catch the assertion or skip this test
-      // Since assertions only fire in debug mode, the function will return false
       expect(SupabaseConfig.supabaseKey, isEmpty);
-      // Skip calling isConfigured() as it throws assertion in test mode
+
+      // Call isConfigured - it will return false since key is empty
+      final result = SupabaseConfig.isConfigured();
+      expect(result, isFalse);
     });
 
     test('supabaseKey should have a default value', () {
       // The key will be empty in tests since we don't pass --dart-define
       expect(SupabaseConfig.supabaseKey, isNotNull);
+    });
+
+    test('supabaseUrl should be a const', () {
+      const url1 = SupabaseConfig.supabaseUrl;
+      const url2 = SupabaseConfig.supabaseUrl;
+      expect(url1, equals(url2));
+    });
+
+    test('supabaseKey should be a const', () {
+      const key1 = SupabaseConfig.supabaseKey;
+      const key2 = SupabaseConfig.supabaseKey;
+      expect(key1, equals(key2));
     });
   });
 }
