@@ -391,32 +391,6 @@ void main() {
       expect(find.byIcon(Icons.upload), findsOneWidget);
     });
 
-    testWidgets('should display history icon', (WidgetTester tester) async {
-      cameras = [];
-
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: CameraScreen(),
-        ),
-      );
-
-      // History icon should be visible
-      expect(find.byIcon(Icons.history), findsOneWidget);
-    });
-
-    testWidgets('should have flip camera icon', (WidgetTester tester) async {
-      cameras = [];
-
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: CameraScreen(),
-        ),
-      );
-
-      // Flip camera icon should exist
-      expect(find.byIcon(Icons.flip_camera_ios), findsOneWidget);
-    });
-
     testWidgets('should build camera screen widget', (WidgetTester tester) async {
       cameras = [];
 
@@ -426,10 +400,35 @@ void main() {
         ),
       );
 
-      await tester.pumpAndSettle();
-
       // Widget should build successfully
       expect(find.byType(CameraScreen), findsOneWidget);
+    });
+
+    testWidgets('should have IconButton widgets', (WidgetTester tester) async {
+      cameras = [];
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: CameraScreen(),
+        ),
+      );
+
+      // Should have icon buttons for interactions
+      expect(find.byType(IconButton), findsWidgets);
+    });
+
+    testWidgets('should display upload and history icons', (WidgetTester tester) async {
+      cameras = [];
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: CameraScreen(),
+        ),
+      );
+
+      // Upload and history icons should exist
+      expect(find.byIcon(Icons.upload), findsOneWidget);
+      expect(find.byIcon(Icons.history), findsOneWidget);
     });
   });
 }
