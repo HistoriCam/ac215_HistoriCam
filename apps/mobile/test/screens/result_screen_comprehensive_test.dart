@@ -25,7 +25,7 @@ void main() {
       testWidgets('should accept buildingId only', (WidgetTester tester) async {
         await tester.pumpWidget(
           const MaterialApp(
-            home: ResultScreen(buildingId: 123),
+            home: ResultScreen(buildingId: 123, buildingName: 'Test'),
           ),
         );
 
@@ -78,7 +78,7 @@ void main() {
           (WidgetTester tester) async {
         await tester.pumpWidget(
           const MaterialApp(
-            home: ResultScreen(buildingId: 123),
+            home: ResultScreen(buildingId: 123, buildingName: 'Test'),
           ),
         );
 
@@ -307,7 +307,7 @@ void main() {
           (WidgetTester tester) async {
         await tester.pumpWidget(
           const MaterialApp(
-            home: ResultScreen(buildingId: 999),
+            home: ResultScreen(buildingId: 999, buildingName: 'Test'),
           ),
         );
 
@@ -330,7 +330,7 @@ void main() {
       testWidgets('should handle buildingId of 0', (WidgetTester tester) async {
         await tester.pumpWidget(
           const MaterialApp(
-            home: ResultScreen(buildingId: 0),
+            home: ResultScreen(buildingId: 0, buildingName: 'Test'),
           ),
         );
 
@@ -341,7 +341,7 @@ void main() {
           (WidgetTester tester) async {
         await tester.pumpWidget(
           const MaterialApp(
-            home: ResultScreen(buildingId: -1),
+            home: ResultScreen(buildingId: -1, buildingName: 'Test'),
           ),
         );
 
@@ -352,7 +352,7 @@ void main() {
           (WidgetTester tester) async {
         await tester.pumpWidget(
           const MaterialApp(
-            home: ResultScreen(buildingId: 999999999),
+            home: ResultScreen(buildingId: 999999999, buildingName: 'Test'),
           ),
         );
 
