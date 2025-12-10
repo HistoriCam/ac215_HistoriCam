@@ -377,5 +377,57 @@ void main() {
       // Exact loading message
       expect(find.text('Initializing camera...'), findsOneWidget);
     });
+
+    testWidgets('should have upload icon button', (WidgetTester tester) async {
+      cameras = [];
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: CameraScreen(),
+        ),
+      );
+
+      // Upload icon should be present
+      expect(find.byIcon(Icons.upload), findsOneWidget);
+    });
+
+    testWidgets('should build camera screen widget', (WidgetTester tester) async {
+      cameras = [];
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: CameraScreen(),
+        ),
+      );
+
+      // Widget should build successfully
+      expect(find.byType(CameraScreen), findsOneWidget);
+    });
+
+    testWidgets('should have GestureDetector widgets for interactions', (WidgetTester tester) async {
+      cameras = [];
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: CameraScreen(),
+        ),
+      );
+
+      // Should have gesture detectors for interactive elements
+      expect(find.byType(GestureDetector), findsWidgets);
+    });
+
+    testWidgets('should display upload icon in camera controls', (WidgetTester tester) async {
+      cameras = [];
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: CameraScreen(),
+        ),
+      );
+
+      // Upload icon should be present in camera controls
+      expect(find.byIcon(Icons.upload), findsOneWidget);
+    });
   });
 }
