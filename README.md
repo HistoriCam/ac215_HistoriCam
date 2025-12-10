@@ -2,41 +2,7 @@
 
 HistoriCam is a mobile-first web application that combines computer vision, geolocation, and historical data to provide instant information about landmarks. Users can point their camera at a building or landmark, and the app will identify it and provide historical context and interesting facts.
 
-## Milestone 4 Specifics
-
-Demo video of the full pipeline running locally: [video](https://drive.google.com/file/d/1xDccEPMYJSxnadXA0BW5U6aER20OuOAM/view?usp=sharing)
-
-Vercel App (Vision and LLM API not connected): [App](https://ac215-histori-cam.vercel.app/)
-
-NOTE: All evidence is located in "docs" for the submission
-
-#### Progress updates
-- [x] Log-in and Sign-up System complete with supabase 
-- [x] Backend building description retrieval complete with supabase
-- [x] Linked flutter APP with Vercel
-- [x] Vision Model with Vertex AI integration
-- [x] Vision model API which takes in image and returns most similar building's index
-- [x] Added Camera switch feature to access all device cameras
-- [x] Added tests for Flutter APP
-- [x] LLM-RAG with ChromaDB completed. 
-- [x] LLM chat API takes in text and context and returns responses
-- [x] LLM Finetuning pipeline complete
-- [x] CI pipeline implemented for flutter linting, tests and autodocumetation generation
-- [x] CD pipeline with vercel complete
-- [x] End-to-End App functional locally
-
-
-NOTE: APIs are located in app/mobile/lib/services
-
-#### TODO before MS5
-
-- [ ] Collect more images for better image retrieval in Vertex AI
-- [ ] Better finetuning for the LLM model with more data
-- [ ] Build a buildings description dataset to display initial information about the buidling (Using dummy descriptions)
-- [ ] Deploy Vision and Language Models to the cloud
-- [ ] Have a Supabase DB tracking user history
-- [ ] Implement the Location based building prediction fallback 
-
+Find the live app here: [App](https://ac215-histori-cam.vercel.app/)
 
 ## Architecture
 
@@ -58,22 +24,23 @@ We also run the data extraction sperately at the begining but it is not an activ
 ac215_HistoriCam/
 ├── services/                   # Backend microservices (FastAPI)
 │   ├── scraper/               # Data collection & image scraping
-│   ├── api/                   # Main API service
+│   ├── llm-rag/               # RAG pipeline with ChromaDB
 │   └── vision/                # Vision model API
 │
 ├── apps/mobile/               # Flutter mobile app
 │
 ├── ml/
-│   ├── llm-rag/              # RAG pipeline with ChromaDB
-│   └── vision-model/         # Vision model training
+│   ├── llm-finetuning/        # LLM fine-tuning experiments
+│   └── vision-setup/          # Vision model setup & training
 │
+├── deployment/                # Kubernetes & GCP deployment configs
+├── vision-setup/              # Additional vision model utilities
 ├── data/                      # Scraped building data & images
 ├── docs/                      # Project documentation
 └── secrets/                   # GCP credentials (gitignored)
 ```
 
-## Getting Started
-### Prerequisites
+## Prerequisites
 
 - [uv](https://docs.astral.sh/uv/) - Fast Python package manager
 - Docker & Docker Compose
@@ -84,7 +51,7 @@ ac215_HistoriCam/
   - Vertex AI
   - Cloud Run / GKE
 
-### Initial Setup (For Local Deploument)
+## Setup Instructions
 
 1. **Clone the repository**
    ```bash
@@ -93,138 +60,163 @@ ac215_HistoriCam/
    ```
 
 2. **Set up GCP credentials**
-   - Place service account JSON in `secrets/gcs-service-account.json`
-   - The secrets directory is gitignored for security
+   ```bash
+   # Create secrets directory
+   mkdir -p secrets
 
-## Complete Pipeline Guide
-### Phase 1: Data Collection (Scraper Service)
+   # Add GCP service account
+   # Place your service account JSON in secrets/gcs-service-account.json
+   ```
 
-The scraper service collects building data and images from Wikipedia and Wikimedia Commons.
+3. **Set up Supabase credentials** (for mobile app)
+   ```bash
+   # Create secrets/supabase_key.env with:
+   echo '{"SUPABASE_KEY": "your_api_key"}' > secrets/supabase_key.env
+   ```
 
-#### Using Docker (Recommended)
+## Deployment
+
+### Local Development
+
+**Backend Services:**
+```bash
+# Vision API
+cd services/vision
+./docker-shell.sh
+
+# LLM-RAG Service
+cd ml/llm-rag
+./docker-shell.sh
+```
+
+**Mobile App:**
+```bash
+cd apps/mobile
+flutter run --dart-define-from-file=../../secrets/supabase_key.env
+```
+
+### Production Deployment
+
+**Kubernetes (GKE):**
+```bash
+cd deployment
+kubectl apply -f kubernetes/
+```
+
+**Flutter Web (Vercel):**
+- Automatically deploys from main branch
+- Live at: [ac215-histori-cam.vercel.app](https://ac215-histori-cam.vercel.app/)
+
+## Usage
+
+### Data Collection Pipeline
+
+**Scrape building data:**
+```bash
+cd services/scraper
+./docker-shell.sh
+uv run python src/run.py
+```
+
+**Upload to GCS:**
+```bash
+uv run python src/scraper/gcs_manager.py upload $GCS_BUCKET_NAME /data/images
+```
+
+### RAG Pipeline
+
+**Process building data:**
+```bash
+cd ml/llm-rag
+./docker-shell.sh
+# Place building text files in input-datasets/buildings/
+```
+
+### Vision API
+
+**Test prediction:**
+```bash
+curl -X POST http://localhost:8080/predict \
+  -F "file=@/path/to/image.jpg"
+```
+
+### Mobile App
+
+1. Open app in browser or device
+2. Point camera at landmark
+3. Take photo
+4. View building information and chat with AI
+
+## CI/CD
+
+### Continuous Integration
+- **Linting:** Flutter code analysis on every commit
+- **Testing:** Automated unit tests for Flutter app
+- **Coverage:** Test coverage reports in [docs/](docs/)
+
+**Untested Features:**
+- ChatbotWidget integration
+- State transitions
+- Error scenarios
+- Typing animation
+
+### Continuous Deployment
+- **Platform:** Vercel
+- **Trigger:** Push to main branch
+- **URL:** [https://ac215-histori-cam.vercel.app/](https://ac215-histori-cam.vercel.app/)
+
+## Known Issues and Limitations
+
+### Current Limitations
+- Vision model limited to pre-trained landmarks
+- RAG database requires manual updates for new buildings
+- Mobile app requires camera permissions
+- Offline mode not supported
+
+### Known Issues
+- Image loading may be slow on low bandwidth
+- Camera permissions must be granted on first use
+- Some landmarks may not be recognized in poor lighting
+- Chat responses depend on GCP API availability
+
+## Development Guides
+
+### Phase 1: Data Collection
+Scraper service collects building data from Wikipedia and Wikimedia Commons.
 
 ```bash
 cd services/scraper
-
-# Build and enter container with mounted volumes
 ./docker-shell.sh
-
-# Inside container - Full pipeline (names + metadata + images)
 uv run python src/run.py
-uv run python src/scraper/scrape_images.py /data/buildings_names_metadata.csv /data/images
-
-# Upload to GCS with versioning (optional)
-uv run python src/scraper/gcs_manager.py upload \
-    $GCS_BUCKET_NAME \
-    /data/images \
-    /data/images/image_manifest.csv
 ```
 
-**Output Files:**
-- `data/buildings_names.csv` - Base building data (id, name, source_url)
-- `data/buildings_names_metadata.csv` - Enriched with lat/lon/aliases from Wikidata
-- `data/buildings_info.csv` - Comprehensive building information
-- `data/image_data.csv` - Image data from Wikipedia baseline scrape
-- `data/images/` - Downloaded images organized by building ID
-- `data/images/image_manifest.csv` - Image metadata (URLs, dimensions, hashes)
-
-#### Dataset Version Control (DVC)
-All files for this are in docs/data-versioning
+**Outputs:** `data/buildings_names_metadata.csv`, `data/images/`
 
 ### Phase 2: LLM-RAG Pipeline
-
-The LLM-RAG service processes building information to create a retrieval-augmented generation system for answering questions about buildings.
-
-#### Prerequisites
-
-1. **Set up GCP credentials**
-   - Place service account JSON in `secrets/gcs-service-account.json`
-   - Update `GCP_PROJECT` in `docker-shell.sh` with your project ID
-
-2. **Prepare input data**
-   - Place building text files in `ml/llm-rag/input-datasets/buildings/`
-   - Each file should be named `[Building Name].txt` with building information
-
-#### Running the LLM-RAG Container
+Process building information for retrieval-augmented generation.
 
 ```bash
 cd ml/llm-rag
-
-# Build and start containers (ChromaDB + LLM-RAG CLI)
 ./docker-shell.sh
 ```
 
-#### Pipeline Architecture
-
-The LLM-RAG system:
-1. **Chunks** text into manageable pieces
-2. **Embeds** chunks using Vertex AI text-embedding-004
-3. **Stores** embeddings in ChromaDB vector database
-4. **Retrieves** relevant chunks based on query similarity
-5. **Generates** responses using Gemini 2.0 Flash with retrieved context
-
-**Docker Components:**
-- **llm-rag-cli**: Main CLI for processing and querying
-- **chromadb**: Vector database for storing embeddings (persistent storage)
-- **Network**: Custom `llm-rag-network` for inter-container communication
-
-**Configuration:**
-- Embedding model: `text-embedding-004` (256 dimensions)
-- Generative model: `gemini-2.0-flash-001`
-- Vector DB: ChromaDB with cosine similarity
-- Port: ChromaDB exposed on `8000`
-
-**Output Files:**
-- `ml/llm-rag/outputs/chunks-[method]-[building].jsonl` - Chunked text
-- `ml/llm-rag/outputs/embeddings-[method]-[building].jsonl` - Embedded chunks
-- `ml/llm-rag/docker-volumes/chromadb/` - Persistent vector database
+**Components:** ChromaDB vector DB, Vertex AI embeddings, Gemini 2.0 Flash
 
 ### Phase 3: Vision Pipeline
-Vision model uses vertexAI and you can follow documentation in services/vision to set up the credentials and env.
-
-### Run Locally
+Vision model using Vertex AI for landmark recognition.
 
 ```bash
 cd services/vision
-
-# 1. Set up environment (first time only)
-cp .env.example .env
-
-# Edit .env with your VERTEX_ENDPOINT_ID
-
-# 2. Start API server
+cp .env.example .env  # Add VERTEX_ENDPOINT_ID
 ./docker-shell.sh
 ```
 
 ### Phase 4: Mobile Application
+Flutter web app for user interface.
 
-The Flutter mobile app provides the user interface.
-
-#### Prerequisites
-
-1. **Set up GCP credentials**
-   - Place Supbase credentials in: secrets/supabase_key.env formatted to:
-
-```env   
-{
-  "SUPABASE_KEY": "API_KEY"
-}
-```
-
-
-
-#### Build Locally
 ```bash
 cd apps/mobile
-
-# Install dependencies
 flutter pub get
-
-# Run on connected device/emulator
-flutter run
-
-# Build for production
-flutter build web --release  
 flutter run --dart-define-from-file=../../secrets/supabase_key.env
 ```
 
