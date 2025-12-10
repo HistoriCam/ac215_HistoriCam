@@ -224,13 +224,14 @@ void main() {
         );
 
         await tester.tap(find.text('Go'));
-        await tester.pumpAndSettle();
+        await tester.pump(); // Start navigation
+        await tester.pump(const Duration(milliseconds: 300)); // Animate navigation
 
         expect(find.byType(ResultScreen), findsOneWidget);
 
         await tester.tap(find.byIcon(Icons.arrow_back));
         await tester.pump(); // Start the pop animation
-        await tester.pumpAndSettle(); // Complete the animation
+        await tester.pump(const Duration(milliseconds: 300)); // Complete the animation
 
         expect(find.byType(ResultScreen), findsNothing);
       });
