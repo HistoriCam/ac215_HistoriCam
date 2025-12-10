@@ -11,7 +11,7 @@
 
 ### Test Statistics
 
-- **Total Test Files**: 22
+- **Total Test Files**: 25
 - **Total Source Files**: 12
 - **Last Updated**: $TIMESTAMP
 - **Commit**: [$COMMIT_SHORT](https://github.com/HistoriCam/ac215_HistoriCam/commit/$COMMIT_SHA)
