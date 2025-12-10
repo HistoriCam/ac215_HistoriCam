@@ -184,5 +184,95 @@ void main() {
       expect(find.text('HistoriCam'), findsOneWidget);
     });
 
+    testWidgets('should have proper widget hierarchy', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: LoginScreen(),
+        ),
+      );
+
+      // Should have core structural widgets
+      expect(find.byType(Scaffold), findsOneWidget);
+      expect(find.byType(SafeArea), findsOneWidget);
+      expect(find.byType(SingleChildScrollView), findsOneWidget);
+    });
+
+    testWidgets('should have Column layout', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: LoginScreen(),
+        ),
+      );
+
+      // Should use Column for vertical layout
+      expect(find.byType(Column), findsWidgets);
+    });
+
+    testWidgets('should have Container widgets', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: LoginScreen(),
+        ),
+      );
+
+      // Should use Containers for styling
+      expect(find.byType(Container), findsWidgets);
+    });
+
+    testWidgets('should have SizedBox for spacing', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: LoginScreen(),
+        ),
+      );
+
+      // Should use SizedBox for spacing
+      expect(find.byType(SizedBox), findsWidgets);
+    });
+
+    testWidgets('should have two TextFields', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: LoginScreen(),
+        ),
+      );
+
+      // Should have two text fields (username and password)
+      expect(find.byType(TextField), findsNWidgets(2));
+    });
+
+    testWidgets('should have ElevatedButton', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: LoginScreen(),
+        ),
+      );
+
+      // Should have elevated button for login/signup
+      expect(find.byType(ElevatedButton), findsOneWidget);
+    });
+
+    testWidgets('should have TextButton for mode switch', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: LoginScreen(),
+        ),
+      );
+
+      // Should have text button to switch modes
+      expect(find.byType(TextButton), findsOneWidget);
+    });
+
+    testWidgets('should use Row widgets for layout', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: LoginScreen(),
+        ),
+      );
+
+      // Should use Row for horizontal layouts
+      expect(find.byType(Row), findsWidgets);
+    });
+
   });
 }

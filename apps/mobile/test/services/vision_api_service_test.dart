@@ -154,6 +154,176 @@ void main() {
         expect(result['success'], isTrue);
         expect(result['buildingId'], isNull);
       });
+
+      test('should handle error status', () {
+        final apiResponse = {
+          'status': 'error',
+          'message': 'API error occurred',
+        };
+
+        final result = visionApiService.parseResponse(apiResponse);
+
+        expect(result['success'], isFalse);
+        expect(result['error'], 'error');
+      });
+
+      test('should handle missing status field', () {
+        final apiResponse = {
+          'building_id': 'test',
+          'confidence': 0.9,
+        };
+
+        final result = visionApiService.parseResponse(apiResponse);
+
+        expect(result['success'], isFalse);
+      });
+
+      test('should preserve original message in responses', () {
+        final apiResponse = {
+          'status': 'confident',
+          'building_id': 'test',
+          'message': 'Custom message here',
+        };
+
+        final result = visionApiService.parseResponse(apiResponse);
+
+        expect(result['message'], 'Custom message here');
+      });
+    });
+
+    group('VisionApiService - initialization and fields', () {
+      test('should create instance successfully', () {
+        final service = VisionApiService();
+        expect(service, isNotNull);
+        expect(service, isA<VisionApiService>());
+      });
+
+      test('should create multiple instances', () {
+        final service1 = VisionApiService();
+        final service2 = VisionApiService();
+
+        expect(service1, isNotNull);
+        expect(service2, isNotNull);
+        expect(service1, isNot(same(service2)));
+      });
+
+      test('should have consistent parsing across instances', () {
+        final service1 = VisionApiService();
+        final service2 = VisionApiService();
+
+        final apiResponse = {
+          'status': 'confident',
+          'building_id': 'test',
+          'confidence': 0.9,
+        };
+
+        final result1 = service1.parseResponse(apiResponse);
+        final result2 = service2.parseResponse(apiResponse);
+
+        expect(result1['success'], result2['success']);
+        expect(result1['buildingId'], result2['buildingId']);
+      });
+    });
+
+    group('parseResponse - status variations', () {
+      test('should handle uppercase status', () {
+        final apiResponse = {
+          'status': 'CONFIDENT',
+          'building_id': 'test',
+        };
+
+        final result = visionApiService.parseResponse(apiResponse);
+
+        // May not match exact status, but should handle gracefully
+        expect(result, isNotNull);
+      });
+
+      test('should handle different confidence levels', () {
+        final testCases = [0.0, 0.5, 0.99, 1.0];
+
+        for (final confidence in testCases) {
+          final apiResponse = {
+            'status': 'confident',
+            'building_id': 'test',
+            'confidence': confidence,
+          };
+
+          final result = visionApiService.parseResponse(apiResponse);
+          expect(result['confidence'], confidence);
+        }
+      });
+
+      test('should handle empty matches array', () {
+        final apiResponse = {
+          'status': 'uncertain',
+          'building_id': 'test',
+          'matches': [],
+        };
+
+        final result = visionApiService.parseResponse(apiResponse);
+
+        expect(result['success'], isTrue);
+        expect(result['matches'], isEmpty);
+      });
+
+      test('should handle large matches array', () {
+        final matches = List.generate(
+          100,
+          (i) => {'building_id': 'building_$i', 'confidence': i / 100.0},
+        );
+
+        final apiResponse = {
+          'status': 'uncertain',
+          'building_id': 'building_0',
+          'matches': matches,
+        };
+
+        final result = visionApiService.parseResponse(apiResponse);
+
+        expect(result['success'], isTrue);
+        expect((result['matches'] as List).length, 100);
+      });
+    });
+
+    group('parseResponse - building ID formats', () {
+      test('should handle numeric building IDs', () {
+        final apiResponse = {
+          'status': 'confident',
+          'building_id': 12345,
+          'confidence': 0.9,
+        };
+
+        final result = visionApiService.parseResponse(apiResponse);
+
+        expect(result['success'], isTrue);
+        expect(result['buildingId'], 12345);
+      });
+
+      test('should handle building ID with special characters', () {
+        final apiResponse = {
+          'status': 'confident',
+          'building_id': 'building-id_123.test',
+          'confidence': 0.9,
+        };
+
+        final result = visionApiService.parseResponse(apiResponse);
+
+        expect(result['success'], isTrue);
+        expect(result['buildingId'], 'building-id_123.test');
+      });
+
+      test('should handle empty building ID', () {
+        final apiResponse = {
+          'status': 'confident',
+          'building_id': '',
+          'confidence': 0.9,
+        };
+
+        final result = visionApiService.parseResponse(apiResponse);
+
+        expect(result['success'], isTrue);
+        expect(result['buildingId'], '');
+      });
     });
   });
 }
