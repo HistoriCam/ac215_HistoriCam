@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:historicam/screens/result_screen.dart';
+import '../test_helpers.dart';
 
 void main() {
+  setUpAll(() async {
+    await initializeSupabaseForTest();
+  });
+
   group('ResultScreen - Comprehensive Coverage', () {
     group('Constructor validation', () {
       test('should require either imagePath or buildingId', () {
