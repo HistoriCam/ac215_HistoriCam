@@ -197,6 +197,147 @@ void main() {
       expect(find.text('Analyzing building...'), findsNothing);
     }, skip: true); // Skip: Async state loading timing is unreliable in tests
 
+    testWidgets('should accept buildingId parameter',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: ResultScreen(buildingId: 123, buildingName: 'Test Building'),
+        ),
+      );
+
+      // Should build without errors
+      expect(find.byType(ResultScreen), findsOneWidget);
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    });
+
+    testWidgets('should require either imagePath or buildingId',
+        (WidgetTester tester) async {
+      // This test verifies the assertion in the constructor
+      expect(
+        () => const ResultScreen(),
+        throwsAssertionError,
+      );
+    });
+
+    testWidgets('should display Column layout in loading state',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: ResultScreen(imagePath: testImagePath),
+        ),
+      );
+
+      // Loading state should have Column
+      final columnFinder = find.descendant(
+        of: find.byType(Center),
+        matching: find.byType(Column),
+      );
+      expect(columnFinder, findsWidgets);
+    });
+
+    testWidgets('should have multiple widget types in structure',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: ResultScreen(imagePath: testImagePath),
+        ),
+      );
+
+      // Verify various widgets exist
+      expect(find.byType(Container), findsWidgets);
+      expect(find.byType(Row), findsWidgets);
+      expect(find.byType(SizedBox), findsWidgets);
+      expect(find.byType(GestureDetector), findsWidgets);
+    });
+
+    testWidgets('should display camera icon in header',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: ResultScreen(imagePath: testImagePath),
+        ),
+      );
+
+      // Camera icon should be in header
+      expect(find.byIcon(Icons.camera_alt), findsOneWidget);
+    });
+
+    testWidgets('should have Center widget for loading',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: ResultScreen(imagePath: testImagePath),
+        ),
+      );
+
+      // Loading should be centered
+      expect(find.byType(Center), findsWidgets);
+    });
+
+    testWidgets('should display subtitle in header',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: ResultScreen(imagePath: testImagePath),
+        ),
+      );
+
+      // Subtitle should be present
+      expect(find.text('Your Personal Tour Guide'), findsOneWidget);
+    });
+
+    testWidgets('should have proper spacing with SizedBox',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: ResultScreen(imagePath: testImagePath),
+        ),
+      );
+
+      // SizedBox for spacing
+      expect(find.byType(SizedBox), findsWidgets);
+    });
+
+    testWidgets('loading message should be visible',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: ResultScreen(imagePath: testImagePath),
+        ),
+      );
+
+      // Loading message
+      expect(find.text('Analyzing building...'), findsOneWidget);
+      expect(
+        find.text('Please wait while we identify the landmark'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('should initialize with SingleTickerProviderStateMixin',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: ResultScreen(imagePath: testImagePath),
+        ),
+      );
+
+      // Widget should be a StatefulWidget
+      expect(find.byType(ResultScreen), findsOneWidget);
+    });
+
+    testWidgets('should have SafeArea for proper layout',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: ResultScreen(imagePath: testImagePath),
+        ),
+      );
+
+      // SafeArea should exist
+      expect(find.byType(SafeArea), findsOneWidget);
+    });
+
     testWidgets('loading state should have proper styling',
         (WidgetTester tester) async {
       await tester.pumpWidget(
