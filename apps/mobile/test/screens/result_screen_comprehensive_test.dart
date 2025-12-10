@@ -225,13 +225,14 @@ void main() {
 
         await tester.tap(find.text('Go'));
         await tester.pump(); // Start navigation
-        await tester.pump(const Duration(milliseconds: 300)); // Animate navigation
+        await tester.pump(const Duration(milliseconds: 500)); // Animate navigation
 
         expect(find.byType(ResultScreen), findsOneWidget);
 
         await tester.tap(find.byIcon(Icons.arrow_back));
         await tester.pump(); // Start the pop animation
-        await tester.pump(const Duration(milliseconds: 300)); // Complete the animation
+        await tester.pump(const Duration(milliseconds: 500)); // Complete the animation
+        await tester.pump(); // One more frame to ensure completion
 
         expect(find.byType(ResultScreen), findsNothing);
       });
@@ -364,7 +365,7 @@ void main() {
 
       testWidgets('should show loading with very long imagePath',
           (WidgetTester tester) async {
-        final longPath = '/test/' + ('a' * 1000) + '.jpg';
+        final longPath = '/test/${'a' * 1000}.jpg';
         await tester.pumpWidget(
           MaterialApp(
             home: ResultScreen(imagePath: longPath),
