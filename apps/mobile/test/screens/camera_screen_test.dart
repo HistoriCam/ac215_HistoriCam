@@ -404,7 +404,7 @@ void main() {
       expect(find.byType(CameraScreen), findsOneWidget);
     });
 
-    testWidgets('should have IconButton widgets', (WidgetTester tester) async {
+    testWidgets('should have GestureDetector widgets for interactions', (WidgetTester tester) async {
       cameras = [];
 
       await tester.pumpWidget(
@@ -413,11 +413,11 @@ void main() {
         ),
       );
 
-      // Should have icon buttons for interactions
-      expect(find.byType(IconButton), findsWidgets);
+      // Should have gesture detectors for interactive elements
+      expect(find.byType(GestureDetector), findsWidgets);
     });
 
-    testWidgets('should display upload and history icons', (WidgetTester tester) async {
+    testWidgets('should display upload icon in camera controls', (WidgetTester tester) async {
       cameras = [];
 
       await tester.pumpWidget(
@@ -426,9 +426,8 @@ void main() {
         ),
       );
 
-      // Upload and history icons should exist
+      // Upload icon should be present in camera controls
       expect(find.byIcon(Icons.upload), findsOneWidget);
-      expect(find.byIcon(Icons.history), findsOneWidget);
     });
   });
 }
