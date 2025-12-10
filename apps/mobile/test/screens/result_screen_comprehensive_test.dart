@@ -28,49 +28,64 @@ void main() {
       });
 
       testWidgets('should accept buildingId only', (WidgetTester tester) async {
-        await tester.pumpWidget(
-          const MaterialApp(
-            home: ResultScreen(buildingId: 123, buildingName: 'Test'),
-          ),
-        );
+        await tester.runAsync(() async {
+          await tester.pumpWidget(
+            const MaterialApp(
+              home: ResultScreen(buildingId: 123, buildingName: 'Test'),
+            ),
+          );
 
-        expect(find.byType(ResultScreen), findsOneWidget);
+          expect(find.byType(ResultScreen), findsOneWidget);
 
-        // Pump frames to handle any pending timers
+          // Give time for async operations to start
+          await Future.delayed(const Duration(milliseconds: 50));
+        });
+
+        // Pump any remaining frames
         await tester.pump();
       });
 
       testWidgets('should accept both imagePath and buildingId',
           (WidgetTester tester) async {
-        await tester.pumpWidget(
-          const MaterialApp(
-            home: ResultScreen(
-              imagePath: '/test/image.jpg',
-              buildingId: 123,
+        await tester.runAsync(() async {
+          await tester.pumpWidget(
+            const MaterialApp(
+              home: ResultScreen(
+                imagePath: '/test/image.jpg',
+                buildingId: 123,
+              ),
             ),
-          ),
-        );
+          );
 
-        expect(find.byType(ResultScreen), findsOneWidget);
+          expect(find.byType(ResultScreen), findsOneWidget);
 
-        // Pump frames to handle any pending timers
+          // Give time for async operations to start
+          await Future.delayed(const Duration(milliseconds: 50));
+        });
+
+        // Pump any remaining frames
         await tester.pump();
       });
 
       testWidgets('should accept buildingName parameter',
           (WidgetTester tester) async {
-        await tester.pumpWidget(
-          const MaterialApp(
-            home: ResultScreen(
-              buildingId: 123,
-              buildingName: 'Test Building',
+        await tester.runAsync(() async {
+          await tester.pumpWidget(
+            const MaterialApp(
+              home: ResultScreen(
+                buildingId: 123,
+                buildingName: 'Test Building',
+              ),
             ),
-          ),
-        );
+          );
 
-        expect(find.byType(ResultScreen), findsOneWidget);
+          expect(find.byType(ResultScreen), findsOneWidget);
 
-        // Pump frames to handle any pending timers
+          // Give time for async operations to start
+          await Future.delayed(const Duration(milliseconds: 50));
+        });
+
+        // Pump any remaining frames
         await tester.pump();
       });
     });
@@ -90,16 +105,21 @@ void main() {
 
       testWidgets('should show loading indicator initially with buildingId',
           (WidgetTester tester) async {
-        await tester.pumpWidget(
-          const MaterialApp(
-            home: ResultScreen(buildingId: 123, buildingName: 'Test'),
-          ),
-        );
+        await tester.runAsync(() async {
+          await tester.pumpWidget(
+            const MaterialApp(
+              home: ResultScreen(buildingId: 123, buildingName: 'Test'),
+            ),
+          );
 
-        expect(find.byType(CircularProgressIndicator), findsOneWidget);
-        expect(find.text('Analyzing building...'), findsOneWidget);
+          expect(find.byType(CircularProgressIndicator), findsOneWidget);
+          expect(find.text('Analyzing building...'), findsOneWidget);
 
-        // Pump frames to handle any pending timers
+          // Give time for async operations to start
+          await Future.delayed(const Duration(milliseconds: 50));
+        });
+
+        // Pump any remaining frames
         await tester.pump();
       });
 
@@ -323,16 +343,21 @@ void main() {
     group('Loading state variations', () {
       testWidgets('should show consistent loading for different building IDs',
           (WidgetTester tester) async {
-        await tester.pumpWidget(
-          const MaterialApp(
-            home: ResultScreen(buildingId: 999, buildingName: 'Test'),
-          ),
-        );
+        await tester.runAsync(() async {
+          await tester.pumpWidget(
+            const MaterialApp(
+              home: ResultScreen(buildingId: 999, buildingName: 'Test'),
+            ),
+          );
 
-        expect(find.byType(CircularProgressIndicator), findsOneWidget);
-        expect(find.text('Analyzing building...'), findsOneWidget);
+          expect(find.byType(CircularProgressIndicator), findsOneWidget);
+          expect(find.text('Analyzing building...'), findsOneWidget);
 
-        // Pump frames to handle any pending timers
+          // Give time for async operations to start
+          await Future.delayed(const Duration(milliseconds: 50));
+        });
+
+        // Pump any remaining frames
         await tester.pump();
       });
 
@@ -349,43 +374,58 @@ void main() {
       });
 
       testWidgets('should handle buildingId of 0', (WidgetTester tester) async {
-        await tester.pumpWidget(
-          const MaterialApp(
-            home: ResultScreen(buildingId: 0, buildingName: 'Test'),
-          ),
-        );
+        await tester.runAsync(() async {
+          await tester.pumpWidget(
+            const MaterialApp(
+              home: ResultScreen(buildingId: 0, buildingName: 'Test'),
+            ),
+          );
 
-        expect(find.byType(ResultScreen), findsOneWidget);
+          expect(find.byType(ResultScreen), findsOneWidget);
 
-        // Pump frames to handle any pending timers
+          // Give time for async operations to start
+          await Future.delayed(const Duration(milliseconds: 50));
+        });
+
+        // Pump any remaining frames
         await tester.pump();
       });
 
       testWidgets('should handle negative buildingId',
           (WidgetTester tester) async {
-        await tester.pumpWidget(
-          const MaterialApp(
-            home: ResultScreen(buildingId: -1, buildingName: 'Test'),
-          ),
-        );
+        await tester.runAsync(() async {
+          await tester.pumpWidget(
+            const MaterialApp(
+              home: ResultScreen(buildingId: -1, buildingName: 'Test'),
+            ),
+          );
 
-        expect(find.byType(ResultScreen), findsOneWidget);
+          expect(find.byType(ResultScreen), findsOneWidget);
 
-        // Pump frames to handle any pending timers
+          // Give time for async operations to start
+          await Future.delayed(const Duration(milliseconds: 50));
+        });
+
+        // Pump any remaining frames
         await tester.pump();
       });
 
       testWidgets('should handle very large buildingId',
           (WidgetTester tester) async {
-        await tester.pumpWidget(
-          const MaterialApp(
-            home: ResultScreen(buildingId: 999999999, buildingName: 'Test'),
-          ),
-        );
+        await tester.runAsync(() async {
+          await tester.pumpWidget(
+            const MaterialApp(
+              home: ResultScreen(buildingId: 999999999, buildingName: 'Test'),
+            ),
+          );
 
-        expect(find.byType(ResultScreen), findsOneWidget);
+          expect(find.byType(ResultScreen), findsOneWidget);
 
-        // Pump frames to handle any pending timers
+          // Give time for async operations to start
+          await Future.delayed(const Duration(milliseconds: 50));
+        });
+
+        // Pump any remaining frames
         await tester.pump();
       });
     });
@@ -393,70 +433,90 @@ void main() {
     group('Building name variations', () {
       testWidgets('should handle empty buildingName',
           (WidgetTester tester) async {
-        await tester.pumpWidget(
-          const MaterialApp(
-            home: ResultScreen(
-              buildingId: 123,
-              buildingName: '',
+        await tester.runAsync(() async {
+          await tester.pumpWidget(
+            const MaterialApp(
+              home: ResultScreen(
+                buildingId: 123,
+                buildingName: '',
+              ),
             ),
-          ),
-        );
+          );
 
-        expect(find.byType(ResultScreen), findsOneWidget);
+          expect(find.byType(ResultScreen), findsOneWidget);
 
-        // Pump frames to handle any pending timers
+          // Give time for async operations to start
+          await Future.delayed(const Duration(milliseconds: 50));
+        });
+
+        // Pump any remaining frames
         await tester.pump();
       });
 
       testWidgets('should handle very long buildingName',
           (WidgetTester tester) async {
-        final longName = 'A' * 1000;
-        await tester.pumpWidget(
-          MaterialApp(
-            home: ResultScreen(
-              buildingId: 123,
-              buildingName: longName,
+        await tester.runAsync(() async {
+          final longName = 'A' * 1000;
+          await tester.pumpWidget(
+            MaterialApp(
+              home: ResultScreen(
+                buildingId: 123,
+                buildingName: longName,
+              ),
             ),
-          ),
-        );
+          );
 
-        expect(find.byType(ResultScreen), findsOneWidget);
+          expect(find.byType(ResultScreen), findsOneWidget);
 
-        // Pump frames to handle any pending timers
+          // Give time for async operations to start
+          await Future.delayed(const Duration(milliseconds: 50));
+        });
+
+        // Pump any remaining frames
         await tester.pump();
       });
 
       testWidgets('should handle buildingName with special characters',
           (WidgetTester tester) async {
-        await tester.pumpWidget(
-          const MaterialApp(
-            home: ResultScreen(
-              buildingId: 123,
-              buildingName: 'Test-Building_123.v2',
+        await tester.runAsync(() async {
+          await tester.pumpWidget(
+            const MaterialApp(
+              home: ResultScreen(
+                buildingId: 123,
+                buildingName: 'Test-Building_123.v2',
+              ),
             ),
-          ),
-        );
+          );
 
-        expect(find.byType(ResultScreen), findsOneWidget);
+          expect(find.byType(ResultScreen), findsOneWidget);
 
-        // Pump frames to handle any pending timers
+          // Give time for async operations to start
+          await Future.delayed(const Duration(milliseconds: 50));
+        });
+
+        // Pump any remaining frames
         await tester.pump();
       });
 
       testWidgets('should handle unicode buildingName',
           (WidgetTester tester) async {
-        await tester.pumpWidget(
-          const MaterialApp(
-            home: ResultScreen(
-              buildingId: 123,
-              buildingName: '艾菲爾鐵塔 🗼',
+        await tester.runAsync(() async {
+          await tester.pumpWidget(
+            const MaterialApp(
+              home: ResultScreen(
+                buildingId: 123,
+                buildingName: '艾菲爾鐵塔 🗼',
+              ),
             ),
-          ),
-        );
+          );
 
-        expect(find.byType(ResultScreen), findsOneWidget);
+          expect(find.byType(ResultScreen), findsOneWidget);
 
-        // Pump frames to handle any pending timers
+          // Give time for async operations to start
+          await Future.delayed(const Duration(milliseconds: 50));
+        });
+
+        // Pump any remaining frames
         await tester.pump();
       });
     });
@@ -521,37 +581,47 @@ void main() {
     group('Combinations', () {
       testWidgets('should handle all parameters provided',
           (WidgetTester tester) async {
-        await tester.pumpWidget(
-          const MaterialApp(
-            home: ResultScreen(
-              imagePath: '/test/image.jpg',
-              buildingId: 123,
-              buildingName: 'Test Building',
+        await tester.runAsync(() async {
+          await tester.pumpWidget(
+            const MaterialApp(
+              home: ResultScreen(
+                imagePath: '/test/image.jpg',
+                buildingId: 123,
+                buildingName: 'Test Building',
+              ),
             ),
-          ),
-        );
+          );
 
-        expect(find.byType(ResultScreen), findsOneWidget);
+          expect(find.byType(ResultScreen), findsOneWidget);
 
-        // Pump frames to handle any pending timers
+          // Give time for async operations to start
+          await Future.delayed(const Duration(milliseconds: 50));
+        });
+
+        // Pump any remaining frames
         await tester.pump();
       });
 
       testWidgets('should prioritize buildingId path when both provided',
           (WidgetTester tester) async {
-        await tester.pumpWidget(
-          const MaterialApp(
-            home: ResultScreen(
-              imagePath: '/test/image.jpg',
-              buildingId: 123,
+        await tester.runAsync(() async {
+          await tester.pumpWidget(
+            const MaterialApp(
+              home: ResultScreen(
+                imagePath: '/test/image.jpg',
+                buildingId: 123,
+              ),
             ),
-          ),
-        );
+          );
 
-        // Should show loading indicator (buildingId path is taken)
-        expect(find.byType(CircularProgressIndicator), findsOneWidget);
+          // Should show loading indicator (buildingId path is taken)
+          expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
-        // Pump frames to handle any pending timers
+          // Give time for async operations to start
+          await Future.delayed(const Duration(milliseconds: 50));
+        });
+
+        // Pump any remaining frames
         await tester.pump();
       });
     });
