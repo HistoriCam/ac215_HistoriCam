@@ -35,6 +35,9 @@ void main() {
         );
 
         expect(find.byType(ResultScreen), findsOneWidget);
+
+        // Pump frames to handle any pending timers
+        await tester.pump();
       });
 
       testWidgets('should accept both imagePath and buildingId',
@@ -49,6 +52,9 @@ void main() {
         );
 
         expect(find.byType(ResultScreen), findsOneWidget);
+
+        // Pump frames to handle any pending timers
+        await tester.pump();
       });
 
       testWidgets('should accept buildingName parameter',
@@ -63,6 +69,9 @@ void main() {
         );
 
         expect(find.byType(ResultScreen), findsOneWidget);
+
+        // Pump frames to handle any pending timers
+        await tester.pump();
       });
     });
 
@@ -89,6 +98,9 @@ void main() {
 
         expect(find.byType(CircularProgressIndicator), findsOneWidget);
         expect(find.text('Analyzing building...'), findsOneWidget);
+
+        // Pump frames to handle any pending timers
+        await tester.pump();
       });
 
       testWidgets('should display loading message',
@@ -197,7 +209,8 @@ void main() {
         expect(find.byType(ResultScreen), findsOneWidget);
 
         await tester.tap(find.byIcon(Icons.arrow_back));
-        await tester.pumpAndSettle();
+        await tester.pump(); // Start the pop animation
+        await tester.pumpAndSettle(); // Complete the animation
 
         expect(find.byType(ResultScreen), findsNothing);
       });
@@ -318,6 +331,9 @@ void main() {
 
         expect(find.byType(CircularProgressIndicator), findsOneWidget);
         expect(find.text('Analyzing building...'), findsOneWidget);
+
+        // Pump frames to handle any pending timers
+        await tester.pump();
       });
 
       testWidgets('should show loading with very long imagePath',
@@ -340,6 +356,9 @@ void main() {
         );
 
         expect(find.byType(ResultScreen), findsOneWidget);
+
+        // Pump frames to handle any pending timers
+        await tester.pump();
       });
 
       testWidgets('should handle negative buildingId',
@@ -351,6 +370,9 @@ void main() {
         );
 
         expect(find.byType(ResultScreen), findsOneWidget);
+
+        // Pump frames to handle any pending timers
+        await tester.pump();
       });
 
       testWidgets('should handle very large buildingId',
@@ -362,6 +384,9 @@ void main() {
         );
 
         expect(find.byType(ResultScreen), findsOneWidget);
+
+        // Pump frames to handle any pending timers
+        await tester.pump();
       });
     });
 
@@ -378,6 +403,9 @@ void main() {
         );
 
         expect(find.byType(ResultScreen), findsOneWidget);
+
+        // Pump frames to handle any pending timers
+        await tester.pump();
       });
 
       testWidgets('should handle very long buildingName',
@@ -393,6 +421,9 @@ void main() {
         );
 
         expect(find.byType(ResultScreen), findsOneWidget);
+
+        // Pump frames to handle any pending timers
+        await tester.pump();
       });
 
       testWidgets('should handle buildingName with special characters',
@@ -407,6 +438,9 @@ void main() {
         );
 
         expect(find.byType(ResultScreen), findsOneWidget);
+
+        // Pump frames to handle any pending timers
+        await tester.pump();
       });
 
       testWidgets('should handle unicode buildingName',
@@ -421,6 +455,9 @@ void main() {
         );
 
         expect(find.byType(ResultScreen), findsOneWidget);
+
+        // Pump frames to handle any pending timers
+        await tester.pump();
       });
     });
 
@@ -495,6 +532,9 @@ void main() {
         );
 
         expect(find.byType(ResultScreen), findsOneWidget);
+
+        // Pump frames to handle any pending timers
+        await tester.pump();
       });
 
       testWidgets('should prioritize buildingId path when both provided',
@@ -510,6 +550,9 @@ void main() {
 
         // Should show loading indicator (buildingId path is taken)
         expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+        // Pump frames to handle any pending timers
+        await tester.pump();
       });
     });
 
