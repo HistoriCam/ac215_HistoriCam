@@ -140,8 +140,8 @@ void main() {
         final result = service.parseResponse(apiResponse);
 
         expect(result['success'], isFalse);
-        expect(result['error'], equals('parse_error'));
-        expect(result['message'], contains('Failed to parse'));
+        expect(result['error'], equals('unknown'));
+        expect(result['message'], contains('Unknown response status'));
       });
 
       test('should handle empty response', () {
@@ -150,7 +150,8 @@ void main() {
         final result = service.parseResponse(apiResponse);
 
         expect(result['success'], isFalse);
-        expect(result['error'], equals('parse_error'));
+        expect(result['error'], equals('unknown'));
+        expect(result['message'], contains('Unknown response status'));
       });
 
       test('should handle malformed response gracefully', () {
