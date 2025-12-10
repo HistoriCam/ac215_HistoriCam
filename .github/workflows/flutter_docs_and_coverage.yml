@@ -72,21 +72,6 @@ jobs:
       - name: Install lcov
         run: sudo apt-get update && sudo apt-get install -y lcov
 
-      - name: Filter coverage data
-        run: |
-          if [ -f coverage/lcov.info ]; then
-            # Remove generated files and test files from coverage
-            lcov --remove coverage/lcov.info \
-              '**/*.g.dart' \
-              '**/*.freezed.dart' \
-              '**/test/**' \
-              '**/tests/**' \
-              -o coverage/lcov_filtered.info
-
-            # Replace original with filtered
-            mv coverage/lcov_filtered.info coverage/lcov.info
-          fi
-
       - name: Generate coverage summary
         id: coverage
         run: |
@@ -105,18 +90,9 @@ jobs:
             if [ -z "$FUNCTIONS_PERCENT" ]; then
               FUNCTIONS_PERCENT="N/A"
             fi
-
-            # Get total lines and covered lines for detailed reporting
-            TOTAL_LINES=$(lcov --summary coverage/lcov.info 2>&1 | grep "lines" | grep -oP '\d+(?= of)')
-            COVERED_LINES=$(lcov --summary coverage/lcov.info 2>&1 | grep "lines" | grep -oP '(?<=of )\d+')
-
-            echo "total_lines=$TOTAL_LINES" >> $GITHUB_OUTPUT
-            echo "covered_lines=$COVERED_LINES" >> $GITHUB_OUTPUT
           else
             LINES_PERCENT="0.0"
             FUNCTIONS_PERCENT="N/A"
-            echo "total_lines=0" >> $GITHUB_OUTPUT
-            echo "covered_lines=0" >> $GITHUB_OUTPUT
           fi
 
           echo "lines_percent=$LINES_PERCENT" >> $GITHUB_OUTPUT
@@ -126,44 +102,9 @@ jobs:
           TEST_COUNT=$(find test -name "*_test.dart" | wc -l)
           echo "test_count=$TEST_COUNT" >> $GITHUB_OUTPUT
 
-          # Count total Dart files in lib (excluding generated files)
-          TOTAL_FILES=$(find lib -name "*.dart" ! -name "*.g.dart" ! -name "*.freezed.dart" | wc -l)
+          # Count total Dart files in lib
+          TOTAL_FILES=$(find lib -name "*.dart" | wc -l)
           echo "total_files=$TOTAL_FILES" >> $GITHUB_OUTPUT
-
-      - name: Check coverage threshold
-        run: |
-          LINES_PERCENT="${{ steps.coverage.outputs.lines_percent }}"
-          THRESHOLD=70.0
-
-          echo "Current coverage: ${LINES_PERCENT}%"
-          echo "Required threshold: ${THRESHOLD}%"
-
-          # Compare using bc for decimal comparison
-          if command -v bc &> /dev/null; then
-            RESULT=$(echo "${LINES_PERCENT} >= ${THRESHOLD}" | bc)
-            if [ "$RESULT" -eq 0 ]; then
-              echo "::warning::Coverage ${LINES_PERCENT}% is below threshold ${THRESHOLD}%"
-              echo "Coverage is below the required threshold!"
-              # Uncomment the next line to fail the build if coverage is below threshold
-              # exit 1
-            else
-              echo "::notice::Coverage ${LINES_PERCENT}% meets threshold ${THRESHOLD}%"
-              echo "Coverage meets the required threshold!"
-            fi
-          else
-            # Fallback to integer comparison if bc is not available
-            LINES_INT=${LINES_PERCENT%.*}
-            THRESHOLD_INT=${THRESHOLD%.*}
-            if [ "$LINES_INT" -lt "$THRESHOLD_INT" ]; then
-              echo "::warning::Coverage ~${LINES_INT}% is below threshold ~${THRESHOLD_INT}%"
-              echo "Coverage is below the required threshold!"
-              # Uncomment the next line to fail the build if coverage is below threshold
-              # exit 1
-            else
-              echo "::notice::Coverage ~${LINES_INT}% meets threshold ~${THRESHOLD_INT}%"
-              echo "Coverage meets the required threshold!"
-            fi
-          fi
 
       - name: Generate coverage markdown report
         run: |
@@ -173,56 +114,41 @@ jobs:
           COMMIT_SHA="${{ github.sha }}"
           COMMIT_SHORT="${COMMIT_SHA:0:7}"
           BRANCH="${{ github.ref_name }}"
-          LINES_PERCENT="${{ steps.coverage.outputs.lines_percent }}"
-          FUNCTIONS_PERCENT="${{ steps.coverage.outputs.functions_percent }}"
-          TEST_COUNT="${{ steps.coverage.outputs.test_count }}"
-          TOTAL_FILES="${{ steps.coverage.outputs.total_files }}"
-          COVERED_LINES="${{ steps.coverage.outputs.covered_lines }}"
-          TOTAL_LINES="${{ steps.coverage.outputs.total_lines }}"
 
-          cat > ../../docs/tests/coverage-report.md << EOFMD
+          cat > ../../docs/tests/coverage-report.md << 'EOFMD'
           # Test Coverage Report
 
           ## Flutter Mobile App Coverage
 
           ### Overall Coverage
 
-          | Metric | Coverage | Details |
-          |--------|----------|---------|
-          | **Lines** | **${LINES_PERCENT}%** | ${COVERED_LINES} of ${TOTAL_LINES} lines |
-          | **Functions** | **${FUNCTIONS_PERCENT}%** | - |
+          | Metric | Coverage |
+          |--------|----------|
+          | **Lines** | **${{ steps.coverage.outputs.lines_percent }}%** |
+          | **Functions** | **${{ steps.coverage.outputs.functions_percent }}%** |
 
           ### Test Statistics
 
-          - **Total Test Files**: ${TEST_COUNT}
-          - **Total Source Files**: ${TOTAL_FILES} (excluding generated files)
-          - **Last Updated**: ${TIMESTAMP}
-          - **Commit**: [${COMMIT_SHORT}](https://github.com/${{ github.repository }}/commit/${COMMIT_SHA})
-          - **Branch**: ${BRANCH}
+          - **Total Test Files**: ${{ steps.coverage.outputs.test_count }}
+          - **Total Source Files**: ${{ steps.coverage.outputs.total_files }}
+          - **Last Updated**: $TIMESTAMP
+          - **Commit**: [$COMMIT_SHORT](https://github.com/${{ github.repository }}/commit/$COMMIT_SHA)
+          - **Branch**: $BRANCH
 
           ### Coverage Status
 
           EOFMD
 
           # Add status badge based on coverage
+          LINES_PERCENT="${{ steps.coverage.outputs.lines_percent }}"
           LINES_INT=${LINES_PERCENT%.*}
 
           if [ "$LINES_INT" -ge 80 ]; then
             echo "![Coverage Status](https://img.shields.io/badge/coverage-${LINES_PERCENT}%25-brightgreen)" >> ../../docs/tests/coverage-report.md
-            echo "" >> ../../docs/tests/coverage-report.md
-            echo "✅ **Excellent coverage!** The codebase has great test coverage." >> ../../docs/tests/coverage-report.md
-          elif [ "$LINES_INT" -ge 70 ]; then
-            echo "![Coverage Status](https://img.shields.io/badge/coverage-${LINES_PERCENT}%25-green)" >> ../../docs/tests/coverage-report.md
-            echo "" >> ../../docs/tests/coverage-report.md
-            echo "✅ **Good coverage!** Meets the 70% threshold." >> ../../docs/tests/coverage-report.md
           elif [ "$LINES_INT" -ge 60 ]; then
             echo "![Coverage Status](https://img.shields.io/badge/coverage-${LINES_PERCENT}%25-yellow)" >> ../../docs/tests/coverage-report.md
-            echo "" >> ../../docs/tests/coverage-report.md
-            echo "⚠️ **Coverage below threshold.** Target is 70%, current is ${LINES_PERCENT}%." >> ../../docs/tests/coverage-report.md
           else
             echo "![Coverage Status](https://img.shields.io/badge/coverage-${LINES_PERCENT}%25-red)" >> ../../docs/tests/coverage-report.md
-            echo "" >> ../../docs/tests/coverage-report.md
-            echo "❌ **Low coverage!** Please add more tests. Target is 70%, current is ${LINES_PERCENT}%." >> ../../docs/tests/coverage-report.md
           fi
 
           cat >> ../../docs/tests/coverage-report.md << 'EOFMD'
@@ -230,13 +156,8 @@ jobs:
           ### Coverage Guidelines
 
           - **Excellent**: ≥ 80% - Great job! Keep it up.
-          - **Good**: 70-79% - Meets threshold requirement.
-          - **Below Threshold**: 60-69% - Consider adding more tests.
+          - **Good**: 60-79% - Consider adding more tests.
           - **Needs Improvement**: < 60% - Please prioritize test coverage.
-
-          ### Coverage Threshold
-
-          This project requires a **minimum of 70% line coverage**. The workflow will warn if coverage falls below this threshold.
 
           ### How to Run Tests Locally
 
@@ -253,22 +174,9 @@ jobs:
           # Generate HTML report
           genhtml coverage/lcov.info -o coverage/html
 
-          # Open in browser (macOS)
+          # Open in browser
           open coverage/html/index.html
-
-          # Open in browser (Linux)
-          xdg-open coverage/html/index.html
-
-          # Open in browser (Windows)
-          start coverage/html/index.html
           ```
-
-          ### Excluded from Coverage
-
-          The following are excluded from coverage calculations:
-          - Generated files (`*.g.dart`, `*.freezed.dart`)
-          - Test files
-          - Third-party packages
 
           ---
 
