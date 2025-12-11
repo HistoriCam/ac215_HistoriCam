@@ -4,6 +4,8 @@ HistoriCam is a mobile-first web application that combines computer vision, geol
 
 Find the live app here: [App](https://ac215-histori-cam.vercel.app/)
 
+For final presentation, find the link here: [https://www.youtube.com/watch?v=uLzQu0OiA5k](https://www.youtube.com/watch?v=uLzQu0OiA5k)
+
 ## Architecture
 
 This project follows AC215 MLOps best practices with containerized microservices and GCP deployment:
